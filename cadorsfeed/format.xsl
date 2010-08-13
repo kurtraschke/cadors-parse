@@ -10,7 +10,7 @@
       <xsl:for-each select="//h:div[@class = 'pagebreak']">
 	<a:entry>
 	  <xsl:variable name="cadors-number">
-	    <xsl:value-of select="translate(.//h:th[contains(text(),'Cadors &#10;Number:')]/following-sibling::h:td/h:strong/text(),'&#160;','')"/>
+	    <xsl:value-of select="translate(.//h:th[contains(text(),'Cadors Number:')]/following-sibling::h:td/h:strong/text(),'&#160;','')"/>
 	  </xsl:variable>
 	  <a:title>CADORS Report <xsl:value-of select="$cadors-number"/></a:title>
 	  <a:link rel="alternate" type="text/html">
@@ -20,10 +20,10 @@
 	    </xsl:attribute>
 	  </a:link>
 	  <xsl:variable name="date">
-	    <xsl:value-of select=".//h:th[contains(text(),'Occurrence &#10;Date:')]/following-sibling::h:td/h:strong/text()"/>
+	    <xsl:value-of select=".//h:th[contains(text(),'Occurrence Date:')]/following-sibling::h:td/h:strong/text()"/>
 	  </xsl:variable>
 	  <xsl:variable name="time">
-	    <xsl:value-of select=".//h:th[contains(text(),'Occurrence &#10;Time:')]/following-sibling::h:td/h:strong/text()"/>
+	    <xsl:value-of select=".//h:th[contains(text(),'Occurrence Time:')]/following-sibling::h:td/h:strong/text()"/>
 	  </xsl:variable>
 	  <a:updated>
 	    <xsl:value-of select="pyf:fix_datetime($date, $time)" />
