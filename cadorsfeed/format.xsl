@@ -4,7 +4,7 @@
   <xsl:output method="xml" omit-xml-declaration="no" indent="yes" />
  
   <xsl:template match="/">
-    <a:feed xmlns:a="http://www.w3.org/2005/Atom" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:pyf="http://www.kurtraschke.com/functions" >
+    <a:feed xmlns:a="http://www.w3.org/2005/Atom" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:pyf="urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd" >
       <a:id>urn:uuid:ec421c3e-df93-4e96-bc2c-81156167830b</a:id>
       <a:title>CADORS National Report</a:title>
       <xsl:for-each select="//h:div[@class = 'pagebreak']">

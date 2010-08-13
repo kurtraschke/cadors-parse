@@ -10,8 +10,7 @@ def parse(input_doc):
     parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder("lxml"))
     etree_document = parser.parse(input_doc)
        
-    ns = etree.FunctionNamespace('http://www.kurtraschke.com/functions')
-    ns.prefix = 'pyf'
+    ns = etree.FunctionNamespace('urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd')
     ns['fix_names'] = fix_names
     ns['fix_datetime'] = fix_datetime
     ns['produce_id'] = produce_id
