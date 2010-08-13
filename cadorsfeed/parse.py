@@ -5,20 +5,6 @@ from os import path
 
 from functions import *
 
-#def doParse(date, reparse=False, refetch=False):
-#    input_db = redis.Redis(host='localhost', port=6379, db=1)
-#    output_db = redis.Redis(host='localhost', port=6379, db=2)
-#    
-#    if date not in input_db or refetch:
-#        fetchReport(date, refetch=refetch)
-#    
-#    if date in output_db and not reparse:
-#        return output_db[date]
-#    else:
-#        input_doc = input_db[date]
-#        output_doc = parse(input_doc)
-#        output_db[date] = output_doc
-
 def parse(input_doc):
  
     parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder("lxml"))
