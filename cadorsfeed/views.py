@@ -4,7 +4,7 @@ from cadorsfeed.utils import expose, url_for, db
 from parse import parse
 from fetch import fetchLatest, fetchReport
 
-@expose('/report/latest')
+@expose('/report/latest/')
 def latest_report(request):
 
     if 'latest' in db:
