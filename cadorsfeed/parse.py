@@ -24,5 +24,6 @@ def parse(input_doc):
     
     result_tree = transform(etree_document)
     
-    output_doc = etree.tostring(result_tree, pretty_print=True)
+    output_doc = etree.tostring(result_tree, encoding=unicode,
+                                pretty_print=True)
     return output_doc
