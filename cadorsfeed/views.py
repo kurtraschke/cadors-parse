@@ -30,7 +30,7 @@ def do_report(request, year, month, day):
     key = "report:"+date
 
     if db.hexists(key, "output") and not reparse:
-        output = db.hget(key, "output")
+        output = db.hget(key, "output").decode('utf-8')
     else:
         if db.hexists(key, "input") and not refetch:
             input = db.hget(key, "input").decode('utf-8')
