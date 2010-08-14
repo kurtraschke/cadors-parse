@@ -27,3 +27,9 @@ def parse(input_doc):
     output_doc = etree.tostring(result_tree, encoding=unicode,
                                 pretty_print=True)
     return output_doc
+
+def make_transform():
+    stylesheet = path.join(path.dirname(__file__), 'format.xsl')
+    xslt_doc = etree.parse(stylesheet)
+    transform = etree.XSLT(xslt_doc, extensions=extensions)
+    return transform
