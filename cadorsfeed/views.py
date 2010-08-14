@@ -42,3 +42,15 @@ def do_report(request, year, month, day):
         db.hset(key,"output", output)
 
     return Response(output, mimetype="application/atom+xml")
+
+@expose('/report/<int:year>/<int:month>/<int:day>/input')
+def do_input(request, year, month, day):
+    date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
+        year=year, month=month, day=day)
+
+    key = "report:"+date
+
+    if db.hexists(key, "input"):
+        return Response(db.hget(key, "input"), mimetype="text/html")
+    else:
+        return NotFound()
