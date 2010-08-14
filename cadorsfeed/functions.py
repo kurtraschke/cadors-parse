@@ -1,6 +1,5 @@
 from lxml import etree
 import re
-import redis
 import uuid
 import itertools
 import datetime
@@ -8,9 +7,19 @@ from pyrfc3339 import generate
 
 from cacheuuid import cacheuuid
 
-def stripout(list):
-    assert len(list) == 1
-    return list[0]
+extensions = {}
+
+def register():
+    def decorate(func):
+        def wrapper(*args):
+            return func(*args[1:])
+        extensions[('urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd',
+                    func.__name__)] = wrapper
+    return decorate
+
+def stripout(things):
+    assert len(things) == 1
+    return things[0]
 
 def strip_nbsp(string):
     return string.rstrip(u'\xa0')
@@ -26,10 +35,12 @@ def elementify(string):
     element.text = string
     return element
 
-def fix_names(context, names):
+@register()
+def fix_names(names):
     return [elementify(s) for s in set([fix_name(name) for name in names])]
 
-def fix_datetime(context, date, time):
+@register()
+def fix_datetime(date, time):
     datere = re.compile(r"(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})")
     dateparts = datere.search(strip_nbsp(stripout(date))).groupdict()
 
@@ -48,12 +59,14 @@ def fix_datetime(context, date, time):
 
     return generate(ts, accept_naive=True)
 
-def produce_id(context, cadors_number):
+@register()
+def produce_id(cadors_number):
     cadors_number = stripout(cadors_number)
 
     return cacheuuid(cadors_number)
 
-def content(context, content_list):
+@register()
+def content(content_list):
     paras = itertools.chain.from_iterable([block.split('\n\n') 
                                            for block in content_list])
     out = [elementify(strip_nbsp(p)) for p in paras]
