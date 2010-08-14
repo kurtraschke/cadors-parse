@@ -11,7 +11,7 @@
       <xsl:for-each select="//h:div[@class = 'pagebreak']">
 	<a:entry>
 	  <xsl:variable name="cadors-number">
-	    <xsl:value-of select="translate(.//h:th[contains(text(),'Cadors Number:')]/following-sibling::h:td/h:strong/text(),'&#160;','')"/>
+	    <xsl:value-of select="pyf:strip_nbsp((.//h:th[contains(text(),'Cadors Number:')]/following-sibling::h:td/h:strong/text()))"/>
 	  </xsl:variable>
 	  <a:title>CADORS Report <xsl:value-of select="$cadors-number"/></a:title>
 	  <a:link rel="alternate" type="text/html">

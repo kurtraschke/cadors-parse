@@ -15,14 +15,18 @@ def register():
             return func(*args[1:])
         extensions[('urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd',
                     func.__name__)] = wrapper
+        return func
     return decorate
 
 def stripout(things):
     assert len(things) == 1
     return things[0]
 
-def strip_nbsp(string):
-    return string.rstrip(u'\xa0')
+@register()
+def strip_nbsp(to_strip):
+    if isinstance(to_strip, list):
+        to_strip = stripout(to_strip)
+    return to_strip.rstrip(u'\xa0')
 
 def fix_name(name):
     name = strip_nbsp(name)
@@ -42,10 +46,10 @@ def fix_names(names):
 @register()
 def fix_datetime(date, time):
     datere = re.compile(r"(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})")
-    dateparts = datere.search(strip_nbsp(stripout(date))).groupdict()
+    dateparts = datere.search(strip_nbsp(date)).groupdict()
 
     timere = re.compile(r"(?P<hour>[0-9]{2})(?P<minute>[0-9]{2}) Z")
-    result = timere.search(strip_nbsp(stripout(time)))
+    result = timere.search(strip_nbsp(time))
     if result:
         timeparts = result.groupdict()
     else:
