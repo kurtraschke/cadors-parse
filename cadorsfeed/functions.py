@@ -4,7 +4,7 @@ import uuid
 import itertools
 import datetime
 from pyrfc3339 import generate
-
+from geolucidate.functions import get_replacements
 from cacheuuid import cacheuuid
 
 extensions = {}
@@ -43,6 +43,7 @@ def elementify(string):
 def fix_names(names):
     return [elementify(s) for s in set([fix_name(name) for name in names])]
 
+
 @register()
 def fix_datetime(date, time):
     datere = re.compile(r"(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})")
@@ -74,5 +75,44 @@ def content(content_list):
     paras = itertools.chain.from_iterable([block.split('\n\n') 
                                            for block in content_list])
     out = [elementify(strip_nbsp(p)) for p in paras]
+    
+    do_findreplace(out)
 
     return out
+
+#Surely there must be a cleaner way to replace text with an Element in lxml.
+def do_findreplace(paras):
+    for p in paras:
+        replacements = get_replacements(p.text, make_link).items()
+        replacements.sort(key=lambda x: x[0].start())
+
+        for (match, link) in replacements:
+            print match.start()
+        element = p
+        offset = 0
+        for (match, link) in replacements:
+            start = match.start() - offset
+            end = match.end() - offset
+
+            if element is p:
+                string = element.text
+                element.text = string[:start]
+                element.append(link)
+            else:
+                string = element.tail
+                element.tail = string[:start]
+                element.getparent().append(link)
+            link.tail = string[end:]
+            assert string[start:end] == match.group(), (string[start:end], match.group())
+            element = link
+            offset += end
+            
+
+def make_link(url, text, title):
+    element = etree.Element("{http://www.w3.org/1999/xhtml}a",
+                            nsmap={'h':'http://www.w3.org/1999/xhtml'})
+    element.text = text
+    element.attrib['href'] = url
+    if title != '':
+        element.attrib['title'] = title
+    return element
