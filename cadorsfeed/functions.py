@@ -86,8 +86,6 @@ def do_findreplace(paras):
         replacements = get_replacements(p.text, make_link).items()
         replacements.sort(key=lambda x: x[0].start())
 
-        for (match, link) in replacements:
-            print match.start()
         element = p
         offset = 0
         for (match, link) in replacements:
