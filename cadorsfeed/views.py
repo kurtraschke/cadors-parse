@@ -13,8 +13,8 @@ def latest_report(request):
         latestDate = fetchLatest()
 
         db['latest'] = latestDate
-        db.expire('latest',60*60)
-    
+        db.expire('latest', 60 * 60 * 12)
+
     (year, month, day) = latestDate.split('-')
     
     return redirect(url_for('do_report', year=year, month=month, day=day))
