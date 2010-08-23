@@ -4,6 +4,7 @@ from cadorsfeed.utils import expose, url_for, db
 from parse import parse
 from fetch import fetchLatest, fetchReport
 
+
 @expose('/report/latest/')
 def latest_report(request):
 
@@ -16,18 +17,19 @@ def latest_report(request):
         db.expire('latest', 60 * 60 * 12)
 
     (year, month, day) = latestDate.split('-')
-    
+
     return redirect(url_for('do_report', year=year, month=month, day=day))
+
 
 @expose('/report/<int:year>/<int:month>/<int:day>/')
 def do_report(request, year, month, day):
-    refetch = request.args.get('refetch','0') == '1'
-    reparse = request.args.get('reparse','0') == '1' or refetch
-    
+    refetch = request.args.get('refetch', '0') == '1'
+    reparse = request.args.get('reparse', '0') == '1' or refetch
+
     date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
         year=year, month=month, day=day)
 
-    key = "report:"+date
+    key = "report:" + date
 
     if db.hexists(key, "output") and not reparse:
         output = db.hget(key, "output").decode('utf-8')
@@ -37,18 +39,19 @@ def do_report(request, year, month, day):
         else:
             input = fetchReport(date)
             db.hset(key, "input", input)
-            
+
         output = parse(input)
-        db.hset(key,"output", output)
+        db.hset(key, "output", output)
 
     return Response(output, mimetype="application/atom+xml")
+
 
 @expose('/report/<int:year>/<int:month>/<int:day>/input')
 def do_input(request, year, month, day):
     date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
         year=year, month=month, day=day)
 
-    key = "report:"+date
+    key = "report:" + date
 
     if db.hexists(key, "input"):
         return Response(db.hget(key, "input"), mimetype="text/html")

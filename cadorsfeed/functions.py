@@ -35,7 +35,7 @@ def fix_name(name):
 
 def elementify(string):
     element = etree.Element("{http://www.w3.org/1999/xhtml}p",
-                            nsmap={'h':'http://www.w3.org/1999/xhtml'})
+                            nsmap={'h': 'http://www.w3.org/1999/xhtml'})
     element.text = string
     return element
 
@@ -54,7 +54,7 @@ def fix_datetime(date, time):
     if result:
         timeparts = result.groupdict()
     else:
-        timeparts = {'hour':0,'minute':0}
+        timeparts = {'hour': 0, 'minute': 0}
 
     ts = datetime.datetime(int(dateparts['year']),
                            int(dateparts['month']),
@@ -72,12 +72,10 @@ def produce_id(cadors_number):
 
 @register()
 def content(content_list):
-    paras = itertools.chain.from_iterable([block.split('\n\n') 
+    paras = itertools.chain.from_iterable([block.split('\n\n')
                                            for block in content_list])
     out = [elementify(strip_nbsp(p)) for p in paras]
-    
     do_findreplace(out)
-
     return out
 
 #Surely there must be a cleaner way to replace text with an Element in lxml.
@@ -104,11 +102,10 @@ def do_findreplace(paras):
             assert string[start:end] == match.group(), (string[start:end], match.group())
             element = link
             offset += end
-            
 
 def make_link(url, text, title):
     element = etree.Element("{http://www.w3.org/1999/xhtml}a",
-                            nsmap={'h':'http://www.w3.org/1999/xhtml'})
+                            nsmap={'h': 'http://www.w3.org/1999/xhtml'})
     element.text = text
     element.attrib['href'] = url
     if title != '':

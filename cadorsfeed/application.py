@@ -7,6 +7,7 @@ from cadorsfeed.utils import local, local_manager, url_map
 from cadorsfeed import views
 from cadorsfeed.parse import make_transform
 
+
 class CadorsFeed(object):
 
     def __init__(self, host='localhost', port=6379, db=0):
