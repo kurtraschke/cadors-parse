@@ -1,5 +1,6 @@
 from werkzeug import redirect, Response
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, ServiceUnavailable, InternalServerError
+from urllib2 import URLError
 from cadorsfeed.utils import expose, url_for, db
 from parse import parse
 from fetch import fetchLatest, fetchReport
@@ -37,11 +38,29 @@ def do_report(request, year, month, day):
         if db.hexists(key, "input") and not refetch:
             input = db.hget(key, "input").decode('utf-8')
         else:
-            input = fetchReport(date)
-            db.hset(key, "input", input)
+            lock = db.lock("fetch:"+key, timeout=120)
+            if lock.acquire(blocking=False):
+                try:
+                    input = fetchReport(date)
+                    db.hset(key, "input", input)
+                except URLError, e:
+                    raise InternalServerError(e)
+                except NotFound, e:
+                    raise e
+                except InternalServerError, e:
+                    raise e
+                finally:
+                    lock.release()
+            else:
+                raise ServiceUnavailable()
 
-        output = parse(input)
-        db.hset(key, "output", output)
+        lock = db.lock("parse:"+key, timeout=120)
+        if lock.acquire(blocking=False):
+            output = parse(input)
+            db.hset(key, "output", output)
+            lock.release()
+        else:
+            raise ServiceUnavailable()
 
     return Response(output, mimetype="application/atom+xml")
 
