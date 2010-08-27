@@ -37,7 +37,7 @@ setup(
     ],
     entry_points="""
     [console_scripts]
-    flask-ctl = cadorsfeed.script:run
+    app-ctl = cadorsfeed.script:run
 
     [paste.app_factory]
     main = cadorsfeed.script:make_app
