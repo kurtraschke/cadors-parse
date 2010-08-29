@@ -64,7 +64,7 @@ def do_report(request, year, month, day):
                 lock.release()
         else:
             raise ServiceUnavailable()
-
+    db.hincrby(key, "hits")
     return Response(output, mimetype="application/atom+xml")
 
 
