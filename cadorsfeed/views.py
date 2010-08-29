@@ -14,7 +14,7 @@ def latest_report(request):
         latestDate = db['latest']
     else:
         latestDate = fetchLatest()
-        db.setex('latest',latestDate, 60 * 60 * 12)
+        db.setex('latest', latestDate, 60 * 60 * 12)
 
     (year, month, day) = latestDate.split('-')
 
@@ -37,7 +37,7 @@ def do_report(request, year, month, day):
         if db.hexists(key, "input") and not refetch:
             input = db.hget(key, "input").decode('utf-8')
         else:
-            lock = db.lock("fetch:"+key, timeout=120)
+            lock = db.lock("fetch:" + key, timeout=120)
             if lock.acquire(blocking=False):
                 try:
                     input = fetchReport(date)
@@ -53,7 +53,7 @@ def do_report(request, year, month, day):
             else:
                 raise ServiceUnavailable()
 
-        lock = db.lock("parse:"+key, timeout=120)
+        lock = db.lock("parse:" + key, timeout=120)
         if lock.acquire(blocking=False):
             try:
                 output = parse(input)
