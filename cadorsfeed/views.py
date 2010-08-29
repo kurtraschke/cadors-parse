@@ -56,9 +56,13 @@ def do_report(request, year, month, day):
 
         lock = db.lock("parse:"+key, timeout=120)
         if lock.acquire(blocking=False):
-            output = parse(input)
-            db.hset(key, "output", output)
-            lock.release()
+            try:
+                output = parse(input)
+                db.hset(key, "output", output)
+            except Exception, e:
+                raise InternalServerError(e)
+            finally:
+                lock.release()
         else:
             raise ServiceUnavailable()
 
