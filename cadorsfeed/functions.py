@@ -110,4 +110,5 @@ def make_link(url, text, title):
     element.attrib['href'] = url
     if title != '':
         element.attrib['title'] = title
+    element.attrib['class'] = "geolink"
     return element
