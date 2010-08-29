@@ -17,7 +17,6 @@ def fetchReport(reportDate):
     br.select_form(name="pageForm")
     br["txt_ReportDate"] = reportDate
     response2 = br.submit(name="btn_SearchTop")
-    print response2.geturl()
     if not response2.geturl().startswith("http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/rpt.aspx"):
         raise InternalServerError()
     data = response2.get_data()
