@@ -65,7 +65,10 @@ def do_report(request, year, month, day):
         else:
             raise ServiceUnavailable()
     db.hincrby(key, "hits")
-    return Response(output, mimetype="application/atom+xml")
+
+    resp = Response(output, mimetype="application/atom+xml")
+    resp.add_etag()
+    return resp.make_conditional(request)
 
 
 @expose('/report/<int:year>/<int:month>/<int:day>/input')
