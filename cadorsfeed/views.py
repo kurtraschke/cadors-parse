@@ -14,9 +14,7 @@ def latest_report(request):
         latestDate = db['latest']
     else:
         latestDate = fetchLatest()
-
-        db['latest'] = latestDate
-        db.expire('latest', 60 * 60 * 12)
+        db.setex('latest',latestDate, 60 * 60 * 12)
 
     (year, month, day) = latestDate.split('-')
 
