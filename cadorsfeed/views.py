@@ -1,9 +1,10 @@
 from werkzeug import redirect, Response
 from werkzeug.exceptions import NotFound, ServiceUnavailable, InternalServerError
 from urllib2 import URLError
+
 from cadorsfeed.utils import expose, url_for, db
-from parse import parse
-from fetch import fetchLatest, fetchReport
+from cadorsfeed.parse import parse
+from cadorsfeed.fetch import fetchLatest, fetchReport
 
 
 @expose('/report/latest/')
