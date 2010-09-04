@@ -71,7 +71,7 @@ def produce_id(cadors_number):
 
 @register()
 def content(content_list):
-    paras = itertools.chain.from_iterable([block.split('\n\n')
+    paras = itertools.chain.from_iterable([block.split('\n')
                                            for block in content_list])
     out = [elementify(strip_nbsp(p)) for p in paras]
     do_findreplace(out)
