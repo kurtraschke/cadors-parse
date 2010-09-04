@@ -1,11 +1,10 @@
 from lxml import etree
 import re
-import uuid
 import itertools
 import datetime
 from pyrfc3339 import generate
 from geolucidate.functions import get_replacements
-from cacheuuid import cacheuuid
+from cadorsfeed.cacheuuid import cacheuuid
 
 extensions = {}
 
