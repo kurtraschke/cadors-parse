@@ -79,6 +79,8 @@ def do_input(request, year, month, day):
     key = "report:" + date
 
     if db.hexists(key, "input"):
-        return Response(db.hget(key, "input"), mimetype="text/html")
+        resp = Response(db.hget(key, "input"), mimetype="text/html")
+        resp.add_etag()
+        return resp.make_conditional(request)
     else:
         return NotFound()
