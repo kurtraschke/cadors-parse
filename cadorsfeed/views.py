@@ -66,7 +66,7 @@ def do_report(request, year, month, day):
             raise ServiceUnavailable()
     db.hincrby(key, "hits")
 
-    resp = Response(output, mimetype="application/atom+xml")
+    resp = Response(output, mimetype="application/xml")
     resp.add_etag()
     return resp.make_conditional(request)
 
