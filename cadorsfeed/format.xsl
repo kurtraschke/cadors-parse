@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:a="http://www.w3.org/2005/Atom" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:pyf="urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd" version="1.0" exclude-result-prefixes="pyf">
-  <xsl:output method="xml" omit-xml-declaration="no" encoding="UTF-8" indent="yes"/>
-
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+                xmlns:a="http://www.w3.org/2005/Atom"
+                xmlns:h="http://www.w3.org/1999/xhtml" 
+                xmlns:pyf="urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd"
+                version="1.0" exclude-result-prefixes="pyf">
+  <xsl:output method="xml" omit-xml-declaration="no" encoding="UTF-8"
+              indent="yes"/>
+  
   <xsl:template match="/">
     <a:feed>
       <a:updated><xsl:value-of select="$ts" /></a:updated>
