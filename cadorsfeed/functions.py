@@ -8,6 +8,7 @@ from cadorsfeed.cacheuuid import cacheuuid
 
 extensions = {}
 
+
 def register():
     def decorate(func):
         def wrapper(*args):
@@ -99,7 +100,8 @@ def do_geolink(paras):
                 element.tail = string[:start]
                 element.getparent().append(link)
             link.tail = string[end:]
-            assert string[start:end] == match.group(), (string[start:end], match.group())
+            assert string[start:end] == match.group(), (string[start:end],
+                                                        match.group())
             element = link
             offset += end
 
