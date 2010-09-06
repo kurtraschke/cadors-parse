@@ -3,7 +3,7 @@ import re
 import itertools
 import datetime
 from pyrfc3339 import generate
-from geolucidate.functions import get_replacements
+from geolucidate.functions import get_replacements, google_maps_link
 from cadorsfeed.cacheuuid import cacheuuid
 
 extensions = {}
@@ -74,13 +74,14 @@ def content(content_list):
     paras = itertools.chain.from_iterable([block.split('\n')
                                            for block in content_list])
     out = [elementify(strip_nbsp(p)) for p in paras]
-    do_findreplace(out)
+    do_geolink(out)
     return out
 
 #Surely there must be a cleaner way to replace text with an Element in lxml.
-def do_findreplace(paras):
+def do_geolink(paras):
     for p in paras:
-        replacements = get_replacements(p.text, make_link).items()
+        replacements = get_replacements(p.text,
+                                        google_maps_link(link=make_link)).items()
         replacements.sort(key=lambda x: x[0].start())
 
         element = p
