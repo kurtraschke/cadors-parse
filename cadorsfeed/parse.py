@@ -23,3 +23,13 @@ def make_transform():
     xslt_doc = etree.parse(stylesheet)
     transform = etree.XSLT(xslt_doc, extensions=extensions)
     return transform
+
+def generate_html(input_doc):
+    xslt_doc = etree.parse(path.join(path.dirname(__file__),
+                                     'static', 'html.xsl'))
+    transform = etree.XSLT(xslt_doc)
+    input_tree = etree.fromstring(input_doc)
+    result_tree = transform(input_tree)
+    output_doc = etree.tostring(result_tree, encoding=unicode,
+                                pretty_print=True, method="html")
+    return output_doc
