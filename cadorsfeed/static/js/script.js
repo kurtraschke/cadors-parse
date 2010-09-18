@@ -24,22 +24,22 @@ function detect(tabs, index) {
     google.language.detect(content, detect_callback(tabs, index));
     //In the callback:
     function detect_callback(tabs, index) {
-	return function(result) {
-	    if(!result.error){
-		if (result.isReliable && result.language == 'en') {
-		    //text is English
-		    do_translate(tabs, index, 'en');
-		} else if (result.isReliable && result.language == 'fr'){
-		    //text is French
-		    do_translate(tabs, index, 'fr');
-		} else {
-		    //detection was not reliable or language was neither en nor fr	    
-		    add_notice(tabs, index);
-		}
-	    } else {
-		add_error(tabs, index);
-	    }
-	}
+        return function(result) {
+            if (!result.error){
+                if (result.isReliable && result.language == 'en') {
+                    //text is English
+                    do_translate(tabs, index, 'en');
+                } else if (result.isReliable && result.language == 'fr'){
+                    //text is French
+                    do_translate(tabs, index, 'fr');
+                } else {
+                    //detection was not reliable or language was neither en nor fr
+                    add_notice(tabs, index);
+                }
+            } else {
+                add_error(tabs, index);
+            }
+        }
     }
 }
 
@@ -54,23 +54,23 @@ function do_translate(tabs, index, thislang) {
     content = $(rptid, tabs).html();
 
     google.language.translate(content, thislang, targetlang,
-			      translate_callback(tabs, index, targetlangname));
-    
+                              translate_callback(tabs, index, targetlangname));
+
     function translate_callback(tabs, index, targetlangname) {
-	return function(result) {
-	    if (!result.error) {
+        return function(result) {
+            if (!result.error) {
                 branding = document.createElement('div');
                 google.language.getBranding(branding);
-		trid = index+"-tr";
+                trid = index+"-tr";
                 tr = $("<div></div>").attr('id',trid);
                 tr.append(result.translation);
                 tr.append(branding);
-		tabs.append(tr);
-		tabs.tabs("add","#"+trid,targetlangname, 1);
-	    } else {
-		add_error(tabs, index);
-	    }
-	}
+                tabs.append(tr);
+                tabs.tabs("add","#"+trid,targetlangname, 1);
+            } else {
+                add_error(tabs, index);
+            }
+        }
     }
 }
 
@@ -84,19 +84,19 @@ function add_error(tabs, index) {
 function add_notice(tabs, index) {
     //We don't know the content language.  Add a panel with buttons and let the user tell us.
     rptid = "#"+index+"-report";
-    
+
     msg = $('<div class="ui-widget"><div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"><p><span class="ui-icon ui-icon-info" style="float: left; margin-top: .6em; margin-right: .3em;"></span>We could not determine the language of this report. Please select the language of this report:&nbsp;</p></div></div>');
 
     function callback(msg, tabs, index, thislang) {
-	return function() {
-	    msg.hide();
-	    msg.remove();
-	    do_translate(tabs, index, thislang);
-	}
+        return function() {
+            msg.hide();
+            msg.remove();
+            do_translate(tabs, index, thislang);
+        }
     }
 
     en = $('<button>English</button>').button().click(callback(msg, tabs, index, 'en'));
-    fr = $('<button>Français</button>').button().click(callback(msg, tabs, index, 'fr')); 
+    fr = $('<button>Français</button>').button().click(callback(msg, tabs, index, 'fr'));
 
     $('p', msg).append(en).append("&nbsp;").append(fr);
 
@@ -112,64 +112,64 @@ function mapify(tabs, index) {
 
     if (links.size() > 0) {
 
-	tabid = index+'-map';
-	containerid = index+'-mapcontainer';
-	
-	maptab = $('<div></div>').attr('id',tabid).append($('<div></div>').attr('id', containerid).attr('style','height: 300px; width: 800px;'));
-	
-	tabs.append(maptab);
-	tabs.tabs("add","#"+tabid,"Map");
-	
-	bounds = new google.maps.LatLngBounds();
-	markers = new Array();
+        tabid = index+'-map';
+        containerid = index+'-mapcontainer';
 
-	links.each(function(index) {
-	    coordinates = $(this).attr('title').split(', ');
-	    text = $(this).html()
-	    latlng = new google.maps.LatLng(coordinates[0], coordinates[1]);
-	    marker = new google.maps.Marker({
-		position: latlng, 
-		title: text
-	    });  
-	    bounds.extend(latlng);
-	    markers.push(marker);
-	});
+        maptab = $('<div></div>').attr('id',tabid).append($('<div></div>').attr('id', containerid).attr('style','height: 300px; width: 800px;'));
 
-	center = bounds.getCenter();
+        tabs.append(maptab);
+        tabs.tabs("add","#"+tabid,"Map");
 
-	var options = {
-	    zoom: 8,
-	    center: bounds.getCenter(),
-	    mapTypeId: google.maps.MapTypeId.HYBRID
-	};
+        bounds = new google.maps.LatLngBounds();
+        markers = new Array();
 
-	map = new google.maps.Map(document.getElementById(containerid), options);
-	
-	for (marker in markers) {
-	    markers[marker].setMap(map);
-	}
+        links.each(function(index) {
+            coordinates = $(this).attr('title').split(', ');
+            text = $(this).html()
+            latlng = new google.maps.LatLng(coordinates[0], coordinates[1]);
+            marker = new google.maps.Marker({
+                position: latlng,
+                title: text
+            });
+            bounds.extend(latlng);
+            markers.push(marker);
+        });
 
-	function tabcb(tabid, map, center) {
-	    return function(event, ui) {
-		if (ui.panel.id == tabid) {
-		    google.maps.event.trigger(map, 'resize');
-		    map.panTo(center);
-		}
-	    }
-	}
-	tabs.bind('tabsshow', tabcb(tabid, map, center));
+        center = bounds.getCenter();
+
+        var options = {
+            zoom: 8,
+            center: bounds.getCenter(),
+            mapTypeId: google.maps.MapTypeId.HYBRID
+        };
+
+        map = new google.maps.Map(document.getElementById(containerid), options);
+
+        for (marker in markers) {
+            markers[marker].setMap(map);
+        }
+
+        function tabcb(tabid, map, center) {
+            return function(event, ui) {
+                if (ui.panel.id == tabid) {
+                    google.maps.event.trigger(map, 'resize');
+                    map.panTo(center);
+                }
+            }
+        }
+        tabs.bind('tabsshow', tabcb(tabid, map, center));
     }
 }
 
 function initialize() {
     $(document).ready(function(){
         $('.hentry').each(function(index) {
-	    index = index + 1;
+            index = index + 1;
             elem = $('.entry-content', this);
             tabs = tabify(elem, index);
-	    detect(tabs, index); 
-	    mapify(tabs, index);
-        });	
+            detect(tabs, index);
+            mapify(tabs, index);
+        });
     });
 }
 google.setOnLoadCallback(initialize);
