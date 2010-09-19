@@ -6,11 +6,11 @@ local_manager = LocalManager([local])
 application = local('application')
 db = local('db')
 
-url_map  = url_map = Map([Rule('/static/<file>', endpoint='static',
-                               build_only=True),
-                          Rule('/favicon.ico', 
-                               redirect_to='/static/favicon.ico')
-                          ])
+url_map = Map([Rule('/static/<file>', endpoint='static',
+                    build_only=True),
+               Rule('/favicon.ico', 
+                    redirect_to='/static/favicon.ico')
+               ])
 
 def expose(rule, **kw):
     def decorate(f):
