@@ -20,8 +20,7 @@ function detect(tabs, index) {
     id = index+"-report";
     content = $('#'+id,tabs).html()
     //Perform the detection
-    //.substr(0,500)
-    google.language.detect(content, detect_callback(tabs, index));
+    google.language.detect(content.substr(0,500), detect_callback(tabs, index));
     //In the callback:
     function detect_callback(tabs, index) {
         return function(result) {
@@ -51,27 +50,29 @@ function do_translate(tabs, index, thislang) {
     rptid = "#"+index+"-report";
     $("a[href='"+rptid+"']", tabs).html(thislangname);
 
-    content = $(rptid, tabs).html();
+    trid = index+"-tr";
+    content = $(rptid, tabs).clone().attr('id',trid);
+    translate_p(content, thislang, targetlang);
+    branding = document.createElement('div');
+    google.language.getBranding(branding);
+    content.append(branding);
+    tabs.append(content);
+    tabs.tabs("add","#"+trid,targetlangname, 1);
+}
 
-    google.language.translate(content, thislang, targetlang,
-                              translate_callback(tabs, index, targetlangname));
-
-    function translate_callback(tabs, index, targetlangname) {
-        return function(result) {
-            if (!result.error) {
-                branding = document.createElement('div');
-                google.language.getBranding(branding);
-                trid = index+"-tr";
-                tr = $("<div></div>").attr('id',trid);
-                tr.append(result.translation);
-                tr.append(branding);
-                tabs.append(tr);
-                tabs.tabs("add","#"+trid,targetlangname, 1);
-            } else {
-                add_error(tabs, index);
+function translate_p(content_div, source, target) {
+    $("p", content_div).each(function(index) {
+        p_content = $(this);
+        function cb(p_content) {
+            return function(result) {
+                if (!result.error) {
+                    new_content = $("<p>").append(result.translation);
+                    p_content.replaceWith(new_content);
+                } //TODO: error handling
             }
         }
-    }
+        google.language.translate(p_content.html(), source, target, cb(p_content))
+    })
 }
 
 function add_error(tabs, index) {
