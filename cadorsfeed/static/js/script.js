@@ -68,6 +68,7 @@ function translate_p(content_div, source, target) {
                 if (!result.error) {
                     new_content = $("<p>").append(result.translation);
                     p_content.replaceWith(new_content);
+                    //FIXME: copy link handlers over.
                 } //TODO: error handling
             }
         }
@@ -110,13 +111,13 @@ function mapify(tabs, index) {
     content = $(rptid, tabs)
 
     links = $('a[class=\'geolink\']', content);
-
+    //Only add a map tab if there is at least one map link.
     if (links.size() > 0) {
 
         tabid = index+'-map';
         containerid = index+'-mapcontainer';
 
-        maptab = $('<div></div>').attr('id',tabid).append($('<div></div>').attr('id', containerid).attr('style','height: 300px; width: 800px;'));
+        maptab = $('<div></div>').attr('id',tabid).append($('<div></div>').attr('id', containerid).attr('style','height: 400px; width: 100%;'));
 
         tabs.append(maptab);
         tabs.tabs("add","#"+tabid,"Map");
@@ -124,41 +125,49 @@ function mapify(tabs, index) {
         bounds = new google.maps.LatLngBounds();
         markers = new Array();
 
+        var options = {
+            zoom: 8,
+            center: new google.maps.LatLng(0,0),
+            mapTypeId: google.maps.MapTypeId.HYBRID,
+            scrollwheel: false,
+        };
+
+        map = new google.maps.Map(document.getElementById(containerid), options);
+
         links.each(function(index) {
             coordinates = $(this).attr('title').split(', ');
             text = $(this).html()
             latlng = new google.maps.LatLng(coordinates[0], coordinates[1]);
             marker = new google.maps.Marker({
                 position: latlng,
-                title: text
+                title: text,
+                map: map
             });
             bounds.extend(latlng);
             markers.push(marker);
+
+            function click_cb(map, latlng, tabs, tabid) {
+                return function(event) {
+                    event.preventDefault();
+                    tabs.tabs("select","#"+tabid);
+                    map.panTo(latlng);
+                    map.setZoom(map.getZoom() + 2);
+                }
+            }
+
+            $(this).click(click_cb(map, latlng, tabs, tabid));
         });
 
-        center = bounds.getCenter();
-
-        var options = {
-            zoom: 8,
-            center: bounds.getCenter(),
-            mapTypeId: google.maps.MapTypeId.HYBRID
-        };
-
-        map = new google.maps.Map(document.getElementById(containerid), options);
-
-        for (marker in markers) {
-            markers[marker].setMap(map);
-        }
-
-        function tabcb(tabid, map, center) {
+        function tabcb(tabid, map, bounds) {
             return function(event, ui) {
                 if (ui.panel.id == tabid) {
                     google.maps.event.trigger(map, 'resize');
-                    map.panTo(center);
+                    map.fitBounds(bounds);
+                    map.setZoom(map.getZoom()-2);
                 }
             }
         }
-        tabs.bind('tabsshow', tabcb(tabid, map, center));
+        tabs.bind('tabsshow', tabcb(tabid, map, bounds));
     }
 }
 
