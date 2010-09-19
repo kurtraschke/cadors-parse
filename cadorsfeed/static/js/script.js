@@ -26,10 +26,8 @@ function detect(tabs, index) {
         return function(result) {
             if (!result.error){
                 if (result.isReliable && result.language == 'en') {
-                    //text is English
                     do_translate(tabs, index, 'en');
                 } else if (result.isReliable && result.language == 'fr'){
-                    //text is French
                     do_translate(tabs, index, 'fr');
                 } else {
                     //detection was not reliable or language was neither en nor fr
@@ -73,7 +71,7 @@ function translate_p(content_div, source, target) {
             }
         }
         google.language.translate(p_content.html(), source, target, cb(p_content))
-    })
+    });
 }
 
 function add_error(tabs, index) {
@@ -96,12 +94,9 @@ function add_notice(tabs, index) {
             do_translate(tabs, index, thislang);
         }
     }
-
     en = $('<button>English</button>').button().click(callback(msg, tabs, index, 'en'));
     fr = $('<button>Français</button>').button().click(callback(msg, tabs, index, 'fr'));
-
     $('p', msg).append(en).append("&nbsp;").append(fr);
-
     $(rptid, tabs).prepend(msg);
 }
 
@@ -177,9 +172,14 @@ function initialize() {
             index = index + 1;
             elem = $('.entry-content', this);
             tabs = tabify(elem, index);
+        });
+        $('.hentry').each(function(index) {
+            index = index + 1;
+            tabs = $("#"+index+"-tabs", this);
             detect(tabs, index);
             mapify(tabs, index);
         });
     });
 }
+
 google.setOnLoadCallback(initialize);
