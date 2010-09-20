@@ -1,7 +1,7 @@
 google.load("maps", "3.2", {other_params: "sensor=false"});
 google.load("language", "1");
 google.load("jquery", "1.4.2");
-google.load("jqueryui", "1.8.4");
+google.load("jqueryui", "1.8.5");
 
 function tabify(element, index) {
     id = index+"-report";
