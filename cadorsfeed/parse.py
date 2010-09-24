@@ -1,5 +1,4 @@
 import html5lib
-from html5lib import treebuilders
 from lxml import etree
 from os import path
 from datetime import datetime
@@ -9,7 +8,8 @@ from functions import extensions
 
 
 def parse(input_doc):
-    parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder("lxml"))
+    parser = html5lib.HTMLParser(
+        tree=html5lib.treebuilders.getTreeBuilder("lxml"))
     etree_document = parser.parse(input_doc)
     stylesheet = path.join(path.dirname(__file__), 'format.xsl')
     xslt_doc = etree.parse(stylesheet)
