@@ -18,7 +18,7 @@
 	<xsl:text disable-output-escaping="yes"><![CDATA[<![endif]-->]]></xsl:text>
         <script type="text/javascript" src="http://www.google.com/jsapi" />
         <script type="text/javascript" src="/static/js/script.js" />
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/themes/smoothness/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/themes/base/jquery-ui.css" />        
       </head>
       <body>
 	<div>
