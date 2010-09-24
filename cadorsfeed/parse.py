@@ -19,3 +19,14 @@ def parse(input_doc):
     output_doc = etree.tostring(result_tree, encoding=unicode,
                                 pretty_print=True)
     return output_doc
+
+def generate_html(input_doc):
+    xslt_doc = etree.parse(path.join(path.dirname(__file__),
+                                     'static', 'html.xsl'))
+    transform = etree.XSLT(xslt_doc)
+    input_tree = etree.fromstring(input_doc)
+    result_tree = transform(input_tree)
+    output_doc = etree.tostring(result_tree, encoding=unicode,
+                                pretty_print=True, method="html")
+    return output_doc
+

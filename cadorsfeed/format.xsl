@@ -9,6 +9,10 @@
               indent="yes"/>
   
   <xsl:template match="/">
+    <xsl:processing-instruction name="xml-stylesheet">
+      <xsl:text>href="/static/html.xsl" type="text/xsl"</xsl:text>
+    </xsl:processing-instruction>
+   
     <a:feed>
       <a:updated><xsl:value-of select="$ts" /></a:updated>
       <a:id>urn:uuid:ec421c3e-df93-4e96-bc2c-81156167830b</a:id>

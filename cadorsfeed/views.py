@@ -3,7 +3,7 @@ from werkzeug.exceptions import NotFound, ServiceUnavailable, InternalServerErro
 from urllib2 import URLError
 
 from cadorsfeed.utils import expose, url_for, db
-from cadorsfeed.parse import parse
+from cadorsfeed.parse import parse, generate_html
 from cadorsfeed.fetch import fetchLatest, fetchReport
 
 
@@ -66,7 +66,7 @@ def do_report(request, year, month, day):
             raise ServiceUnavailable()
     db.hincrby(key, "hits")
 
-    resp = Response(output, mimetype="application/atom+xml")
+    resp = Response(output, mimetype="application/xml")
     resp.add_etag()
     return resp.make_conditional(request)
 
@@ -80,6 +80,22 @@ def do_input(request, year, month, day):
 
     if db.hexists(key, "input"):
         resp = Response(db.hget(key, "input").decode('utf-8'),
+                        mimetype="text/html")
+        resp.add_etag()
+        return resp.make_conditional(request)
+    else:
+        return NotFound()
+
+@expose('/report/<int:year>/<int:month>/<int:day>/html')
+def do_html(request, year, month, day):
+    date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
+        year=year, month=month, day=day)
+
+    key = "report:" + date
+
+    if db.hexists(key, "output"):
+        
+        resp = Response(generate_html(db.hget(key,"output").decode('utf-8')), 
                         mimetype="text/html")
         resp.add_etag()
         return resp.make_conditional(request)
