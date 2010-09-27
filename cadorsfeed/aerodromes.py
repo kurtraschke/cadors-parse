@@ -47,9 +47,15 @@ def geocode(id):
     if (response['status'] == 'OK'):
         result = response['results'][0]
         if ('airport' in result['types']):
+            for component in result['address_components']:
+                if ('establishment' in component['types']) or ('airport' in component['types']):
+                    name =  component['long_name']
+                    break
+            else:
+                name = result['formatted_address']
             return {'lat': round(result['geometry']['location']['lat']),
                     'lon': round(result['geometry']['location']['lng']),
-                    'name': result['formatted_address']}
+                    'name': name}
         else:
             del db[key]
             return None
