@@ -3,16 +3,16 @@ import lxml.sax
 from lxml import etree
 from xml.sax.handler import ContentHandler
 
+NS = "http://www.w3.org/1999/xhtml"
+
 
 def make_link(url, text, title):
-    NS = "http://www.w3.org/1999/xhtml"
-
     def output_link(out):
-        out.startElementNS((NS, 'a'), 'h:a', {('', 'href'): url,
-                                              ('', 'title'): title,
-                                              ('', 'class'): 'geolink'})
+        out.startElementNS((NS, 'a'), 'a', {('', 'href'): url,
+                                            ('', 'title'): title,
+                                            ('', 'class'): 'geolink'})
         out.characters(text)
-        out.endElementNS((NS, 'a'), 'h:a')
+        out.endElementNS((NS, 'a'), 'a')
     return output_link
 
 
@@ -45,8 +45,10 @@ class FilterContentHandler(ContentHandler, object):
 
     def startDocument(self, *args):
         self.out.startDocument(*args)
+        self.out.startPrefixMapping('h', NS)
 
     def endDocument(self, *args):
+        self.out.endPrefixMapping('h')        
         self.out.endDocument(*args)
 
     def startElementNS(self, *args):
