@@ -9,6 +9,7 @@ from cadorsfeed import views
 
 STATIC_PATH = path.join(path.dirname(__file__), 'static')
 
+
 class CadorsFeed(object):
 
     def __init__(self, host='localhost', port=6379, db=0):
@@ -17,9 +18,8 @@ class CadorsFeed(object):
         self.port = port
         self.db = db
         local.db = redis.Redis(host=host, port=port, db=db)
-        self.dispatch = SharedDataMiddleware(self.dispatch, {
-                '/static':  STATIC_PATH
-                })
+        self.dispatch = SharedDataMiddleware(self.dispatch,
+                                             {'/static':  STATIC_PATH})
 
     def dispatch(self, environ, start_response):
         local.application = self

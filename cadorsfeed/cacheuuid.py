@@ -1,5 +1,5 @@
 import uuid
-from utils import db
+from cadorsfeed.utils import db
 
 
 def cacheuuid(key):

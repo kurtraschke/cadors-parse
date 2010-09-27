@@ -4,6 +4,7 @@ import itertools
 import datetime
 from pyrfc3339 import generate
 from geolucidate.functions import get_replacements, google_maps_link
+
 from cadorsfeed.cacheuuid import cacheuuid
 
 extensions = {}
@@ -18,9 +19,11 @@ def register():
         return func
     return decorate
 
+
 def stripout(things):
     assert len(things) == 1
     return things[0]
+
 
 @register()
 def strip_nbsp(to_strip):
@@ -28,16 +31,19 @@ def strip_nbsp(to_strip):
         to_strip = stripout(to_strip)
     return to_strip.rstrip(u'\xa0')
 
+
 def fix_name(name):
     name = strip_nbsp(name)
     (last, first) = name.split(", ")
     return first + " " + last
+
 
 def elementify(string):
     element = etree.Element("{http://www.w3.org/1999/xhtml}p",
                             nsmap={'h': 'http://www.w3.org/1999/xhtml'})
     element.text = string
     return element
+
 
 @register()
 def fix_names(names):

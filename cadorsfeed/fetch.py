@@ -22,7 +22,7 @@ def fetchReport(reportDate):
     data = response2.get_data()
     if re.search("There were no results for the search criteria you entered",
                  data):
-        raise NotFound()        
+        raise NotFound()
     data_filtered = re.sub("""<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="[A-Za-z0-9/+=]*" />""",
                            "<!-- viewstate field stripped -->",
                            data)
