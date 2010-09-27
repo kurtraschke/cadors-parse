@@ -8,25 +8,23 @@ from functions import extensions
 
 
 def parse(input_doc):
-    parser = html5lib.HTMLParser(
-        tree=html5lib.treebuilders.getTreeBuilder("lxml"))
+    parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"))
     etree_document = parser.parse(input_doc)
-    stylesheet = path.join(path.dirname(__file__), 'format.xsl')
-    xslt_doc = etree.parse(stylesheet)
-    transform = etree.XSLT(xslt_doc, extensions=extensions)
+
+    atom_stylesheet = path.join(path.dirname(__file__), 'format.xsl')
+    atom_xslt_doc = etree.parse(atom_stylesheet)
+    atom_transform = etree.XSLT(atom_xslt_doc, extensions=extensions)
+
     ts = etree.XSLT.strparam(generate(datetime.utcnow(), accept_naive=True))
-    result_tree = transform(etree_document, ts=ts)
-    output_doc = etree.tostring(result_tree, encoding=unicode,
-                                pretty_print=True)
-    return output_doc
+    atom_result_tree = atom_transform(etree_document, ts=ts)
 
-def generate_html(input_doc):
-    xslt_doc = etree.parse(path.join(path.dirname(__file__),
-                                     'static', 'html.xsl'))
-    transform = etree.XSLT(xslt_doc)
-    input_tree = etree.fromstring(input_doc)
-    result_tree = transform(input_tree)
-    output_doc = etree.tostring(result_tree, encoding=unicode,
-                                pretty_print=True, method="html")
-    return output_doc
+    atom_output = etree.tostring(atom_result_tree, encoding=unicode,
+                                 pretty_print=True)
 
+    html_xslt_doc = etree.parse(path.join(path.dirname(__file__),
+                                          'static', 'html.xsl'))
+    html_transform = etree.XSLT(html_xslt_doc)
+    html_result_tree = html_transform(atom_result_tree)
+    html_output = etree.tostring(html_result_tree, encoding=unicode,
+                                 pretty_print=True, method="html")
+    return {'output': atom_output, 'output_html': html_output}

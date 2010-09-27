@@ -3,7 +3,7 @@ from werkzeug.exceptions import NotFound, ServiceUnavailable, InternalServerErro
 from urllib2 import URLError
 
 from cadorsfeed.utils import expose, url_for, db
-from cadorsfeed.parse import parse, generate_html
+from cadorsfeed.parse import parse
 from cadorsfeed.fetch import fetchLatest, fetchReport
 
 
@@ -22,15 +22,48 @@ def latest_report(request):
 
 
 @expose('/report/<int:year>/<int:month>/<int:day>/')
-def do_report(request, year, month, day):
+@expose('/report/<int:year>/<int:month>/<int:day>/<any(u"atom", u"html"):format>')
+def do_report(request, year, month, day, format="atom"):
     refetch = request.args.get('refetch', '0') == '1'
     reparse = request.args.get('reparse', '0') == '1' or refetch
 
     date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
         year=year, month=month, day=day)
+    key = "report:" + date
+
+    process_report(key, date, refetch, reparse)
+
+    db.hincrby(key, "hits")
+
+    if format == "atom":
+        output = db.hget(key, "output")
+        mimetype = "application/atom+xml"
+    elif format == "html":
+        output = db.hget(key, "output_html")
+        mimetype = "text/html"
+
+    resp = Response(output.decode("utf-8"), mimetype=mimetype)
+    resp.add_etag()
+    return resp.make_conditional(request)
+
+
+@expose('/report/<int:year>/<int:month>/<int:day>/input')
+def do_input(request, year, month, day):
+    date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
+        year=year, month=month, day=day)
 
     key = "report:" + date
 
+    if db.hexists(key, "input"):
+        resp = Response(db.hget(key, "input").decode('utf-8'),
+                        mimetype="text/html")
+        resp.add_etag()
+        return resp.make_conditional(request)
+    else:
+        return NotFound()
+
+
+def process_report(key, date, refetch=False, reparse=False):
     if db.hexists(key, "output") and not reparse:
         output = db.hget(key, "output").decode('utf-8')
     else:
@@ -56,48 +89,10 @@ def do_report(request, year, month, day):
         lock = db.lock("parse:" + key, timeout=120)
         if lock.acquire(blocking=False):
             try:
-                output = parse(input)
-                db.hset(key, "output", output)
+                db.hmset(key, parse(input))
             except Exception, e:
                 raise InternalServerError(e)
             finally:
                 lock.release()
         else:
             raise ServiceUnavailable()
-    db.hincrby(key, "hits")
-
-    resp = Response(output, mimetype="application/xml")
-    resp.add_etag()
-    return resp.make_conditional(request)
-
-
-@expose('/report/<int:year>/<int:month>/<int:day>/input')
-def do_input(request, year, month, day):
-    date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
-        year=year, month=month, day=day)
-
-    key = "report:" + date
-
-    if db.hexists(key, "input"):
-        resp = Response(db.hget(key, "input").decode('utf-8'),
-                        mimetype="text/html")
-        resp.add_etag()
-        return resp.make_conditional(request)
-    else:
-        return NotFound()
-
-@expose('/report/<int:year>/<int:month>/<int:day>/html')
-def do_html(request, year, month, day):
-    date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
-        year=year, month=month, day=day)
-
-    key = "report:" + date
-
-    if db.hexists(key, "output"):
-        
-        resp = Response(generate_html(db.hget(key,"output").decode('utf-8')), 
-                        mimetype="text/html")
-        resp.add_etag()
-        return resp.make_conditional(request)
-    else:
-        return NotFound()
