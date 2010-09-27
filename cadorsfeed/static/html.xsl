@@ -34,6 +34,10 @@
   
   <xsl:template match="a:entry">
     <article class="hentry">
+      <xsl:attribute name="id">
+        <xsl:variable name="uuid" select="a:id" />
+        <xsl:value-of select="translate(substring-after($uuid,'urn:uuid:'),'-','')" />
+      </xsl:attribute>
       <h2><a><xsl:attribute name="href"><xsl:value-of select="a:link/@href"/></xsl:attribute><xsl:value-of select="a:title"/></a></h2>
       
       <ul>
@@ -44,7 +48,7 @@
         <xsl:apply-templates select="a:author" />
       </ul>
       <br />
-      <xsl:value-of select="a:updated"/>
+      <p><xsl:value-of select="a:updated"/></p>
       
       <div class="entry-content">
         <xsl:apply-templates select="a:content/h:div/*" />
