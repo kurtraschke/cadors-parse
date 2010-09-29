@@ -64,9 +64,7 @@ def do_input(request, year, month, day):
 
 
 def process_report(key, date, refetch=False, reparse=False):
-    if db.hexists(key, "output") and not reparse:
-        output = db.hget(key, "output").decode('utf-8')
-    else:
+    if (not db.hexists(key, "output")) or (not db.hexists(key, "output_html")) or reparse:
         if db.hexists(key, "input") and not refetch:
             input = db.hget(key, "input").decode('utf-8')
         else:
