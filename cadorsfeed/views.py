@@ -7,9 +7,9 @@ from cadorsfeed.parse import parse
 from cadorsfeed.fetch import fetchLatest, fetchReport
 
 
-@expose('/report/latest/')
-def latest_report(request):
-
+@expose('/report/latest/', defaults={'format': 'atom'})
+@expose('/report/latest/<any(u"atom", u"html"):format>')
+def latest_report(request, format):
     if 'latest' in db:
         latestDate = db['latest']
     else:
@@ -18,12 +18,12 @@ def latest_report(request):
 
     (year, month, day) = latestDate.split('-')
 
-    return redirect(url_for('do_report', year=year, month=month, day=day))
+    return redirect(url_for('do_report', year=year, month=month, day=day, format=format))
 
 
-@expose('/report/<int:year>/<int:month>/<int:day>/')
+@expose('/report/<int:year>/<int:month>/<int:day>/', defaults={'format': 'atom'})
 @expose('/report/<int:year>/<int:month>/<int:day>/<any(u"atom", u"html"):format>')
-def do_report(request, year, month, day, format="atom"):
+def do_report(request, year, month, day, format):
     refetch = request.args.get('refetch', '0') == '1'
     reparse = request.args.get('reparse', '0') == '1' or refetch
 
