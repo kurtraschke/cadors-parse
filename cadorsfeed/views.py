@@ -1,6 +1,8 @@
 from werkzeug import redirect, Response
-from werkzeug.exceptions import NotFound, ServiceUnavailable, InternalServerError
+from werkzeug.exceptions import NotFound, ServiceUnavailable, InternalServerError, BadRequest
 from urllib2 import URLError
+from datetime import date
+import time
 
 from cadorsfeed.utils import expose, url_for, db
 from cadorsfeed.parse import parse
@@ -27,11 +29,14 @@ def do_report(request, year, month, day, format):
     refetch = request.args.get('refetch', '0') == '1'
     reparse = request.args.get('reparse', '0') == '1' or refetch
 
-    date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
-        year=year, month=month, day=day)
-    key = "report:" + date
+    try:
+        ts = date(year, month, day)
+    except ValueError, e:
+        raise BadRequest(e)
+    
+    key = "report:" + ts.isoformat()
 
-    process_report(key, date, refetch, reparse)
+    process_report(key, ts, refetch, reparse)
 
     db.hincrby(key, "hits")
 
@@ -49,10 +54,12 @@ def do_report(request, year, month, day, format):
 
 @expose('/report/<int:year>/<int:month>/<int:day>/input')
 def do_input(request, year, month, day):
-    date = "{year:04.0f}-{month:02.0f}-{day:02.0f}".format(
-        year=year, month=month, day=day)
-
-    key = "report:" + date
+    try:
+        ts = date(year, month, day)
+    except ValueError:
+        raise BadRequest(e)
+    
+    key = "report:" + ts.isoformat()
 
     if db.hexists(key, "input"):
         resp = Response(db.hget(key, "input").decode('utf-8'),
@@ -63,7 +70,7 @@ def do_input(request, year, month, day):
         return NotFound()
 
 
-def process_report(key, date, refetch=False, reparse=False):
+def process_report(key, report_date, refetch=False, reparse=False):
     if (not db.hexists(key, "output")) or (not db.hexists(key, "output_html")) or reparse:
         if db.hexists(key, "input") and not refetch:
             input = db.hget(key, "input").decode('utf-8')
@@ -71,8 +78,11 @@ def process_report(key, date, refetch=False, reparse=False):
             lock = db.lock("fetch:" + key, timeout=120)
             if lock.acquire(blocking=False):
                 try:
-                    input = fetchReport(date)
+                    input = fetchReport(report_date.isoformat())
                     db.hset(key, "input", input)
+                    db.hset(key, "date", report_date.isoformat())
+                    db.hset(key, "fetch_ts", time.time())
+                    db.zadd("reports", key, report_date.toordinal())
                 except URLError, e:
                     raise InternalServerError(e)
                 except NotFound, e:
@@ -88,6 +98,7 @@ def process_report(key, date, refetch=False, reparse=False):
         if lock.acquire(blocking=False):
             try:
                 db.hmset(key, parse(input))
+                db.hset(key, "parse_ts", time.time())
             except Exception, e:
                 raise InternalServerError(e)
             finally:
