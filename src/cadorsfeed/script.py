@@ -25,9 +25,8 @@ del _buildout_path
 
 # bin/paster serve parts/etc/deploy.ini
 def make_app(global_conf={}, config=DEPLOY_CFG, debug=False):
-    from cadorsfeed.application import CadorsFeed
-    app = CadorsFeed()
-    #app.config.from_pyfile(abspath(config))
+    from cadorsfeed import app
+    app.config.from_pyfile(abspath(config))
     app.debug = debug
     return app
 
@@ -39,12 +38,13 @@ def make_debug(global_conf={}, **conf):
     return DebuggedApplication(app, evalex=True)
 
 
-# bin/flask-ctl shell
+# bin/app-ctl shell
 def make_shell():
-    """Interactive Werkzeug Shell"""
+    """Interactive Flask Shell"""
+    from flask import request
     app = make_app()
-    #http = app.test_client()
-    #reqctx = app.test_request_context
+    http = app.test_client()
+    reqctx = app.test_request_context
     return locals()
 
 
@@ -76,11 +76,11 @@ def _serve(action, debug=False, dry_run=False):
     paste.script.command.run()
 
 
-# bin/flask-ctl ...
+# bin/app-ctl ...
 def run():
     action_shell = werkzeug.script.make_shell(make_shell, make_shell.__doc__)
 
-    # bin/flask-ctl serve [fg|start|stop|restart|status]
+    # bin/app-ctl serve [fg|start|stop|restart|status]
     def action_serve(action=('a', 'start'), dry_run=False):
         """Serve the application.
 
@@ -93,17 +93,17 @@ def run():
         """
         _serve(action, debug=False, dry_run=dry_run)
 
-    # bin/flask-ctl debug [fg|start|stop|restart|status]
+    # bin/app-ctl debug [fg|start|stop|restart|status]
     def action_debug(action=('a', 'start'), dry_run=False):
         """Serve the debugging application."""
         _serve(action, debug=True, dry_run=dry_run)
 
-    # bin/flask-ctl status
+    # bin/app-ctl status
     def action_status(dry_run=False):
         """Status of the application."""
         _serve('status', dry_run=dry_run)
 
-    # bin/flask-ctl stop
+    # bin/app-ctl stop
     def action_stop(dry_run=False):
         """Stop the application."""
         _serve('stop', dry_run=dry_run)

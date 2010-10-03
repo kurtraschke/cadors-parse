@@ -4,14 +4,15 @@ import re
 import urllib
 from os import path
 from decimal import Decimal, setcontext, ExtendedContext
+from flask import g
 
-from cadorsfeed.utils import db
+from cadorsfeed import app
+
 
 setcontext(ExtendedContext)
 
-with codecs.open(path.join(path.join(path.dirname(__file__), 'static'),
-                           "aerodromes.json"), "r", "utf-8") as aerodromefile:
-    aerodromes = json.loads(aerodromefile.read())
+with app.open_resource("static/aerodromes.json") as aerodromefile:
+    aerodromes = json.loads(aerodromefile.read().decode('utf-8'))
 
 aerodrome_re = re.compile('|'.join([r"\b" + re.escape(name) for name in aerodromes.keys()]),
                           re.I)
@@ -31,16 +32,16 @@ def get_aerodromes(text, link_function):
 
 def geocode(id):
     key = "cacheaerodrome:" + id
-    if not key in db:
+    if not key in g.db:
         params = {'address': id,
                    'region': 'CA',
                    'sensor': 'false'}
         baseurl = 'http://maps.googleapis.com/maps/api/geocode/json?'
         url = baseurl + urllib.urlencode(params)
         response = urllib.urlopen(url).read()
-        db.setex(key, response, 604800)
+        g.db.setex(key, response, 604800)
     else:
-        response = db[key]
+        response = g.db[key]
 
     response = json.loads(response)
 
@@ -57,10 +58,10 @@ def geocode(id):
                     'lon': round(result['geometry']['location']['lng']),
                     'name': name}
         else:
-            del db[key]
+            del g.db[key]
             return None
     else:
-        del db[key]
+        del g.db[key]
         return None
 
 

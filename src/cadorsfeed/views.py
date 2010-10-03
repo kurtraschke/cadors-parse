@@ -1,107 +1,112 @@
-from werkzeug import redirect, Response
-from werkzeug.exceptions import NotFound, ServiceUnavailable, InternalServerError, BadRequest
 from urllib2 import URLError
 from datetime import date
 import time
+import redis
+from flask import abort, request, redirect, url_for, g, make_response
 
-from cadorsfeed.utils import expose, url_for, db
+from cadorsfeed import app
 from cadorsfeed.parse import parse
-from cadorsfeed.fetch import fetchLatest, fetchReport
+from cadorsfeed.fetch import fetchLatest, fetchReport, ReportNotFoundError, ReportFetchError
 
 
-@expose('/report/latest/', defaults={'format': 'atom'})
-@expose('/report/latest/<any(u"atom", u"html"):format>')
-def latest_report(request, format):
-    if 'latest' in db:
-        latestDate = db['latest']
+@app.route('/report/latest/', defaults = {'format': 'atom'})
+@app.route('/report/latest/<any(u"atom", u"html"):format>')
+def latest_report(format):
+    if 'latest' in g.db:
+        latestDate = g.db['latest']
     else:
-        latestDate = fetchLatest()
-        db.setex('latest', latestDate, 60 * 60 * 12)
+        try:
+            latestDate = fetchLatest()
+            g.db.setex('latest', latestDate, 60 * 60 * 12)
+        except Exception, e:
+            abort(500)
 
     (year, month, day) = latestDate.split('-')
 
     return redirect(url_for('do_report', year=year, month=month, day=day, format=format))
 
 
-@expose('/report/<int:year>/<int:month>/<int:day>/', defaults={'format': 'atom'})
-@expose('/report/<int:year>/<int:month>/<int:day>/<any(u"atom", u"html"):format>')
-def do_report(request, year, month, day, format):
+@app.route('/report/<int:year>/<int:month>/<int:day>/', 
+           defaults={'format': 'atom'})
+@app.route('/report/<int:year>/<int:month>/<int:day>/<any(u"atom", u"html"):format>')
+def do_report(year, month, day, format):
     refetch = request.args.get('refetch', '0') == '1'
     reparse = request.args.get('reparse', '0') == '1' or refetch
 
     try:
         ts = date(year, month, day)
     except ValueError, e:
-        raise BadRequest(e)
+        abort(400)
     
     key = "report:" + ts.isoformat()
 
     process_report(key, ts, refetch, reparse)
 
-    db.hincrby(key, "hits")
+    g.db.hincrby(key, "hits")
 
     if format == "atom":
-        output = db.hget(key, "output")
+        output = g.db.hget(key, "output")
         mimetype = "application/atom+xml"
     elif format == "html":
-        output = db.hget(key, "output_html")
+        output = g.db.hget(key, "output_html")
         mimetype = "text/html"
 
-    resp = Response(output.decode("utf-8"), mimetype=mimetype)
-    resp.add_etag()
-    return resp.make_conditional(request)
+    rv = app.make_response(output.decode("utf-8"))
+    rv.mimetype = mimetype
+    return rv
 
 
-@expose('/report/<int:year>/<int:month>/<int:day>/input')
-def do_input(request, year, month, day):
+@app.route('/report/<int:year>/<int:month>/<int:day>/input')
+def do_input(year, month, day):
     try:
         ts = date(year, month, day)
     except ValueError:
-        raise BadRequest(e)
+        abort(400)
     
     key = "report:" + ts.isoformat()
 
-    if db.hexists(key, "input"):
-        resp = Response(db.hget(key, "input").decode('utf-8'),
-                        mimetype="text/html")
-        resp.add_etag()
-        return resp.make_conditional(request)
+    if g.db.hexists(key, "input"):
+        rv = app.make_response(g.db.hget(key, "input").decode('utf-8'))
+        rv.mimetype = "text/html"
+        return rv
     else:
-        return NotFound()
-
+        abort(404)
 
 def process_report(key, report_date, refetch=False, reparse=False):
-    if (not db.hexists(key, "output")) or (not db.hexists(key, "output_html")) or reparse:
-        if db.hexists(key, "input") and not refetch:
-            input = db.hget(key, "input").decode('utf-8')
+    if (not g.db.hexists(key, "output")) or (not g.db.hexists(key, "output_html")) or reparse:
+        if g.db.hexists(key, "input") and not refetch:
+            input = g.db.hget(key, "input").decode('utf-8')
         else:
-            lock = db.lock("fetch:" + key, timeout=120)
+            lock = g.db.lock("fetch:" + key, timeout=120)
             if lock.acquire(blocking=False):
                 try:
                     input = fetchReport(report_date.isoformat())
-                    db.hset(key, "input", input)
-                    db.hset(key, "date", report_date.isoformat())
-                    db.hset(key, "fetch_ts", time.time())
-                    db.zadd("reports", key, report_date.toordinal())
-                except URLError, e:
-                    raise InternalServerError(e)
-                except NotFound, e:
-                    raise e
-                except InternalServerError, e:
-                    raise e
+                    g.db.hset(key, "input", input)
+                    g.db.hset(key, "date", report_date.isoformat())
+                    g.db.hset(key, "fetch_ts", time.time())
+                    g.db.zadd("reports", key, report_date.toordinal())
+                except (URLError, ReportFetchError), e:
+                    raise
+                except ReportNotFoundError, e:
+                    abort(404)
                 finally:
                     lock.release()
             else:
-                raise ServiceUnavailable()
-
-        lock = db.lock("parse:" + key, timeout=120)
+                abort(503)
+        lock = g.db.lock("parse:" + key, timeout=120)
         if lock.acquire(blocking=False):
             try:
-                db.hmset(key, parse(input))
-                db.hset(key, "parse_ts", time.time())
+                g.db.hmset(key, parse(input))
+                g.db.hset(key, "parse_ts", time.time())
             except Exception, e:
-                raise InternalServerError(e)
+                raise
             finally:
                 lock.release()
         else:
-            raise ServiceUnavailable()
+            abort(503)
+
+@app.before_request
+def before_request():
+    g.db = redis.Redis(host=app.config['REDIS_HOST'],
+                       port=app.config['REDIS_PORT'],
+                       db=app.config['REDIS_DB'])

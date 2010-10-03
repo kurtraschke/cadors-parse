@@ -2,10 +2,11 @@ from lxml import etree
 import re
 import itertools
 import datetime
+import uuid
 from pyrfc3339 import generate
 from geolucidate.functions import get_replacements, google_maps_link
+from flask import g
 
-from cadorsfeed.cacheuuid import cacheuuid
 from cadorsfeed.aerodromes import get_aerodromes
 from cadorsfeed.filter import make_link, doFilter
 
@@ -76,8 +77,12 @@ def fix_datetime(date, time):
 @register()
 def produce_id(cadors_number):
     cadors_number = stripout(cadors_number)
+    key = "cacheuuid:" + cadors_number
 
-    return cacheuuid(cadors_number)
+    if not key in g.db:
+        g.db[key] = uuid.uuid4().urn
+
+    return g.db[key]
 
 
 @register()
