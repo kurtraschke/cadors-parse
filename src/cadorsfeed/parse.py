@@ -1,6 +1,6 @@
 import html5lib
+import time
 from lxml import etree
-from os import path
 from datetime import datetime
 from pyrfc3339 import generate
 
@@ -16,7 +16,8 @@ def parse(input_doc):
         atom_xslt_doc = etree.parse(f)
     atom_transform = etree.XSLT(atom_xslt_doc, extensions=extensions)
 
-    ts = etree.XSLT.strparam(generate(datetime.utcnow(), accept_naive=True))
+    now = time.time()
+    ts = etree.XSLT.strparam(generate(datetime.utcfromtimestamp(now), accept_naive=True))
     atom_result_tree = atom_transform(etree_document, ts=ts)
 
     atom_output = etree.tostring(atom_result_tree, encoding=unicode,
@@ -28,4 +29,5 @@ def parse(input_doc):
     html_result_tree = html_transform(atom_result_tree)
     html_output = etree.tostring(html_result_tree, encoding=unicode,
                                  pretty_print=True, method="html")
-    return {'output': atom_output, 'output_html': html_output}
+    return {'output': atom_output, 'output_html': html_output,
+            'parse_ts': now}

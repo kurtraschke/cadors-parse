@@ -1,8 +1,8 @@
 from urllib2 import URLError
 from datetime import date
-import time
-import redis
 from flask import abort, request, redirect, url_for, g, make_response
+import redis
+import time
 
 from cadorsfeed import app
 from cadorsfeed.parse import parse
@@ -97,7 +97,6 @@ def process_report(key, report_date, refetch=False, reparse=False):
         if lock.acquire(blocking=False):
             try:
                 g.db.hmset(key, parse(input))
-                g.db.hset(key, "parse_ts", time.time())
             except Exception, e:
                 raise
             finally:
