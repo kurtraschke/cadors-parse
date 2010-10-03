@@ -12,7 +12,7 @@ def read(*rnames):
 setup(
     name=name,
     version=version,
-    description="a hello world demo",
+    description="Produce an Atom feed from the CADORS National Report",
     long_description=read('README'),
     # Get strings from http://www.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[],
@@ -20,7 +20,7 @@ setup(
     author="Kurt Raschke",
     author_email='kurt@kurtraschke.com',
     url='http://github.com/kurtraschke/cadors-parse',
-    license='BSD',
+    license='MIT',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     include_package_data=True,
