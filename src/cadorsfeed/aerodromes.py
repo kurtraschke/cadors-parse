@@ -1,8 +1,6 @@
 import json
-import codecs
 import re
 import urllib
-from os import path
 from decimal import Decimal, setcontext, ExtendedContext
 from flask import g
 
@@ -12,7 +10,7 @@ from cadorsfeed import app
 setcontext(ExtendedContext)
 
 with app.open_resource("static/aerodromes.json") as aerodromefile:
-    aerodromes = json.loads(aerodromefile.read().decode('utf-8'))
+    aerodromes = json.load(aerodromefile, 'utf-8')
 
 aerodrome_re = re.compile('|'.join([r"\b" + re.escape(name) for name in aerodromes.keys()]),
                           re.I)
