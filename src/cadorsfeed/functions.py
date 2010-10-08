@@ -5,22 +5,23 @@ import datetime
 import uuid
 from pyrfc3339 import generate
 from geolucidate.functions import get_replacements, google_maps_link
+from functools import wraps
 from flask import g
 
 from cadorsfeed.aerodromes import get_aerodromes
 from cadorsfeed.filter import make_link, doFilter
 
 extensions = {}
+EXTENSION_NS = 'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd'
 
 
-def register():
-    def decorate(func):
-        def wrapper(*args):
-            return func(*args[1:])
-        extensions[('urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd',
-                    func.__name__)] = wrapper
-        return func
-    return decorate
+def register(func):
+    @wraps(func)
+    def wrapper(*args):
+        return func(*args[1:])
+    extensions[(EXTENSION_NS, func.__name__)] = wrapper
+    return func
+
 
 
 def stripout(things):
@@ -28,7 +29,7 @@ def stripout(things):
     return things[0]
 
 
-@register()
+@register
 def strip_nbsp(to_strip):
     if isinstance(to_strip, list):
         to_strip = stripout(to_strip)
@@ -48,12 +49,12 @@ def elementify(string):
     return element
 
 
-@register()
+@register
 def fix_names(names):
     return [elementify(s) for s in set([fix_name(name) for name in names])]
 
 
-@register()
+@register
 def fix_datetime(date, time):
     datere = re.compile(r"(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})")
     dateparts = datere.search(strip_nbsp(date)).groupdict()
@@ -74,7 +75,7 @@ def fix_datetime(date, time):
     return generate(ts, accept_naive=True)
 
 
-@register()
+@register
 def produce_id(cadors_number):
     cadors_number = stripout(cadors_number)
     key = "cacheuuid:" + cadors_number
@@ -85,7 +86,7 @@ def produce_id(cadors_number):
     return g.db[key]
 
 
-@register()
+@register
 def content(content_list):
     paras = itertools.chain.from_iterable([block.split('\n')
                                            for block in content_list])
