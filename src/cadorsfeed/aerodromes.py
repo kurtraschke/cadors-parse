@@ -12,8 +12,7 @@ setcontext(ExtendedContext)
 with app.open_resource("static/aerodromes.json") as aerodromefile:
     aerodromes = json.load(aerodromefile, 'utf-8')
 
-aerodrome_re = re.compile('|'.join([r"\b" + re.escape(name) for name in aerodromes.keys()]),
-                          re.I)
+aerodrome_re = re.compile('|'.join([r"\b" + re.escape(name) for name in aerodromes.keys()]))
 
 
 def get_aerodromes(text, link_function):
@@ -41,14 +40,18 @@ def geocode(id):
     else:
         response = g.db[key]
 
-    response = json.loads(response)
+    try:
+        response = json.loads(response)
+    except ValueError:
+        del g.db[key]
+        return None
 
     if (response['status'] == 'OK'):
         result = response['results'][0]
         if ('airport' in result['types']):
             for component in result['address_components']:
                 if ('establishment' in component['types']) or ('airport' in component['types']):
-                    name =  component['long_name']
+                    name = component['long_name']
                     break
             else:
                 name = result['formatted_address']
@@ -56,7 +59,7 @@ def geocode(id):
                     'lon': round(result['geometry']['location']['lng']),
                     'name': name}
         else:
-            del g.db[key]
+            #del g.db[key]
             return None
     else:
         del g.db[key]
