@@ -1,5 +1,5 @@
 from urllib2 import URLError
-from datetime import date
+from datetime import date, datetime
 from flask import abort, request, redirect, url_for, g, make_response
 import redis
 import time
@@ -53,6 +53,9 @@ def do_report(year, month, day, format):
 
     rv = app.make_response(output.decode("utf-8"))
     rv.mimetype = mimetype
+    rv.last_modified = datetime.utcfromtimestamp(float(g.db.hget(key, "parse_ts")))
+    rv.add_etag()
+    rv.make_conditional(request)
     return rv
 
 
@@ -68,6 +71,9 @@ def do_input(year, month, day):
     if g.db.hexists(key, "input"):
         rv = app.make_response(g.db.hget(key, "input").decode('utf-8'))
         rv.mimetype = "text/html"
+        rv.last_modified = datetime.utcfromtimestamp(float(g.db.hget(key, "fetch_ts")))
+        rv.add_etag()
+        rv.make_conditional(request)
         return rv
     else:
         abort(404)
