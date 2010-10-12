@@ -16,9 +16,11 @@
 	<xsl:text disable-output-escaping="yes"><![CDATA[<!--[if IE]>]]></xsl:text>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js" />
 	<xsl:text disable-output-escaping="yes"><![CDATA[<![endif]-->]]></xsl:text>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+        <script src="http://cdn.jquerytools.org/1.2.5/tiny/jquery.tools.min.js"></script>
         <script type="text/javascript" src="http://www.google.com/jsapi" />
-        <script type="text/javascript" src="/static/js/script.js" />
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/themes/base/jquery-ui.css" />        
+        <script type="text/javascript" src="/static/js/script.js" />  
+        <link rel="stylesheet" type="text/css" href="/static/css/tabs.css" />
       </head>
       <body>
 	<div>
