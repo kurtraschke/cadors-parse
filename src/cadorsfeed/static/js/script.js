@@ -155,7 +155,6 @@ function addmaptab(tabs) {
 
     var map = new google.maps.Map(document.getElementById(containerid), options);
     var bounds = new google.maps.LatLngBounds();
-    bounds.count = 0;
 
     function tabcb(api, tabid, map, bounds) {
         return function(event, index) {
@@ -165,11 +164,6 @@ function addmaptab(tabs) {
             if (event.srcElement.hash == '#'+tabid) {
                 google.maps.event.trigger(map, 'resize');
                 map.fitBounds(bounds);
-                if (bounds.count > 1) {
-                    map.setZoom(map.getZoom() - 2);
-                } else {
-                    map.setZoom(map.getZoom() - 4);
-                }                               
             }
         }
     }
@@ -196,7 +190,6 @@ function addpoint(map, bounds, latlng, text) {
         map: map
     });
     bounds.extend(latlng);
-    bounds.count++;
 }
 
 function mapify(tabs) {
@@ -227,7 +220,6 @@ function mapify(tabs) {
                     api.click("#"+tabid);
                     google.maps.event.trigger(map, 'resize');
                     map.panTo(latlng);
-                    map.setZoom(map.getZoom() + 2);
                 }
             }
 
