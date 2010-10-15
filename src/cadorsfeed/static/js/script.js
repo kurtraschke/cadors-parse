@@ -72,7 +72,7 @@ function do_translate(tabs, thislang) {
     $("a[href='#"+rptid+"']", tabs).html(thislangname);
 
     var trid = tabs.parent().attr('id')+"-tr";
-    var content = $(jq(rptid), tabs).clone().attr('id',trid);
+    var content = $(jq(rptid), tabs).clone(true).attr('id',trid);
     translate_p(content, thislang, targetlang);
     var branding = document.createElement('div');
     google.language.getBranding(branding);
@@ -89,8 +89,19 @@ function translate_p(content_div, source, target) {
                 return function(result) {
                     if (!result.error) {
                         var new_content = $("<p>").append(result.translation);
+                        
+                        $("a", new_content).each(function() {
+                            var thislink = $(this);
+                            var href = thislink.attr('href');
+                            var oldlink = $("a", p_content).filter(function() {
+                                if ($(this).attr('href') == href) {
+                                    return true;
+                                }
+                            });
+                            thislink.replaceWith(oldlink);
+                        });
+
                         p_content.replaceWith(new_content);
-                        //FIXME: copy link handlers over.
                     } //TODO: error handling
                 }
             }
