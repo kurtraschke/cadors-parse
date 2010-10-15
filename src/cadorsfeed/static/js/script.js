@@ -35,7 +35,6 @@ function addtab(tabs, newcontent, tabtitle, suffix) {
     if (callback) {
         api.onClick(callback);
     }
-    
 }
 
 function detect(tabs) {
@@ -89,7 +88,7 @@ function translate_p(content_div, source, target) {
                 return function(result) {
                     if (!result.error) {
                         var new_content = $("<p>").append(result.translation);
-                        
+
                         $("a", new_content).each(function() {
                             var thislink = $(this);
                             var href = thislink.attr('href');
