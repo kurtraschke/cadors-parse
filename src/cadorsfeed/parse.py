@@ -5,7 +5,7 @@ from datetime import datetime
 from pyrfc3339 import generate
 
 from cadorsfeed.functions import extensions
-from cadorsfeed import app
+from flask import current_app as app
 
 
 def parse(input_doc):

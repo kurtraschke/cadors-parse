@@ -2,22 +2,24 @@ import json
 import re
 import urllib
 from decimal import Decimal, setcontext, ExtendedContext
-from flask import g
-
-from cadorsfeed import app
-
+from flask import g, current_app as app
+from werkzeug import cached_property
 
 setcontext(ExtendedContext)
 
-with app.open_resource("static/aerodromes.json") as aerodromefile:
-    aerodromes = json.load(aerodromefile, 'utf-8')
+class Aerodromes(object):
+    @cached_property
+    def get_re(self):
+        with app.open_resource("static/aerodromes.json") as aerodromefile:
+            aerodromes = json.load(aerodromefile, 'utf-8')
+        aerodromes_re = re.compile('|'.join([r"\b" + re.escape(name) + r"\b" for name in aerodromes.keys()]))
+        return aerodromes_re
 
-aerodrome_re = re.compile('|'.join([r"\b" + re.escape(name) for name in aerodromes.keys()]))
-
+aerodromes_re = Aerodromes()
 
 def get_aerodromes(text, link_function):
     substitutions = {}
-    matches = aerodrome_re.finditer(text)
+    matches = aerodromes.get_re.finditer(text)
 
     for match in matches:
         title = match.group()
