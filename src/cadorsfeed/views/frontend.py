@@ -4,13 +4,18 @@ from flask import abort, request, redirect, url_for, g, make_response
 import redis
 import time
 
-from cadorsfeed import app
+from flask import current_app as app
 from cadorsfeed.parse import parse
 from cadorsfeed.fetch import fetchLatest, fetchReport, ReportNotFoundError, ReportFetchError
 
 
-@app.route('/report/latest/', defaults = {'format': 'atom'})
-@app.route('/report/latest/<any(u"atom", u"html"):format>')
+from flask import Module
+
+frontend = Module(__name__)
+
+
+@frontend.route('/report/latest/', defaults = {'format': 'atom'})
+@frontend.route('/report/latest/<any(u"atom", u"html"):format>')
 def latest_report(format):
     if 'latest' in g.db:
         latestDate = g.db['latest']
@@ -18,17 +23,17 @@ def latest_report(format):
         try:
             latestDate = fetchLatest()
             g.db.setex('latest', latestDate, 60 * 60 * 12)
-        except Exception, e:
-            abort(500)
+        except Exception:
+            raise
 
     (year, month, day) = latestDate.split('-')
 
     return redirect(url_for('do_report', year=year, month=month, day=day, format=format))
 
 
-@app.route('/report/<int:year>/<int:month>/<int:day>/', 
+@frontend.route('/report/<int:year>/<int:month>/<int:day>/', 
            defaults={'format': 'atom'})
-@app.route('/report/<int:year>/<int:month>/<int:day>/<any(u"atom", u"html"):format>')
+@frontend.route('/report/<int:year>/<int:month>/<int:day>/<any(u"atom", u"html"):format>')
 def do_report(year, month, day, format):
     refetch = request.args.get('refetch', '0') == '1'
     reparse = request.args.get('reparse', '0') == '1' or refetch
@@ -59,7 +64,7 @@ def do_report(year, month, day, format):
     return rv
 
 
-@app.route('/report/<int:year>/<int:month>/<int:day>/input')
+@frontend.route('/report/<int:year>/<int:month>/<int:day>/input')
 def do_input(year, month, day):
     try:
         ts = date(year, month, day)
@@ -110,7 +115,8 @@ def process_report(key, report_date, refetch=False, reparse=False):
         else:
             abort(503)
 
-@app.before_request
+
+@frontend.before_request
 def before_request():
     g.db = redis.Redis(host=app.config['REDIS_HOST'],
                        port=app.config['REDIS_PORT'],
