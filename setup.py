@@ -32,15 +32,13 @@ setup(
         'lxml',
         'mechanize',
         'html5lib',
+        'cryptacular',
+        'Flask-Script',
         'pyRFC3339',
         'geolucidate',
     ],
     entry_points="""
     [console_scripts]
-    app-ctl = cadorsfeed.script:run
-
-    [paste.app_factory]
-    main = cadorsfeed.script:make_app
-    debug = cadorsfeed.script:make_debug
+    manage = cadorsfeed.manage:run
     """,
 )
