@@ -19,7 +19,7 @@ aerodromes_re = Aerodromes()
 
 def get_aerodromes(text, link_function):
     substitutions = {}
-    matches = aerodromes.get_re.finditer(text)
+    matches = aerodromes_re.get_re.finditer(text)
 
     for match in matches:
         title = match.group()
@@ -33,8 +33,8 @@ def geocode(id):
     key = "cacheaerodrome:" + id
     if not key in g.db:
         params = {'address': id,
-                   'region': 'CA',
-                   'sensor': 'false'}
+                  'region': 'CA',
+                  'sensor': 'false'}
         baseurl = 'http://maps.googleapis.com/maps/api/geocode/json?'
         url = baseurl + urllib.urlencode(params)
         response = urllib.urlopen(url).read()
