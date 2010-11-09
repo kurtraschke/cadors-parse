@@ -1,0 +1,41 @@
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<table border=1>
+  <tr><th>Date</th><th>Hits</th><th colspan="3">View</th></tr>
+  {% for report in reports %}
+  <tr>
+    <td>{{ report.date }}</td><td>{{ report.hits }}</td>
+    <td><a href="{{ report.html_link }}">HTML</a></td>
+    <td><a href="{{ report.atom_link }}">Atom</a></td>
+    <td><a href="{{ report.input_link }}">Input</a></td>
+    {% if session['logged_in'] %}
+    <td>
+      <form action="/clear" method="POST">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="date" value="{{ report.date }}" />
+        <button type="submit" name="submit" value="input">Clear input cache</button>
+        <button type="submit" name="submit" value="output">Clear output cache</button>
+      </form>
+    </td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+</table>
+
+
+ <div class="pagination">
+    {%- if pagination.has_previous %}<a href="{{ pagination.previous
+        }}">&laquo; Previous</a>
+    {%- else %}<span class="inactive">&laquo; Previous</span>{% endif %}
+    | {{ pagination.page }} |
+    {% if pagination.has_next %}<a href="{{ pagination.next }}">Next &raquo;</a>
+    {%- else %}<span class="inactive">Next &raquo;</span>{% endif %}
+  </div>`

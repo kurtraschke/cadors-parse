@@ -16,12 +16,12 @@ def create_app(config=None):
     app = Flask(__name__)
     if config is not None:
         app.config.from_pyfile(abspath(etc(config)))
+    from cadorsfeed.views.feeds import feeds
     from cadorsfeed.views.frontend import frontend
     from cadorsfeed.views.auth import auth
+    app.register_module(feeds)
     app.register_module(frontend)
     app.register_module(auth)
     app.add_url_rule('/favicon.ico', 'favicon', redirect_to = '/static/favicon.ico')
     csrf(app)
     return app
-
-#import cadorsfeed.views
