@@ -34,6 +34,7 @@ setup(
         'html5lib',
         'cryptacular',
         'Flask-Script',
+        'Flask-CSRF',
         'pyRFC3339',
         'geolucidate',
     ],

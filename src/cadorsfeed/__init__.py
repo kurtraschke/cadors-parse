@@ -2,6 +2,7 @@ import os
 from functools import partial
 
 from flask import Flask
+from flaskext.csrf import csrf
 
 etc = partial(os.path.join, 'parts', 'etc')
 _buildout_path = __file__
@@ -20,6 +21,7 @@ def create_app(config=None):
     app.register_module(frontend)
     app.register_module(auth)
     app.add_url_rule('/favicon.ico', 'favicon', redirect_to = '/static/favicon.ico')
+    csrf(app)
     return app
 
 #import cadorsfeed.views
