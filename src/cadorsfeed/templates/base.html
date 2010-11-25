@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>cadorsfeed</title>
+<link type="text/css" rel="stylesheet" media="screen" href="/static/css/baseline.compress.css">
+<style type="text/css">
+#page { margin: 0 auto 36px auto; }
+</style>
+</head>
+<body>
+<body class="page-home">
+<div id="page">
+  <header class="full">
+  <h1>Header text goes here.</h1>
+  </header>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <section class="full flashes">
+    {% for message in messages %}
+    <mark>{{ message }}</mark><br />
+    {% endfor %}
+  </section>
+  {% endif %}
+  {% endwith %}
+  
+  <section class="full">
+  {% block body %}{% endblock %}
+  </section>
+  
+  <footer class="full">
+  <p><small>Footer text goes here</small></p>
+  </footer>
+</div>
+</body>
+</html>

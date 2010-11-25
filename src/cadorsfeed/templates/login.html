@@ -1,17 +1,17 @@
-<!doctype html>
-<title>cadorsfeed login</title>
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class="flashes">
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-<form action="" method="POST">
-<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-<label>Username: <input type="text" name="username" /></label>
-<label>Password: <input type="password" name="password" /></label>
-<input type="submit" />
+{% extends "base.html" %}
+{% block body %}
+<!--<title>cadorsfeed login</title>-->
+<form action="" method="POST" >
+<section class="column first width2">
+<fieldset class="width2">
+<legend>Login</legend>
+<input type="hidden" name="_csrf_token" value="{{ csrf_token()}}">
+<label class="unitx1 first">Username: <input type="text" name="username" class="text" /></label>
+<label class="unitx1">Password: <input type="password" name="password" class="text" /></label>
+</fieldset>
+
+<fieldset class="width2"><input type="submit" /></fieldset>
+</fieldset>
+</section>
 </form>
+{% endblock %}
