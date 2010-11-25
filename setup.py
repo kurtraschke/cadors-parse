@@ -32,6 +32,7 @@ setup(
         'lxml',
         'mechanize',
         'html5lib',
+        'SPARQLWrapper',
         'cryptacular',
         'Flask-Script',
         'Flask-CSRF',

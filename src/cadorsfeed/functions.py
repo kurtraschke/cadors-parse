@@ -8,7 +8,7 @@ from geolucidate.functions import get_replacements, google_maps_link
 from functools import wraps
 from flask import g
 
-from cadorsfeed.aerodromes import get_aerodromes
+from cadorsfeed.aerodromes import replace_aerodromes
 from cadorsfeed.filter import make_link, doFilter
 
 extensions = {}
@@ -21,7 +21,6 @@ def register(func):
         return func(*args[1:])
     extensions[(EXTENSION_NS, func.__name__)] = wrapper
     return func
-
 
 
 def stripout(things):
@@ -101,4 +100,4 @@ def do_geolucidate(text):
 
 
 def do_aerodromes(text):
-    return get_aerodromes(text, make_link)
+    return replace_aerodromes(text, make_link)
