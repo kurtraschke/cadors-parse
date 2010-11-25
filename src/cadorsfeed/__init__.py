@@ -8,9 +8,10 @@ etc = partial(os.path.join, 'parts', 'etc')
 _buildout_path = __file__
 for i in range(3 + __name__.count('.')):
     _buildout_path = os.path.dirname(_buildout_path)
-    
+
 abspath = partial(os.path.join, _buildout_path)
 del _buildout_path
+
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -22,6 +23,6 @@ def create_app(config=None):
     app.register_module(feeds)
     app.register_module(frontend)
     app.register_module(auth)
-    app.add_url_rule('/favicon.ico', 'favicon', redirect_to = '/static/favicon.ico')
+    app.add_url_rule('/favicon.ico', 'favicon', redirect_to='/static/favicon.ico')
     csrf(app)
     return app

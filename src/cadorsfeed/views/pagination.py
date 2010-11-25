@@ -1,6 +1,7 @@
 from werkzeug import cached_property
 from flask import url_for
 
+
 class Pagination(object):
 
     def __init__(self, db, key, per_page, page, endpoint):

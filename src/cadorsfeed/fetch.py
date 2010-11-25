@@ -31,5 +31,6 @@ def fetchReport(reportDate):
 class ReportNotFoundError(Exception):
     pass
 
+
 class ReportFetchError(Exception):
     pass

@@ -14,7 +14,7 @@ from flask import Module
 feeds = Module(__name__)
 
 
-@feeds.route('/report/latest/', defaults = {'format': 'atom'})
+@feeds.route('/report/latest/', defaults={'format': 'atom'})
 @feeds.route('/report/latest/<any(u"atom", u"html"):format>')
 def latest_report(format):
     if 'latest' in g.db:
@@ -38,7 +38,7 @@ def do_report(year, month, day, format):
         ts = date(year, month, day)
     except ValueError, e:
         abort(400)
-    
+
     key = "report:" + ts.isoformat()
 
     process_report(key, ts)
@@ -66,7 +66,7 @@ def do_input(year, month, day):
         ts = date(year, month, day)
     except ValueError:
         abort(400)
-    
+
     key = "report:" + ts.isoformat()
 
     if g.db.hexists(key, "input"):
@@ -78,6 +78,7 @@ def do_input(year, month, day):
         return rv
     else:
         abort(404)
+
 
 def process_report(key, report_date, refetch=False, reparse=False):
     if (not g.db.hexists(key, "output")) or (not g.db.hexists(key, "output_html")) or reparse:
