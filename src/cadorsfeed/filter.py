@@ -22,8 +22,14 @@ class FilterContentHandler(ContentHandler, object):
     def __init__(self, replacement_function):
         self.out = lxml.sax.ElementTreeContentHandler()
         self.replacement_function = replacement_function
+        self.openElements = []
 
     def characters(self, data):
+        if 'a' in self.openElements:
+            #Don't perform replacement inside an existing link.
+            self.out.characters(data)
+            return
+
         after = data
         offset = 0
         replacements = self.replacement_function(after).items()
@@ -48,13 +54,16 @@ class FilterContentHandler(ContentHandler, object):
         self.out.startPrefixMapping('h', NS)
 
     def endDocument(self, *args):
-        self.out.endPrefixMapping('h')        
+        assert len(self.openElements) == 0
+        self.out.endPrefixMapping('h')
         self.out.endDocument(*args)
 
     def startElementNS(self, *args):
+        self.openElements.append(args[0][1])
         self.out.startElementNS(*args)
 
     def endElementNS(self, *args):
+        assert self.openElements.pop() == args[0][1]
         self.out.endElementNS(*args)
 
     def getOutput(self):
