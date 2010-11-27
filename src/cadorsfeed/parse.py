@@ -12,7 +12,7 @@ def parse(input_doc):
     parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"))
     etree_document = parser.parse(input_doc)
 
-    with app.open_resource('static/format.xsl') as f:
+    with app.open_resource('format.xsl') as f:
         atom_xslt_doc = etree.parse(f)
     atom_transform = etree.XSLT(atom_xslt_doc, extensions=extensions)
 
@@ -23,7 +23,7 @@ def parse(input_doc):
     atom_output = etree.tostring(atom_result_tree, encoding=unicode,
                                  pretty_print=True)
 
-    with app.open_resource('static/html.xsl') as f:
+    with app.open_resource('html.xsl') as f:
         html_xslt_doc = etree.parse(f)
     html_transform = etree.XSLT(html_xslt_doc)
     html_result_tree = html_transform(atom_result_tree)
