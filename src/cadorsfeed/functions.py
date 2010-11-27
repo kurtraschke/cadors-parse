@@ -8,9 +8,9 @@ from geolucidate.functions import get_replacements, google_maps_link
 from functools import wraps
 from flask import g
 
-from cadorsfeed.aerodromes import replace_aerodromes
-from cadorsfeed.link_cadors import replace_cadors_links
-from cadorsfeed.filter import make_link, doFilter
+from cadorsfeed.filters.aerodromes import replace_aerodromes
+from cadorsfeed.filters.link_cadors import replace_cadors_links
+from cadorsfeed.filters.filter import make_link, doFilter
 
 extensions = {}
 EXTENSION_NS = 'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd'
@@ -91,19 +91,9 @@ def content(content_list):
     paras = itertools.chain.from_iterable([block.split('\n')
                                            for block in content_list])
     out = [elementify(strip_nbsp(p)) for p in paras]
-    out = [doFilter(p, do_geolucidate) for p in out]
-    out = [doFilter(p, do_aerodromes) for p in out]
-    out = [doFilter(p, do_cadors) for p in out]
+    filters = [lambda text: get_replacements(text, google_maps_link(link=make_link)),
+               lambda text: replace_aerodromes(text, make_link),
+               lambda text: replace_cadors_links(text, make_link)]
+    for filter in filters:
+        out = [doFilter(p, filter) for p in out]
     return out
-
-
-def do_geolucidate(text):
-    return get_replacements(text, google_maps_link(link=make_link))
-
-
-def do_aerodromes(text):
-    return replace_aerodromes(text, make_link)
-
-
-def do_cadors(text):
-    return replace_cadors_links(text, make_link)

@@ -43,8 +43,9 @@ def deluser(username):
 
 @manager.command
 @with_db
-def load():
-    from cadorsfeed.aerodromes import fetch_aerodromes
+def load_aerodromes():
+    '''Load or update aerodrome data from DBpedia'''
+    from cadorsfeed.filters.aerodromes import fetch_aerodromes
     fetch_aerodromes()
 
 

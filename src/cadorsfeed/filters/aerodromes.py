@@ -45,7 +45,7 @@ def replace_aerodromes(text, link_function):
             substitutions[match] = link_function(result['airport'], match.group(), title)
 
     icao_matches = aerodromes_re.get_icao_re.finditer(text)
-    process_matches(icao_matches, lambda id: lookup('icao:'+id))
+    process_matches(icao_matches, lambda id: lookup('icao:' + id))
     iata_matches = aerodromes_re.get_iata_re.finditer(text)
     process_matches(iata_matches, lambda id: lookup('iata:' + id))
 
@@ -70,7 +70,7 @@ def fetch_aerodromes():
     g.db.delete('icao_codes')
     g.db.delete('iata_codes')
 
-    with app.open_resource("dbpedia_query.rq") as queryfile:
+    with app.open_resource("filters/dbpedia_query.rq") as queryfile:
         query = queryfile.read()
 
     limit = 500
@@ -80,7 +80,7 @@ def fetch_aerodromes():
         sparql.setQuery(query % (offset, limit))
         sparql.setReturnFormat(JSON)
         results = sparql.query().convert()
-        
+
         for result in results["results"]["bindings"]:
             values = dict([(key, value['value']) for key, value in result.items()])
             values['longitude'] = fix_coord(values['longitude'])
@@ -88,7 +88,7 @@ def fetch_aerodromes():
             if 'name' not in values:
                 values['name'] = urllib.unquote(urlparse.urlparse(values['airport']).path.decode('utf-8').split('/')[-1]).replace('_', ' ')
 
-            airportkey = "airport:"+values['airport']
+            airportkey = "airport:" + values['airport']
 
             g.db.hmset(airportkey, values)
             g.db.sadd('airports', airportkey)

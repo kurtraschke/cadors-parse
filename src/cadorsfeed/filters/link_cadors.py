@@ -2,6 +2,7 @@ import re
 
 cadors_re = re.compile(r"\b[0-9]{4}[AOPCQ][0-9]{4}\b")
 
+
 def replace_cadors_links(text, link_function):
     substitutions = {}
     matches = cadors_re.finditer(text)
