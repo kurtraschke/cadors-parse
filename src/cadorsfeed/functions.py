@@ -9,6 +9,7 @@ from functools import wraps
 from flask import g
 
 from cadorsfeed.aerodromes import replace_aerodromes
+from cadorsfeed.link_cadors import replace_cadors_links
 from cadorsfeed.filter import make_link, doFilter
 
 extensions = {}
@@ -92,6 +93,7 @@ def content(content_list):
     out = [elementify(strip_nbsp(p)) for p in paras]
     out = [doFilter(p, do_geolucidate) for p in out]
     out = [doFilter(p, do_aerodromes) for p in out]
+    out = [doFilter(p, do_cadors) for p in out]
     return out
 
 
@@ -101,3 +103,7 @@ def do_geolucidate(text):
 
 def do_aerodromes(text):
     return replace_aerodromes(text, make_link)
+
+
+def do_cadors(text):
+    return replace_cadors_links(text, make_link)
