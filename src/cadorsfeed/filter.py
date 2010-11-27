@@ -6,11 +6,13 @@ from xml.sax.handler import ContentHandler
 NS = "http://www.w3.org/1999/xhtml"
 
 
-def make_link(url, text, title):
+def make_link(url, text, title, css_class='geolink'):
     def output_link(out):
-        out.startElementNS((NS, 'a'), 'a', {('', 'href'): url,
-                                            ('', 'title'): title,
-                                            ('', 'class'): 'geolink'})
+        parameters = {('', 'href'): url,
+                      ('', 'title'): title}
+        if css_class is not None:
+            parameters[('', 'class')] = css_class
+        out.startElementNS((NS, 'a'), 'a', parameters)
         out.characters(text)
         out.endElementNS((NS, 'a'), 'a')
     return output_link
