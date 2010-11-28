@@ -23,8 +23,12 @@ class Aerodromes(object):
     def get_iata_re(self):
         if 'iata_re_cache' not in g.db:
             #Blacklist likely false positives
-            blacklist = ["iata:" + c for c in ('ATC', 'SMS', 'DME', 'ANS', 'PAG', 'CNK', 'WJA',
-                                               'GPS', 'ACC', 'FSS', 'AKK', 'VIS', 'PAN', 'AMM')]
+            blacklist = ["iata:" + c for c in ('ATC', 'SMS', 'DME', 'ANS', 
+                                               'PAG', 'CNK', 'WJA', 'GPS',
+                                               'ACC', 'FSS', 'AKK', 'VIS',
+                                               'PAN', 'AMM', 'CAP', 'ASP',
+                                               'CAS', 'CFR', '08R', 'CAR',
+                                               'MLG', 'M06', 'RMK', 'SID')]
             re_string = r"\b(" + '|'.join([re.escape(c.lstrip("iata:")) for c in g.db.smembers('iata_codes') if c not in blacklist]) + r")\b"
             g.db.setex('iata_re_cache', re_string, 3600)
         aerodromes_re = re.compile(g.db['iata_re_cache'])
