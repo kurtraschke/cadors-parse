@@ -4,7 +4,8 @@ import itertools
 import datetime
 import uuid
 from pyrfc3339 import generate
-from geolucidate.functions import get_replacements, google_maps_link
+from geolucidate.functions import get_replacements
+from geolucidate.links.google import google_maps_link
 from functools import wraps
 from flask import g
 
