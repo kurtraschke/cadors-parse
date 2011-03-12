@@ -23,13 +23,10 @@ class Aerodromes(object):
     def get_iata_re(self):
         if 'iata_re_cache' not in g.db:
             #Blacklist likely false positives; this is not an ideal solution.
-            blacklist = ["iata:" + c for c in ('ATC', 'SMS', 'DME', 'ANS', 
-                                               'PAG', 'CNK', 'WJA', 'GPS',
-                                               'ACC', 'FSS', 'AKK', 'VIS',
-                                               'PAN', 'AMM', 'CAP', 'ASP',
-                                               'CAS', 'CFR', '08R', 'CAR',
-                                               'MLG', 'M06', 'RMK', 'SID',
-                                               'CYR', 'PRM', 'NOC')]
+            #Some of these are listed because they conflict with ICAO airline designators.
+            #It would help to have a database of airline designators, but that wouldn't help disambiguate
+            #between ICAO airline designators and IATA airport codes.
+            blacklist = ["iata:" + c for c in g.db.smembers('iata_blacklist')]
             re_string = r"\b(" + '|'.join([re.escape(c.lstrip("iata:")) for c in g.db.smembers('iata_codes') if c not in blacklist]) + r")\b"
             g.db.setex('iata_re_cache', re_string, 3600)
         aerodromes_re = re.compile(g.db['iata_re_cache'])
@@ -69,6 +66,14 @@ def fix_coord(value):
     input = Decimal(str(value))
     return str(input.quantize(precision))
 
+def import_blacklist():
+    g.db.delete('iata_blacklist')
+    g.db.delete('iata_re_cache')
+    with app.open_resource('filters/blacklist.txt') as blacklist:
+        for line in blacklist:
+            line = line.strip()
+            if not line.startswith('#') and len(line) == 3:
+                g.db.sadd('iata_blacklist', line)
 
 def fetch_aerodromes():
     g.db.delete('airports')

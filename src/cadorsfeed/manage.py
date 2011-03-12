@@ -48,6 +48,13 @@ def load_aerodromes():
     from cadorsfeed.filters.aerodromes import fetch_aerodromes
     fetch_aerodromes()
 
+@manager.command
+@with_db
+def load_iata_blacklist():
+    '''Load or update blacklist of IATA codes which produce false positives'''
+    from cadorsfeed.filters.aerodromes import import_blacklist
+    import_blacklist()
+
 
 def run():
     manager.run()
