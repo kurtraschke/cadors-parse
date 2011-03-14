@@ -29,6 +29,8 @@ def process_narrative(narrative_block):
                lambda text: replace_aerodromes(text, make_link),
                lambda text: replace_cadors_links(text, make_link)]
     for paragraph in paras:
+        if len(paragraph) == 0:
+            continue
         p = etree.Element("{http://www.w3.org/1999/xhtml}p",
                           nsmap={'h': 'http://www.w3.org/1999/xhtml'})
         p.text = paragraph
