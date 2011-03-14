@@ -3,19 +3,39 @@ import lxml.sax
 from lxml import etree
 from xml.sax.handler import ContentHandler
 
-NS = "http://www.w3.org/1999/xhtml"
+NS = 'http://www.w3.org/1999/xhtml'
+
+NSMAP = {'h': 'http://www.w3.org/1999/xhtml',
+         'a': 'http://www.w3.org/2005/Atom',
+         'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'}
 
 
-def make_link(url, text, title, css_class='geolink'):
+def make_link(url, text, title, css_class='geolink', coordinates=None):
     def output_link(out):
         parameters = {('', 'href'): url,
                       ('', 'title'): title}
         if css_class is not None:
             parameters[('', 'class')] = css_class
+        if coordinates is not None:
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 'lat')] = coordinates['latitude']
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 'long')] = coordinates['longitude']
         out.startElementNS((NS, 'a'), 'a', parameters)
         out.characters(text)
         out.endElementNS((NS, 'a'), 'a')
     return output_link
+
+def make_span(text, title, css_class='geolink', coordinates=None):
+    def output_span(out):
+        parameters = {('', 'title'): title}
+        if css_class is not None:
+            parameters[('', 'class')] = css_class
+        if coordinates is not None:
+            parameters[('geo', 'lat')] = coordinates['latitude']
+            parameters[('geo', 'long')] = coordinates['longitude']
+        out.startElementNS((NS, 'span'), 'span', parameters)
+        out.characters(text)
+        out.endElementNS((NS, 'span'), 'span')
+    return output_span
 
 
 #There _is_ a cleaner way to replace text with an Element, but only marginally cleaner.
@@ -53,11 +73,13 @@ class FilterContentHandler(ContentHandler, object):
 
     def startDocument(self, *args):
         self.out.startDocument(*args)
-        self.out.startPrefixMapping('h', NS)
+        for prefix, namespace in NSMAP.iteritems():
+            self.out.startPrefixMapping(prefix, namespace)
 
     def endDocument(self, *args):
         assert len(self.openElements) == 0
-        self.out.endPrefixMapping('h')
+        for prefix, namespace in NSMAP.iteritems():
+            self.out.endPrefixMapping(prefix)
         self.out.endDocument(*args)
 
     def startElementNS(self, *args):
@@ -72,7 +94,7 @@ class FilterContentHandler(ContentHandler, object):
         return self.out.etree.getroot()
 
 
-def doFilter(input, replacement_function):
+def do_filter(input, replacement_function):
     handler = FilterContentHandler(replacement_function)
     lxml.sax.saxify(input, handler)
     return handler.getOutput()

@@ -4,14 +4,14 @@ import itertools
 import datetime
 import uuid
 from pyrfc3339 import generate
-from geolucidate.functions import get_replacements
-from geolucidate.links.google import google_maps_link
+#from geolucidate.functions import get_replacements
+#from geolucidate.links.google import google_maps_link
 from functools import wraps
 from flask import g
 
 from cadorsfeed.filters.aerodromes import replace_aerodromes
 from cadorsfeed.filters.link_cadors import replace_cadors_links
-from cadorsfeed.filters.filter import make_link, doFilter
+#from cadorsfeed.filters.filter import make_link, doFilter
 
 extensions = {}
 EXTENSION_NS = 'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd'
@@ -26,13 +26,15 @@ def register(func):
 
 
 def stripout(things):
-    assert len(things) == 1
+    assert len(things) == 1, things
     return things[0]
 
 
 @register
 def strip_nbsp(to_strip):
     if isinstance(to_strip, list):
+        if len(to_strip) == 0:
+            return None
         to_strip = stripout(to_strip)
     return to_strip.rstrip(u'\xa0')
 
@@ -47,9 +49,10 @@ def elementify(string):
     element = etree.Element("{http://www.w3.org/1999/xhtml}p",
                             nsmap={'h': 'http://www.w3.org/1999/xhtml'})
     element.text = string
-    return element
+    return string
+#return element
 
-
+"""
 @register
 def fix_names(names):
     return [elementify(s) for s in set([fix_name(name) for name in names])]
@@ -98,3 +101,4 @@ def content(content_list):
     for filter in filters:
         out = [doFilter(p, filter) for p in out]
     return out
+"""

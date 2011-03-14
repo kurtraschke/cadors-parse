@@ -1,20 +1,18 @@
 import mechanize
 import re
 
-
-def fetchLatest():
+def fetch_latest_date():
     br = mechanize.Browser()
     br.open("http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/nrpt.aspx?lang=eng")
     br.select_form(name="pageForm")
-    latestDate = br["txt_ReportDate"]
-    return latestDate
+    latest_date = br["txt_ReportDate"]
+    return latest_date
 
-
-def fetchReport(reportDate):
+def fetch_daily_report(report_date):
     br = mechanize.Browser()
     br.open("http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/nrpt.aspx?lang=eng")
     br.select_form(name="pageForm")
-    br["txt_ReportDate"] = reportDate
+    br["txt_ReportDate"] = report_date
     response2 = br.submit(name="btn_SearchTop")
     if not response2.geturl().startswith("http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/rpt.aspx"):
         raise ReportFetchError()
@@ -26,7 +24,6 @@ def fetchReport(reportDate):
                            "<!-- viewstate field stripped -->",
                            data)
     return data_filtered.decode("utf-8")
-
 
 class ReportNotFoundError(Exception):
     pass

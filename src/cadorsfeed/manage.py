@@ -1,10 +1,10 @@
 from flaskext.script import Manager, prompt_pass, prompt_bool
 from flask import g
 from functools import wraps
-import redis
 
 from cadorsfeed import create_app
 from cadorsfeed.auth import set_password
+from cadorsfeed.db import setup_db
 
 manager = Manager(create_app)
 manager.add_option('-c', '--config', dest='config', required=False)
@@ -13,10 +13,7 @@ manager.add_option('-c', '--config', dest='config', required=False)
 def with_db(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        from flask import g, current_app as app
-        g.db = redis.Redis(host=app.config['REDIS_HOST'],
-                        port=app.config['REDIS_PORT'],
-                        db=app.config['REDIS_DB'])
+        setup_db()
         return f(*args, **kwargs)
     return wrapper
 
@@ -40,6 +37,11 @@ def deluser(username):
     else:
         print "User %s does not exist." % username
 
+@manager.option('-d', '--date', dest='date', required=True)
+@with_db
+def retrieve(date):
+    from cadorsfeed.retrieve import retrieve_report
+    retrieve_report(date)
 
 @manager.command
 @with_db

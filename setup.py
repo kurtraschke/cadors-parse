@@ -29,6 +29,7 @@ setup(
         'setuptools',
         'Flask',
         'Redis',
+        'PyMongo',
         'lxml',
         'mechanize',
         'html5lib',

@@ -1,7 +1,9 @@
 import os
 from functools import partial
 
-from flask import Flask
+from pymongo import Connection
+
+from flask import Flask, g
 from flaskext.csrf import csrf
 
 etc = partial(os.path.join, 'parts', 'etc')
@@ -25,4 +27,11 @@ def create_app(config=None):
     app.register_module(auth)
     app.add_url_rule('/favicon.ico', 'favicon', redirect_to='/static/favicon.ico')
     csrf(app)
+
+    @app.before_request
+    def before_request():
+        from cadorsfeed.db import setup_db
+        setup_db()
+
+
     return app
