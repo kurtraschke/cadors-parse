@@ -205,7 +205,7 @@ def parse_report(report):
 
     for aircraft_part in report_data['aircraft']:
         if aircraft_part['flight_number'] != "":
-            match = re.match("([A-Z]{2,3})([0-9]{2,4}M?)", 
+            match = re.match("([A-Z]{2,4})([0-9]{2,4}M?)", 
                              aircraft_part['flight_number'])
             if match:
                 parsed_flight = {'operator': match.group(1),
