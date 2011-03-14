@@ -7,11 +7,18 @@ from lxml import etree
 from bson.son import SON
 from flask import g
 
+from geolucidate.functions import cleanup, convert
+from geolucidate.parser import parser_re
+
 from cadorsfeed.functions import extensions
+from cadorsfeed.filters.aerodromes import aerodromes_re, lookup
 from cadorsfeed.cadorslib.narrative import process_narrative
+from cadorsfeed.cadorslib.locations import LocationStore
 
 NSMAP = {'h':'http://www.w3.org/1999/xhtml',
-         'pyf':'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd'}
+         'pyf':'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd',
+         'a': 'http://www.w3.org/2005/Atom',
+         'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'}
 
 def grouper(n, iterable):
     args = [iter(iterable)] * n
@@ -144,8 +151,35 @@ def parse_report(report):
     report_data['fatalities'] = int(report_data['fatalities']) 
     report_data['injuries'] = int(report_data['injuries']) 
 
-    report_data['locations'] = []
+    locations = LocationStore()
 
+    if report_data['tclid'] != '':
+        #try to do a db lookup
+        data = lookup(report_data['tclid'])
+        if data is not None:
+            locations.add(data['location']['latitude'],
+                          data['location']['longitude'],
+                          data['name'],
+                          data['airport'])
+            
+    if report_data['location'] != '':
+        location = report_data['location']
+        #Apply geolucidate and the aerodromes RE
+        match = aerodromes_re.get_icao_re.search(location)
+        if match:
+            data = lookup(match.group())
+            locations.add(data['location']['latitude'],
+                          data['location']['longitude'],
+                          data['name'],
+                          data['airport'])
+        match = parser_re.search(location)
+        if match:
+            (latitude, longitude) = convert(*cleanup(match.groupdict()))
+
+            locations.add(latitude,
+                          longitude,
+                          match.group())
+            
     for narrative_part in report_data['narrative']:
         name = narrative_part['name']
         (last, first) = name.split(", ")
@@ -154,6 +188,20 @@ def parse_report(report):
                                                             "%Y-%m-%d")
         
         narrative_part['parsed_html'] = process_narrative(narrative_part['narrative'])
+        #do the location extraction here
+        root = etree.fromstring(narrative_part['parsed_html'])
+        elements = root.xpath("//*[@class='geolink' and @geo:lat and @geo:long]",
+                              namespaces=NSMAP)
+        for element in elements:
+            longitude = element.attrib['{http://www.w3.org/2003/01/geo/wgs84_pos#}long']
+            latitude = element.attrib['{http://www.w3.org/2003/01/geo/wgs84_pos#}lat']
+
+            name = element.attrib['title']
+            if 'href' in element.attrib:
+                url = element.attrib['href']
+            else:
+                url = None
+            locations.add(latitude, longitude, name, url)
 
     for aircraft_part in report_data['aircraft']:
         if aircraft_part['flight_number'] != "":
@@ -163,5 +211,8 @@ def parse_report(report):
                 parsed_flight = {'operator': match.group(1),
                                  'flight': match.group(2)}
                 aircraft_part['flight_number_parsed'] = parsed_flight
+
+
+    report_data['locations'] = locations.to_list()
 
     return report_data

@@ -21,6 +21,17 @@ def fetch_report(report):
     return response
 
 
+
+@feeds.route("/report/<report>/kml")
+def fetch_report_kml(report):
+    report = g.mdb.reports.find_one({'cadors_number': report})
+    locations = g.mdb.locations.find({'report.$id': report['_id']})
+
+    response = make_response(render_template('kml.xml', locations=locations))
+    response.mimetype = "application/vnd.google-earth.kml+xml"
+    return response
+
+
 @feeds.route("/reports")
 def fetch_reports():
     reports = g.mdb.reports.find()

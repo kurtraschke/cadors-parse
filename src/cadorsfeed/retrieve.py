@@ -38,6 +38,11 @@ def retrieve_report(date):
             if 'uuid' not in stored_report:
                 stored_report['uuid'] = uuid.uuid4()
             g.mdb.reports.save(stored_report)
+            g.mdb.locations.remove({'report.$id':stored_report['_id']})
+            for location in stored_report['locations']:
+                location['report'] = stored_report
+                g.mdb.locations.save(location)
+
             daily_report['reports'].append(stored_report)
         
         stored_daily_report = g.mdb.daily_reports.find_one(

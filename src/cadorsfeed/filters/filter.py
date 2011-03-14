@@ -17,8 +17,10 @@ def make_link(url, text, title, css_class='geolink', coordinates=None):
         if css_class is not None:
             parameters[('', 'class')] = css_class
         if coordinates is not None:
-            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 'lat')] = coordinates['latitude']
-            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 'long')] = coordinates['longitude']
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 
+                        'lat')] = coordinates['latitude']
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#',
+                        'long')] = coordinates['longitude']
         out.startElementNS((NS, 'a'), 'a', parameters)
         out.characters(text)
         out.endElementNS((NS, 'a'), 'a')
@@ -30,8 +32,10 @@ def make_span(text, title, css_class='geolink', coordinates=None):
         if css_class is not None:
             parameters[('', 'class')] = css_class
         if coordinates is not None:
-            parameters[('geo', 'lat')] = coordinates['latitude']
-            parameters[('geo', 'long')] = coordinates['longitude']
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#',
+                        'lat')] = coordinates['latitude']
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 
+                        'long')] = coordinates['longitude']
         out.startElementNS((NS, 'span'), 'span', parameters)
         out.characters(text)
         out.endElementNS((NS, 'span'), 'span')

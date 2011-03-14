@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    {% for location in locations %}
+    <Placemark>
+      <name>{{location.name}}</name>
+      {% if location.url is defined %}
+      <description>
+        <![CDATA[
+                 <a href="{{location.url}}">{{location.name}}</a>      
+        ]]>
+      </description>
+      {% endif %}
+      <Point>
+        <coordinates>{{location.location.longitude}},{{location.location.latitude}}</coordinates>
+      </Point>
+    </Placemark>
+    {% endfor %}
+  </Document>
+</kml>
