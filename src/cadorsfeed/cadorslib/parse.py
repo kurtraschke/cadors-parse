@@ -10,10 +10,11 @@ from flask import g
 from geolucidate.functions import cleanup, convert
 from geolucidate.parser import parser_re
 
-from cadorsfeed.functions import extensions
-from cadorsfeed.filters.aerodromes import aerodromes_re, lookup
+from cadorsfeed.cadorslib.functions import extensions
 from cadorsfeed.cadorslib.narrative import process_narrative
 from cadorsfeed.cadorslib.locations import LocationStore
+from cadorsfeed.cadorslib.filters.aerodromes import aerodromes_re, lookup
+
 
 NSMAP = {'h':'http://www.w3.org/1999/xhtml',
          'pyf':'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd',
@@ -48,7 +49,6 @@ def make_datetime(date, time):
         time = "0000 Z"
     return datetime.datetime.strptime(date+" "+time, "%Y-%m-%d %H%M Z")
 
-
 def parse_daily_report(report_file):
     parser = html5lib.HTMLParser(
         tree=html5lib.treebuilders.getTreeBuilder("lxml"))
@@ -56,7 +56,7 @@ def parse_daily_report(report_file):
 
     reports = etree_document.xpath("//h:div[@class = 'pagebreak']",
                                    namespaces=NSMAP)
-    
+
     parsed_reports = []
 
     for report_xml in reports:
@@ -64,7 +64,7 @@ def parse_daily_report(report_file):
         parsed_reports.append(report_data)
 
     header_date = re.search("\d\d\d\d-\d\d-\d\d",
-                      etree_document.xpath('//h:div[@class = "widthFull" and contains(text(), "CADORS National Report dated")]', 
+                      etree_document.xpath('//h:div[@class = "widthFull" and contains(text(), "CADORS National Report dated")]',
                                            namespaces=NSMAP)[0].text).group()
 
     daily_report = {'date': datetime.datetime.strptime(header_date,
@@ -96,7 +96,7 @@ def parse_report(report):
               'tsb_number': 'TSB Occurrence No:'}
 
     fields = make_queries(fields)
-    
+
     fields['categories'] = ".//h:fieldset/h:legend/h:strong[contains(text(),'Event Information')]/../following-sibling::h:table//h:strong/text()"
 
     report_data = extractor(report, fields)
@@ -105,7 +105,7 @@ def parse_report(report):
 
     narrative_parts = report.xpath(".//h:fieldset/h:legend/h:strong[contains(text(),'Detail Information')]/../following-sibling::h:table",
                                  namespaces=NSMAP, extensions=extensions)
-    
+
     narrative_fields = {'name': 'User Name:',
                         'date': 'Date:',
                         'further_action': 'Further Action Required:',
@@ -113,13 +113,13 @@ def parse_report(report):
                         'narrative': 'Narrative:'}
 
     for narrative_part in grouper(5, narrative_parts):
-        narrative_data = extractor(narrative_part, 
+        narrative_data = extractor(narrative_part,
                                   make_queries(narrative_fields))
         report_data['narrative'].append(narrative_data)
 
     aircraft_parts = report.xpath(".//h:fieldset/h:legend/h:strong[contains(text(),'Aircraft Information')]/../following-sibling::h:table",
                                   namespaces=NSMAP, extensions=extensions)
-    
+
     aircraft_fields = {'flight_number': 'Flight #:',
                        'category': 'Aircraft Category:',
                        'reg_country': 'Country of Registration:',
@@ -138,7 +138,7 @@ def parse_report(report):
                        'operator_type': 'Operator Type:'}
 
     for aircraft_part in grouper(9, aircraft_parts):
-        aircraft_data = extractor(aircraft_part, 
+        aircraft_data = extractor(aircraft_part,
                                   make_queries(aircraft_fields))
         report_data['aircraft'].append(aircraft_data)
 
@@ -148,8 +148,8 @@ def parse_report(report):
                                              report_data['time'])
     del report_data['date']
     del report_data['time']
-    report_data['fatalities'] = int(report_data['fatalities']) 
-    report_data['injuries'] = int(report_data['injuries']) 
+    report_data['fatalities'] = int(report_data['fatalities'])
+    report_data['injuries'] = int(report_data['injuries'])
 
     locations = LocationStore()
 
@@ -161,7 +161,7 @@ def parse_report(report):
                           data['location']['longitude'],
                           data['name'],
                           data['airport'])
-            
+
     if report_data['location'] != '':
         location = report_data['location']
         #Apply geolucidate and the aerodromes RE
@@ -179,14 +179,14 @@ def parse_report(report):
             locations.add(latitude,
                           longitude,
                           match.group())
-            
+
     for narrative_part in report_data['narrative']:
         name = narrative_part['name']
         (last, first) = name.split(", ")
         narrative_part['name'] = first + " " + last
         narrative_part['date'] = datetime.datetime.strptime(narrative_part['date'],
                                                             "%Y-%m-%d")
-        
+
         narrative_part['parsed_html'] = process_narrative(narrative_part['narrative'])
         #do the location extraction here
         root = etree.fromstring(narrative_part['parsed_html'])
@@ -205,7 +205,7 @@ def parse_report(report):
 
     for aircraft_part in report_data['aircraft']:
         if aircraft_part['flight_number'] != "":
-            match = re.match("([A-Z]{2,4})([0-9]{2,4}M?)", 
+            match = re.match("([A-Z]{2,4})([0-9]{2,4}M?)",
                              aircraft_part['flight_number'])
             if match:
                 parsed_flight = {'operator': match.group(1),
@@ -216,3 +216,4 @@ def parse_report(report):
     report_data['locations'] = locations.to_list()
 
     return report_data
+

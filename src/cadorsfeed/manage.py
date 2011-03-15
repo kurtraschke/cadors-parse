@@ -47,14 +47,14 @@ def retrieve(date):
 @with_db
 def load_aerodromes():
     '''Load or update aerodrome data from DBpedia'''
-    from cadorsfeed.filters.aerodromes import fetch_aerodromes
+    from cadorsfeed.cadorslib.filters.aerodromes import fetch_aerodromes
     fetch_aerodromes()
 
 @manager.command
 @with_db
 def load_iata_blacklist():
     '''Load or update blacklist of IATA codes which produce false positives'''
-    from cadorsfeed.filters.aerodromes import import_blacklist
+    from cadorsfeed.cadorslib.filters.aerodromes import import_blacklist
     import_blacklist()
 
 

@@ -2,8 +2,9 @@ import json
 import re
 import urlparse
 import urllib
-from SPARQLWrapper import SPARQLWrapper, JSON
 from decimal import Decimal, setcontext, ExtendedContext
+
+from SPARQLWrapper import SPARQLWrapper, JSON
 from flask import g, current_app as app
 from werkzeug import cached_property
 from bson.son import SON
@@ -85,14 +86,14 @@ def fix_coord(value):
 def import_blacklist():
     g.db.delete('iata_blacklist')
     g.db.delete('iata_re_cache')
-    with app.open_resource('filters/blacklist.txt') as blacklist:
+    with app.open_resource('cadorslib/filters/blacklist.txt') as blacklist:
         for line in blacklist:
             line = line.strip()
             if not line.startswith('#') and len(line) == 3:
                 g.db.sadd('iata_blacklist', line)
 
 def fetch_aerodromes():
-    with app.open_resource("filters/dbpedia_query.rq") as queryfile:
+    with app.open_resource("cadorslib/filters/dbpedia_query.rq") as queryfile:
         query = queryfile.read()
 
     limit = 500

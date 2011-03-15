@@ -6,7 +6,7 @@ from xml.sax.handler import ContentHandler
 NS = 'http://www.w3.org/1999/xhtml'
 
 NSMAP = {'h': 'http://www.w3.org/1999/xhtml',
-         'a': 'http://www.w3.org/2005/Atom',
+         #'a': 'http://www.w3.org/2005/Atom',
          'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'}
 
 
