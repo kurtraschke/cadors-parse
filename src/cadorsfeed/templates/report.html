@@ -36,8 +36,9 @@
 {% endfor %}
 </ul>
 <h3>Locations</h3>
-<p><a href="{{ url_for('report.fetch_report_kml',
+<p><a href="{{ url_for('report.display_report',
 	    report=report.cadors_number,
+	    format='kml',
 	    _external=True)}}" class="maplink">View map</a></p>
 </section>
 

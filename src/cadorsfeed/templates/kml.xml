@@ -3,8 +3,9 @@
   <Folder>
     <open>1</open>
     <name>CADORS report {{report.cadors_number}}</name>
-    <atom:link href="{{ url_for('fetch_report_html',
+    <atom:link href="{{ url_for('report.display_report',
 		     report=report.cadors_number,
+		     format='html',
 		     _external=True) }}" />
     {% for location in report['locations'] %}
     <Placemark>
