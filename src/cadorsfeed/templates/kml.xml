@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-  <Document>
-    {% for location in locations %}
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+  <Folder>
+    <open>1</open>
+    <name>CADORS report {{report.cadors_number}}</name>
+    <atom:link href="{{ url_for('fetch_report_html',
+		     report=report.cadors_number,
+		     _external=True) }}" />
+    {% for location in report['locations'] %}
     <Placemark>
       <name>{{location.name}}</name>
       {% if location.url is defined %}
@@ -16,5 +21,5 @@
       </Point>
     </Placemark>
     {% endfor %}
-  </Document>
+  </Folder>
 </kml>

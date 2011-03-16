@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+{% block head %}
 <title>cadorsfeed</title>
 <link type="text/css" rel="stylesheet" media="screen" href="/static/css/baseline.compress.css">
 <style type="text/css">
 #page { margin: 0 auto 36px auto; }
 </style>
+<!--[if IE]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js" />
+<![endif]-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script src="http://cdn.jquerytools.org/1.2.5/all/jquery.tools.min.js"></script>
+<!-- FIXME: the Google Maps key should be parameterized. -->
+<script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAXcuKXMwaEjGtWQylDfGXqBQ4MdEIN7TugTKbD7ebaEXCKD6fOxQDvaeGczoQkzQQMYM2p0W50crfDw"></script>
+
+{% endblock %}
 </head>
 <body>
 <body class="page-home">

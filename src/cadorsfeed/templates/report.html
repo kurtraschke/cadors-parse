@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<script type="text/javascript" src="/static/js/map_overlay.js"></script>
+<link type="text/css" rel="stylesheet" media="screen" href="/static/css/map_overlay.css">
+{% endblock %}
+
+
+{% block body %}
+
+{% for report in reports %}
+<div class="report clear width4" id="{{report.cadors_number}}">
+<h2>CADORS Report {{report.cadors_number}}</h2>
+
+
+<section class="column width1 first">
+<h3>Occurrence Information</h3>
+<dl>
+<dt>Location</dt>
+<dd>{{report.location}}</dd>
+<dt>Date</dt>
+<dd>{{report.timestamp}}</dd>
+<dt>Type</dt>
+<dd>{{report.type}}</dd>
+<dt>Fatalities</dt>
+<dd>{{report.fatalities}}</dd>
+<dt>Injuries</dt>
+<dd>{{report.injuries}}</dd>
+</dl>
+
+<h3>Event Information</h3>
+<ul>
+{% for category in report.categories %}
+<li>{{category}}</li>
+{% endfor %}
+</ul>
+<h3>Locations</h3>
+<p><a href="{{ url_for('report.fetch_report_kml',
+	    report=report.cadors_number,
+	    _external=True)}}" class="maplink">View map</a></p>
+</section>
+
+
+<div class="column width3">
+<h3 class="current">Aircraft Information</h3>
+{% for aircraft_block in report.aircraft %}
+<div class="column width1 {{"first" if loop.index0 % 3 == 0}}">
+<h4>{{aircraft_block.category}} {{loop.index}}</h4>
+<p>{{aircraft_block.year}} {{aircraft_block.make}} {{aircraft_block.model}}</p>
+<dl>
+{% if aircraft_block.flight_number %}
+<dt>Flight number</dt>
+<dd>{{aircraft_block.flight_number }}</dd>
+{% endif %} 
+<dt>Damage</dt>
+<dd>{{aircraft_block.damage}}
+<dt>Phase of flight</dt>
+<dd>{{aircraft_block.flight_phase}}</dd>
+<dt>Engine</dt>
+<dd>{{aircraft_block.engine_type}} {{aircraft_block.engine_make}} {{aircraft_block.engine_model}}</dd>
+<dt>Gear type</dt>
+<dd>{{aircraft_block.gear_type}}</dd>
+<dt>Amateur-built</dt>
+<dd>{{aircraft_block.amateur_built}}</dd>
+<dt>Owner</dt>
+<dd>{{aircraft_block.owner}}</dd>
+<dt>Operator</dt>
+<dd>{{aircraft_block.operator_type}} {{aircraft_block.operator}}</dd>
+<dt>Country of registration</dt>
+<dd>{{aircraft_block.reg_country}}</dd>
+</dl>
+</div>
+{% endfor %}
+
+</div>
+
+<section class="narrative width4 clear">
+<h3>Narrative</h3>
+{% for narrative_block in report.narrative %}
+<h4>Update {{loop.index}} by {{narrative_block.name}} on {{narrative_block.date}}</h4>
+{{narrative_block.parsed_html|safe}}
+{% endfor %}
+</section>
+
+
+<div class="overlay">
+<div class="map" style="width: 675px; height: 400px"></div>
+</div>
+</div>
+<hr />
+{% endfor %}
+{% endblock %}
