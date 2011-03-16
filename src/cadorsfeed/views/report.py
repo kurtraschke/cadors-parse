@@ -7,10 +7,21 @@ from flask import abort, request, redirect, url_for, g, make_response, session, 
 
 import bson.json_util
 
-from cadorsfeed.views.util import process_report_atom
+from cadorsfeed.views.util import process_report_atom, Pagination
 
 
 report = Module(__name__)
+
+
+@report.route('/reports/', defaults={'page': 1})
+@report.route('/reports/<int:page>')
+def display_report_list(page):
+
+    pagination = Pagination(g.mdb.reports,{}, 20, page, 'report.display_report_list')
+    if pagination.page > 1 and not pagination.entries:
+        abort(404)
+
+    return render_template('list.html', reports=pagination.entries, pagination=pagination)
 
 
 @report.route('/report/<report>', defaults={'format':'html'})

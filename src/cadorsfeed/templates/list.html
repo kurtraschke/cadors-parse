@@ -1,52 +1,31 @@
 {% extends "base.html" %}
+{% import "pagination.html" as pg %}
+
 {% block body %}
 {% if pagination.page > 1 %}
-<div class="pagination">
-    {%- if pagination.has_previous %}<a href="{{ pagination.previous
-        }}">&laquo; Previous</a>
-    {%- else %}<span class="inactive">&laquo; Previous</span>{% endif %}
-    | {{ pagination.page }} |
-    {% if pagination.has_next %}<a href="{{ pagination.next }}">Next &raquo;</a>
-    {%- else %}<span class="inactive">Next &raquo;</span>{% endif %}
-</div>
+{{ pg.render_pagination(pagination) }}
 {% endif %}
 
 <table>
   <thead>
-  <tr><th>Report Date</th><th>Hits</th><th colspan="3">View</th>
-  {% if session.logged_in %}
-  <th colspan="2">Manage</th>
-  {% endif %}
+  <tr><th>Report Number</th><th>Report Date</th><th>Location</th><th>Type</th>
+    <th>Preview</th>
   </tr>
   </thead>
   <tbody>
   {% for report in reports %}
   <tr>
-    <td>{{ report.date }}</td><td>{{ report.hits }}</td>
-    <td><a href="{{ report.html_link }}">HTML</a></td>
-    <td><a href="{{ report.atom_link }}">Atom</a></td>
-    <td><a href="{{ report.input_link }}">Input</a></td>
-    {% if session.logged_in %}
-    <td>
-      <form action="{{ report.clear_link }}" method="POST">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <button type="submit" name="submit" value="input">Clear input cache</button>
-        <button type="submit" name="submit" value="output">Clear output cache</button>
-      </form>
-    </td>
-    {% endif %}
+    <td><a href="{{ url_for('report.display_report',
+		 report=report.cadors_number) }}">{{report.cadors_number}}</a></td>
+    <td>{{report.timestamp}}</td>
+    <td>{{report.location}}</td>
+    <td>{{report.type}}</td>
+    <td>{{report.narrative[0].narrative | truncate(length=150)}}</td>
   </tr>
   {% endfor %}
   </tbody>
 </table>
 
-<div class="pagination">
-    {%- if pagination.has_previous %}<a href="{{ pagination.previous
-        }}">&laquo; Previous</a>
-    {%- else %}<span class="inactive">&laquo; Previous</span>{% endif %}
-    | {{ pagination.page }} |
-    {% if pagination.has_next %}<a href="{{ pagination.next }}">Next &raquo;</a>
-    {%- else %}<span class="inactive">Next &raquo;</span>{% endif %}
-</div>
+{{ pg.render_pagination(pagination) }}
 
 {% endblock %}
