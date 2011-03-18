@@ -10,7 +10,7 @@ from flask import g
 from geolucidate.functions import cleanup, convert
 from geolucidate.parser import parser_re
 
-from cadorsfeed.cadorslib.functions import extensions
+from cadorsfeed.cadorslib.xpath_functions import extensions
 from cadorsfeed.cadorslib.narrative import process_narrative
 from cadorsfeed.cadorslib.locations import LocationStore
 from cadorsfeed.cadorslib.filters.aerodromes import aerodromes_re, lookup
@@ -70,10 +70,10 @@ def parse_daily_report(report_file):
     daily_report = {'date': datetime.datetime.strptime(header_date,
                                                        "%Y-%m-%d"),
                     'parse_timestamp': datetime.datetime.utcnow(),
-                    'reports': []
+                    'reports': parsed_reports
                     }
 
-    return (daily_report, parsed_reports)
+    return daily_report
 
 def parse_report(report):
     fields = {'cadors_number': 'Cadors Number:',
@@ -213,7 +213,6 @@ def parse_report(report):
                 aircraft_part['flight_number_parsed'] = parsed_flight
 
 
-    report_data['locations'] = locations.to_list()
+    report_data['locations'] = locations.to_list(report_data['cadors_number'])
 
     return report_data
-

@@ -25,10 +25,11 @@ class LocationStore(object):
             if url is not None:
                 self.locations[(latitude, longitude)]['url'] = url
 
-    def to_list(self):
+    def to_list(self, cadors_number):
         out = []
         for location, data in self.locations.iteritems():
             data['location'] = to_son(location)
+            data['cadors_number'] = cadors_number
             out.append(data)
         return out
 

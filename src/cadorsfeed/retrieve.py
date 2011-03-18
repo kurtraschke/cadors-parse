@@ -37,24 +37,27 @@ def retrieve_report(report_date):
     except (URLError, ReportFetchError, ReportNotFoundError):
         raise
 
-        (daily_report, reports) = parse_daily_report(report_file)
-        
-        for report in reports:
-            stored_report = g.mdb.reports.find_one(
-                {'cadors_number': report['cadors_number']}) or {}
-            stored_report.update(report)
-            if 'uuid' not in stored_report:
-                stored_report['uuid'] = uuid.uuid4()
-            g.mdb.reports.save(stored_report)
-            g.mdb.locations.remove({'report.$id':stored_report['_id']})
-            for location in stored_report['locations']:
-                location['report'] = stored_report
-                g.mdb.locations.save(location)
+    daily_report = parse_daily_report(report_file)
 
-            daily_report['reports'].append(stored_report)
+    stored_daily_report = g.mdb.daily_reports.find_one(
+        {'date': daily_report['date']}
+        ) or {'input_id': report_file._id}
+
+    stored_daily_report.update(daily_report)
+    reports = []
+
+    for report in stored_daily_report['reports']:
+        stored_report = g.mdb.reports.find_one(
+            {'cadors_number': report['cadors_number']}
+            ) or {'uuid': uuid.uuid4()}
+        stored_report.update(report)
+        g.mdb.reports.save(stored_report) #save first so we get an id
+        g.mdb.locations.remove({'cadors_number':
+                                    stored_report['cadors_number']})
+        for location in stored_report['locations']:
+            g.mdb.locations.save(location)
+        g.mdb.reports.save(stored_report)
+        reports.append(stored_report)
         
-        stored_daily_report = g.mdb.daily_reports.find_one(
-            {'date': daily_report['date']}) or {}
-        stored_daily_report.update(daily_report)
-        stored_daily_report['input_id'] = report_file._id
-        g.mdb.daily_reports.save(stored_daily_report)
+    stored_daily_report['reports'] = reports
+    g.mdb.daily_reports.save(stored_daily_report)
