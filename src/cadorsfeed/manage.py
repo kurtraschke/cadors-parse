@@ -3,7 +3,6 @@ from flask import g
 from functools import wraps
 
 from cadorsfeed import create_app
-from cadorsfeed.auth import set_password
 from cadorsfeed.db import setup_db
 
 manager = Manager(create_app)
@@ -16,26 +15,6 @@ def with_db(f):
         setup_db()
         return f(*args, **kwargs)
     return wrapper
-
-
-@manager.option('-u', '--username', dest='username', required=True)
-@with_db
-def adduser(username):
-    '''Add an administrative user'''
-    password = prompt_pass("Enter password for user %s" % username)
-    set_password(username, password)
-
-
-@manager.option('-u', '--username', dest='username', required=True)
-@with_db
-def deluser(username):
-    '''Add an administrative user'''
-    if g.db.exists("users:" + username):
-        confirm = prompt_bool("Are you sure you wish to delete user %s" % username)
-        if confirm:
-            g.db.delete("users:" + username)
-    else:
-        print "User %s does not exist." % username
 
 @manager.option('-d', '--date', dest='report_date', required=True)
 @with_db
