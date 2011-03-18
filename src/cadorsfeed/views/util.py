@@ -1,6 +1,6 @@
 from pyrfc3339 import generate
 from werkzeug import cached_property
-from flask import url_for
+from flask import url_for, request
 
 
 def process_report_atom(reports):
@@ -30,7 +30,7 @@ class Pagination(object):
             (self.page - 1) * self.per_page).limit(self.per_page)
 
     def iter_pages(self, left_edge=2, left_current=2,
-                   right_current=5, right_edge=2):
+                   right_current=3, right_edge=2):
         last = 0
         for num in xrange(1, self.pages + 1):
             if num <= left_edge or \
@@ -43,10 +43,13 @@ class Pagination(object):
                 last = num
         
     def url_for_page(self, page):
-        return url_for(self.endpoint, page=page)
+        args =  request.args.to_dict(flat=True)
+        args.update(request.view_args.copy())
+        args['page'] = page
+        return url_for(self.endpoint, **args)
 
     has_previous = property(lambda x: x.page > 1)
     has_next = property(lambda x: x.page < x.pages)
-    previous = property(lambda x: url_for(x.endpoint, page=x.page - 1))
-    next = property(lambda x: url_for(x.endpoint, page=x.page + 1))
+    previous = property(lambda x: x.url_for_page(page=x.page - 1))
+    next = property(lambda x: x.url_for_page(page=x.page + 1))
     pages = property(lambda x: max(0, x.count - 1) // x.per_page + 1)
