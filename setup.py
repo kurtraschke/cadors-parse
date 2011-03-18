@@ -28,7 +28,6 @@ setup(
     install_requires=[
         'setuptools',
         'Flask',
-        'Redis',
         'PyMongo',
         'lxml',
         'mechanize',
