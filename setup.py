@@ -34,7 +34,6 @@ setup(
         'mechanize',
         'html5lib',
         'SPARQLWrapper',
-        'cryptacular',
         'Flask-Script',
         'Flask-CSRF',
         'pyRFC3339',

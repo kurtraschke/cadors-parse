@@ -22,11 +22,9 @@ def create_app(config=None):
     from cadorsfeed.views.daily_report import daily_report
     from cadorsfeed.views.report import report
     #from cadorsfeed.views.frontend import frontend
-    #from cadorsfeed.views.auth import auth
     app.register_module(daily_report)
     app.register_module(report)
     #app.register_module(frontend)
-    #app.register_module(auth)
     app.add_url_rule('/favicon.ico', 'favicon', redirect_to='/static/favicon.ico')
     csrf(app)
 
