@@ -37,11 +37,20 @@ def deluser(username):
     else:
         print "User %s does not exist." % username
 
-@manager.option('-d', '--date', dest='date', required=True)
+@manager.option('-d', '--date', dest='report_date', required=True)
 @with_db
-def retrieve(date):
+def retrieve(report_date):
+    from datetime import datetime
     from cadorsfeed.retrieve import retrieve_report
-    retrieve_report(date)
+    retrieve_report(datetime.strptime(report_date, "%Y-%m-%d"))
+
+@manager.command
+@with_db
+def retrieve_today():
+    from cadorsfeed.retrieve import retrieve_report, latest_daily_report
+    report_date = latest_daily_report()
+    retrieve_report(report_date)
+    print "Retrieved daily report for %s." % report_date
 
 @manager.command
 @with_db
