@@ -13,12 +13,13 @@ def process_report_atom(reports):
 
 class Pagination(object):
 
-    def __init__(self, db, query, per_page, page, endpoint):
+    def __init__(self, db, query, per_page, page, endpoint, sort=None):
         self.db = db
         self.query = query
         self.per_page = per_page
         self.page = page
         self.endpoint = endpoint
+        self.sort = sort
 
     @cached_property
     def count(self):
@@ -26,8 +27,11 @@ class Pagination(object):
 
     @cached_property
     def entries(self):
-        return self.db.find(self.query).skip(
+        cursor = self.db.find(self.query).skip(
             (self.page - 1) * self.per_page).limit(self.per_page)
+        if self.sort:
+            cursor.sort(self.sort)
+        return cursor
 
     def iter_pages(self, left_edge=2, left_current=2,
                    right_current=3, right_edge=2):

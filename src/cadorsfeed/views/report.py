@@ -6,6 +6,7 @@ import json
 from flask import abort, request, redirect, url_for, g, make_response, session, flash, render_template, Module
 
 import bson.json_util
+import pymongo
 
 from cadorsfeed.views.util import process_report_atom, Pagination
 
@@ -17,7 +18,9 @@ report = Module(__name__)
 @report.route('/reports/<int:page>')
 def display_report_list(page):
 
-    pagination = Pagination(g.mdb.reports,{}, 20, page, 'report.display_report_list')
+    pagination = Pagination(g.mdb.reports,{}, 20, page,
+                            'report.display_report_list',
+                            sort=[('timestamp', pymongo.DESCENDING)])
     if pagination.page > 1 and not pagination.entries:
         abort(404)
 
