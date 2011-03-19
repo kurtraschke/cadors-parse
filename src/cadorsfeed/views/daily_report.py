@@ -1,32 +1,31 @@
 from datetime import datetime
+from collections import defaultdict
 import json
 
 from flask import abort, request, redirect, url_for, g
 from flask import make_response, render_template, send_file, Module
 from flask import current_app as app
 import bson.json_util
+import pymongo
 
 from cadorsfeed.views.util import process_report_atom
+from cadorsfeed.retrieve import latest_daily_report 
 
 daily_report = Module(__name__)
 
-"""
-@feeds.route('/report/latest/', defaults={'format': 'atom'})
-@feeds.route('/report/latest/<any(u"atom", u"html"):format>')
+@daily_report.route('/day/latest/', defaults={'format': 'html'})
+@daily_report.route('/day/latest/report.<any(u"atom", u"html", u"json"):format>')
 def latest_report(format):
-    if 'latest' in g.db:
-        latestDate = g.db['latest']
-    else:
-        try:
-            latestDate = fetchLatest()
-            g.db.setex('latest', latestDate, 60 * 60 * 12)
-        except Exception:
-            raise
+    report = g.mdb.daily_reports.find_one({},
+                                 sort=[('date',
+                                        pymongo.DESCENDING)],
+                                 fields=['date'])
 
-    (year, month, day) = latestDate.split('-')
+    (year, month, day) = report['date'].utctimetuple()[0:3]
 
-    return redirect(url_for('do_report', year=year, month=month, day=day, format=format))
-"""
+    return redirect(url_for('do_daily_report', year=year, month=month,
+                            day=day, format=format))
+
 
 @daily_report.route('/day/<int:year>/<int:month>/<int:day>/', defaults={'format': 'html'})
 @daily_report.route('/day/<int:year>/<int:month>/<int:day>/report.<any(u"atom", u"html", u"json"):format>')
@@ -45,15 +44,37 @@ def do_daily_report(year, month, day, format):
                                                  reports=process_report_atom(daily_report['reports'])))
         response.mimetype = "application/atom+xml"
     elif format=='html':
-        response = make_response(render_template('report.html',
-                                                 reports=daily_report['reports']))
+        next_report = g.mdb.daily_reports.find_one({'date': {'$gt': ts}},
+                                                    sort=[('date',
+                                                           pymongo.ASCENDING)],
+                                                   fields=['date'])
+        previous_report = g.mdb.daily_reports.find_one({'date': {'$lt': ts}},
+                                                        sort=[('date',
+                                                               pymongo.DESCENDING)],
+                                                       fields=['date'])
+
+        types = defaultdict(int)
+        regions = defaultdict(int)
+        
+        daily_report['reports'].sort(key=lambda r: r['timestamp'], reverse=True)
+
+        for report in daily_report['reports']:
+            types[report['type']] += 1
+            regions[report['region']] += 1
+        
+            response = make_response(render_template('daily_report.html',
+                                                     reports=daily_report['reports'],
+                                                     types=types,
+                                                     regions=regions,
+                                                     previous_report=previous_report,
+                                                     next_report=next_report
+                                                     ))
     elif format=='json':
         response = make_response(json.dumps({'reports': daily_report['reports']},
                                             indent=None if request.is_xhr else 2,
                                             default=bson.json_util.default))
         response.mimetype = "application/json"
 
-    #rv.last_modified = datetime.utcfromtimestamp(float(g.db.hget(key, "parse_ts")))
     response.add_etag()
     response.make_conditional(request)
     return response

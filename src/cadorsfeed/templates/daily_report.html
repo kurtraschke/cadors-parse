@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% import "pagination.html" as pg %}
+
+{% block head %}
+{{ super() }}
+<style type="text/css">
+
+.count {
+    font-size: 36px;
+    top: 5px;
+    line-height: 36px;
+}
+</style>
+
+{% endblock %}
+
+
+{% block body %}
+
+<section>
+{% if previous_report %}
+<a href="{{ url_for('daily_report.do_daily_report', 
+	 year=previous_report['date'].year,
+	 month=previous_report['date'].month,
+	 day=previous_report['date'].day,
+	 format='html')}}">{{ previous_report['date'].strftime("%Y-%m-%d")}}</a>
+{% endif %}
+
+|
+
+{% if next_report %}
+<a href="{{ url_for('daily_report.do_daily_report', 
+	 year=next_report['date'].year,
+	 month=next_report['date'].month,
+	 day=next_report['date'].day,
+	 format='html')}}">{{ next_report['date'].strftime("%Y-%m-%d")}}</a>
+{% endif %}
+
+</section>
+
+<section>
+<h2>What</h2>
+{% for type in types %}
+<div class="column unitx1 {{ 'first' if loop.index0 == 0}}">
+<p>
+<span class="count">{{ types[type] }}</span><br />
+<span><strong>{{ type }}</strong></span>
+</p>
+</div>
+{% endfor %}
+</section>
+
+<section class="width4 clear">
+<h2>Where</h2>
+{% for region in regions %}
+<div class="column unitx1 {{ 'first' if loop.index0 == 0}}">
+<p>
+<span class="count">{{ regions[region] }}</span><br />
+<span><strong>{{ region }}</strong></span>
+</p>
+</div>
+{% endfor %}
+</section>
+
+<table>
+  <thead>
+  <tr><th>Report Number</th><th>Report Date</th><th>Location</th><th>Type</th>
+    <th>Preview</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for report in reports %}
+  <tr>
+    <td><a href="{{ url_for('report.display_report',
+		 report=report.cadors_number) }}">{{report.cadors_number}}</a></td>
+    <td>{{ report.timestamp.strftime("%Y&#8209;%m&#8209;%d %H%M&nbsp;Z") | safe }}</td>
+    <td>{{report.location}}</td>
+    <td>{{report.type}}</td>
+    <td>{{report.narrative[0].narrative | truncate(length=150)}}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
