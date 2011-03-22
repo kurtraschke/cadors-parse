@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "pagination.html" as pg %}
+{% import "report_list.html" as r %}
+
+{% block body %}
+{% if pagination.page > 1 %}
+{{ pg.render_pagination(pagination, endpoint) }}
+{% endif %}
+
+<table>
+  <thead>
+  <tr><th>Report Number</th><th>Report Date</th><th>Location</th><th>Type</th>
+    <th>Preview</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for (report, snippets) in reports %}
+  <tr>
+    <td><a href="{{ url_for('report.display_report',
+		 report=report.cadors_number) }}">{{report.cadors_number}}</a></td>
+    <td>{{ report.timestamp.strftime("%Y&#8209;%m&#8209;%d %H%M&nbsp;Z") | safe }}</td>
+    <td>{{report.location}}</td>
+    <td>{{report.occurrence_type}}</td>
+    <td>{% for snippet in snippets.split('|||') %}
+    <span>{{snippet|safe}}<br></span>
+    {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+
+{{ pg.render_pagination(pagination, endpoint) }}
+
+{% endblock %}

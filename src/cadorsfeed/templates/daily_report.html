@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "pagination.html" as pg %}
+{% import "report_list.html" as r %}
 
 {% block head %}
 {{ super() }}
@@ -20,20 +21,20 @@
 <section>
 {% if previous_report %}
 <a href="{{ url_for('daily_report.do_daily_report', 
-	 year=previous_report['date'].year,
-	 month=previous_report['date'].month,
-	 day=previous_report['date'].day,
-	 format='html')}}">{{ previous_report['date'].strftime("%Y-%m-%d")}}</a>
+	 year=previous_report.report_date.year,
+	 month=previous_report.report_date.month,
+	 day=previous_report.report_date.day,
+	 format='html')}}">{{ previous_report.report_date.strftime("%Y-%m-%d")}}</a>
 {% endif %}
 
 |
 
 {% if next_report %}
 <a href="{{ url_for('daily_report.do_daily_report', 
-	 year=next_report['date'].year,
-	 month=next_report['date'].month,
-	 day=next_report['date'].day,
-	 format='html')}}">{{ next_report['date'].strftime("%Y-%m-%d")}}</a>
+	 year=next_report.report_date.year,
+	 month=next_report.report_date.month,
+	 day=next_report.report_date.day,
+	 format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}</a>
 {% endif %}
 
 </section>
@@ -43,8 +44,8 @@
 {% for type in types %}
 <div class="column unitx1 {{ 'first' if loop.index0 == 0}}">
 <p>
-<span class="count">{{ types[type] }}</span><br />
-<span><strong>{{ type }}</strong></span>
+<span class="count">{{ type[1] }}</span><br />
+<span><strong>{{ type[0] }}</strong></span>
 </p>
 </div>
 {% endfor %}
@@ -55,31 +56,14 @@
 {% for region in regions %}
 <div class="column unitx1 {{ 'first' if loop.index0 == 0}}">
 <p>
-<span class="count">{{ regions[region] }}</span><br />
-<span><strong>{{ region }}</strong></span>
+<span class="count">{{ region[1] }}</span><br />
+<span><strong>{{ region[0] }}</strong></span>
 </p>
 </div>
 {% endfor %}
 </section>
 
-<table>
-  <thead>
-  <tr><th>Report Number</th><th>Report Date</th><th>Location</th><th>Type</th>
-    <th>Preview</th>
-  </tr>
-  </thead>
-  <tbody>
-  {% for report in reports %}
-  <tr>
-    <td><a href="{{ url_for('report.display_report',
-		 report=report.cadors_number) }}">{{report.cadors_number}}</a></td>
-    <td>{{ report.timestamp.strftime("%Y&#8209;%m&#8209;%d %H%M&nbsp;Z") | safe }}</td>
-    <td>{{report.location}}</td>
-    <td>{{report.type}}</td>
-    <td>{{report.narrative[0].narrative | truncate(length=150)}}</td>
-  </tr>
-  {% endfor %}
-  </tbody>
-</table>
+{{ r.report_list(reports) }}
+
 
 {% endblock %}

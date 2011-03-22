@@ -1,12 +1,12 @@
-{% macro render_pagination(pagination) %}
+{% macro render_pagination(pagination, endpoint) %}
  <div class="pagination">
    {% if pagination.has_previous -%}
-   <a href="{{ pagination.previous}}">&laquo; Previous</a> |
+   <a href="{{ modified_url_for(page=pagination.prev_num) }}">&laquo; Previous</a> |
    {%- endif -%}
   {%- for page in pagination.iter_pages() -%}
     {% if page -%}
       {% if page != pagination.page %}
-        <a href="{{ pagination.url_for_page(page) }}">{{ page }}</a>
+        <a href="{{ modified_url_for(page=page) }}">{{ page }}</a>
       {%- else %}
         <strong>{{ page }}</strong>
       {%- endif %}
@@ -15,7 +15,7 @@
     {%- endif %}
   {%- endfor -%}
   {% if pagination.has_next -%}
-    &nbsp;| <a href="{{ pagination.next }}">Next &raquo;</a>
+    &nbsp;| <a href="{{ modified_url_for(page=pagination.next_num) }}">Next &raquo;</a>
   {%- endif %}
   </div>
 {% endmacro %}

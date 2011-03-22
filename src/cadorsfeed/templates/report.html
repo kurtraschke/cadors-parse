@@ -22,7 +22,7 @@
 <dt>Date</dt>
 <dd>{{report.timestamp}}</dd>
 <dt>Type</dt>
-<dd>{{report.type}}</dd>
+<dd>{{report.occurrence_type}}</dd>
 <dt>Fatalities</dt>
 <dd>{{report.fatalities}}</dd>
 <dt>Injuries</dt>
@@ -32,7 +32,7 @@
 <h3>Event Information</h3>
 <ul>
 {% for category in report.categories %}
-<li>{{category}}</li>
+<li>{{category.text}}</li>
 {% endfor %}
 </ul>
 <h3>Locations</h3>
@@ -48,9 +48,9 @@
 {% for aircraft_block in report.aircraft %}
 <div class="column width1 {{"first" if loop.index0 % 3 == 0}}">
 <h4>{{aircraft_block.category}} {{loop.index}}</h4>
-<p>{{aircraft_block.year}} {{aircraft_block.make}} {{aircraft_block.model}}</p>
+<p>{{aircraft_block.year|d('foo')}} {{aircraft_block.make}} {{aircraft_block.model}}</p>
 <dl>
-{% if aircraft_block.flight_number %}
+{% if aircraft_block.flight_number is defined %}
 <dt>Flight number</dt>
 <dd>{{aircraft_block.flight_number }}</dd>
 {% endif %} 
@@ -59,15 +59,15 @@
 <dt>Phase of flight</dt>
 <dd>{{aircraft_block.flight_phase}}</dd>
 <dt>Engine</dt>
-<dd>{{aircraft_block.engine_type}} {{aircraft_block.engine_make}} {{aircraft_block.engine_model}}</dd>
+<dd>{{aircraft_block.engine_type|d}} {{aircraft_block.engine_make|d}} {{aircraft_block.engine_model|d}}</dd>
 <dt>Gear type</dt>
-<dd>{{aircraft_block.gear_type}}</dd>
+<dd>{{ aircraft_block.gear_type|d('Unknown', true) }}</dd>
 <dt>Amateur-built</dt>
 <dd>{{aircraft_block.amateur_built}}</dd>
 <dt>Owner</dt>
 <dd>{{aircraft_block.owner}}</dd>
 <dt>Operator</dt>
-<dd>{{aircraft_block.operator_type}} {{aircraft_block.operator}}</dd>
+<dd>{{aircraft_block.operator_type}} {{aircraft_block.operator|d}}</dd>
 <dt>Country of registration</dt>
 <dd>{{aircraft_block.reg_country}}</dd>
 </dl>
@@ -78,15 +78,15 @@
 
 <section class="narrative width4 clear">
 <h3>Narrative</h3>
-{% for narrative_block in report.narrative %}
+{% for narrative_block in report.narrative_parts %}
 <h4>Update {{loop.index}} by {{narrative_block.name}} on {{narrative_block.date}}</h4>
-{{narrative_block.parsed_html|safe}}
+{{narrative_block.narrative_html|safe}}
 {% endfor %}
 </section>
 
 
 <div class="overlay">
-<div class="map" style="width: 675px; height: 400px"></div>
+<div class="map" style="width: 800px; height: 500px"></div>
 </div>
 </div>
 <hr />

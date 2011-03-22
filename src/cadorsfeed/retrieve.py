@@ -2,7 +2,11 @@ from datetime import datetime, timedelta
 import uuid
 from urllib2 import URLError
 
-from flask import g
+#from flask import g
+from geoalchemy import WKTSpatialElement
+
+from cadorsfeed.models import *
+from cadorsfeed import db
 
 from cadorsfeed.cadorslib.fetch import fetch_daily_report, fetch_latest_date
 from cadorsfeed.cadorslib.fetch import ReportNotFoundError, ReportFetchError
@@ -10,6 +14,10 @@ from cadorsfeed.cadorslib.parse import parse_daily_report
 
 
 def latest_daily_report():
+    return datetime.strptime(fetch_latest_date(),
+                             "%Y-%m-%d")
+
+    """
     latest = g.mdb.latest_daily_report.find_one({})
     if latest is None or (datetime.utcnow() - \
                               latest['fetch_time']) > timedelta(hours=12):
@@ -18,46 +26,80 @@ def latest_daily_report():
                   'fetch_time': datetime.utcnow()}
         g.mdb.latest_daily_report.save(latest)
     return latest['report_date']
+    """
 
 def conditional_fetch(report_date, refetch=False):
-    if not g.fs.exists(filename=report_date) or refetch:
+    daily_report = DailyReport.query.filter(
+        DailyReport.report_date==report_date).first()
+    
+    if daily_report is None:
+        daily_report = DailyReport(report_date=report_date)
+        db.session.add(daily_report)
+    if daily_report.report_html is None or refetch:
         try:
-            report_data = fetch_daily_report(report_date)
+            daily_report.report_html = fetch_daily_report(report_date.strftime("%Y-%m-%d")).encode('utf-8')
+            daily_report.fetch_timestamp = datetime.utcnow()
         except (URLError, ReportFetchError, ReportNotFoundError):
             raise
-        g.fs.put(report_data, filename=report_date, encoding='utf-8',
-                 date=report_date, fetch_date=datetime.utcnow())
-        
-    return g.fs.get_last_version(filename=report_date)
+        db.session.commit()
+
+    return daily_report.report_html
 
 def retrieve_report(report_date):
 
     try:
-        report_file = conditional_fetch(report_date.strftime("%Y-%m-%d"))
+        report_file = conditional_fetch(report_date)
     except (URLError, ReportFetchError, ReportNotFoundError):
         raise
 
-    daily_report = parse_daily_report(report_file)
+    parsed_daily_report = parse_daily_report(report_file)
 
-    stored_daily_report = g.mdb.daily_reports.find_one(
-        {'date': daily_report['date']}
-        ) or {'input_id': report_file._id}
+    #We might be updating a report which already exists.
+    daily_report = DailyReport.query.filter(
+        DailyReport.report_date==report_date).first()
 
-    stored_daily_report.update(daily_report)
+    daily_report.parse_timestamp = datetime.utcnow()
+
     reports = []
 
-    for report in stored_daily_report['reports']:
-        stored_report = g.mdb.reports.find_one(
-            {'cadors_number': report['cadors_number']}
-            ) or {'uuid': uuid.uuid4()}
-        stored_report.update(report)
-        g.mdb.reports.save(stored_report) #save first so we get an id
-        g.mdb.locations.remove({'cadors_number':
-                                    stored_report['cadors_number']})
-        for location in stored_report['locations']:
-            g.mdb.locations.save(location)
-        g.mdb.reports.save(stored_report)
-        reports.append(stored_report)
+    for parsed_report in parsed_daily_report['reports']:
+
+        categories = []
+        for category in parsed_report['categories']:
+            categories.append(ReportCategory(text=category))
+        del parsed_report['categories']
+
+        aircraft_parts = []
+        for aircraft_part in parsed_report['aircraft']:
+            aircraft_parts.append(Aircraft(**aircraft_part))
+        del parsed_report['aircraft']
+    
+        narrative_parts = []
+        for narrative_part in parsed_report['narrative']:
+            narrative_parts.append(NarrativePart(**narrative_part))
+        del parsed_report['narrative']
         
-    stored_daily_report['reports'] = reports
-    g.mdb.daily_reports.save(stored_daily_report)
+        locations = []
+        for location in parsed_report['locations']:
+            wkt = "POINT(%s %s)" % (location['longitude'], location['latitude'])
+            location['location'] = WKTSpatialElement(wkt)
+            del location['latitude']
+            del location['longitude']
+            locations.append(Location(**location))
+        del parsed_report['locations']
+
+        report = CadorsReport.query.get(
+            parsed_report['cadors_number']) or CadorsReport(uuid=uuid.uuid4())
+
+        for key, value in parsed_report.iteritems():
+            setattr(report, key, value)
+
+        report.categories = categories
+        report.aircraft = aircraft_parts
+        report.narrative_parts = narrative_parts
+        report.locations = locations
+
+        reports.append(report)
+
+    daily_report.reports = reports
+    db.session.commit()

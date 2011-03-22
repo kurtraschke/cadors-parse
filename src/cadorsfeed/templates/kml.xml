@@ -17,9 +17,7 @@
         ]]>
       </description>
       {% endif %}
-      <Point>
-        <coordinates>{{location.location.longitude}},{{location.location.latitude}}</coordinates>
-      </Point>
+      {{location.kml|safe}}
     </Placemark>
     {% endfor %}
   </Folder>

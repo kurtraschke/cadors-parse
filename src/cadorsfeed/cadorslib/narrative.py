@@ -3,7 +3,7 @@ from lxml import etree
 
 from geolucidate.functions import get_replacements
 
-from cadorsfeed.cadorslib.filters.aerodromes import replace_aerodromes
+from cadorsfeed.aerodb import replace_aerodromes
 from cadorsfeed.cadorslib.filters.link_cadors import replace_cadors_links
 from cadorsfeed.cadorslib.filters.filter import make_link, make_span, do_filter
 

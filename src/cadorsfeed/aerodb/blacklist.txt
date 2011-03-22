@@ -1,4 +1,8 @@
+#Keep sorted with C-x h M-x sort-lines
 08R
+26R
+30F
+AAF
 ACC
 AKK
 AMM
@@ -9,12 +13,14 @@ ATC
 ATR
 ATS
 BFF
+BST
 CAP
 CAR
 CAS
 CAT
 CCR
 CFR
+CIA
 CNK
 CSA
 CTA
@@ -26,8 +32,10 @@ FSS
 GPS
 M06
 MEA
+MEL
 MLG
 MPE
+NAV
 NDB
 NOC
 OFF
@@ -37,6 +45,7 @@ PRM
 PST
 RAC
 RMK
+SDR
 SID
 SMS
 SNA
@@ -44,6 +53,7 @@ SOP
 TCA
 THR
 TOC
+TSB
 UTC
 VIS
 WJA

@@ -26,13 +26,13 @@
     {% endfor %}
     <a:content type="xhtml">
       <h:div>
-      {% for narrative in report.narrative %}
-      {{narrative.parsed_html|safe}}
+      {% for narrative in report.narrative_parts %}
+      {{narrative.narrative_html|safe}}
       {% endfor %}
       </h:div>
     </a:content>
     {% for category in report.categories %}
-    <a:category label="{{category}}" term="{{category}}" />
+    <a:category label="{{category.text}}" term="{{category.text}}" />
     {% endfor %}
   </a:entry>
   {% endfor %}

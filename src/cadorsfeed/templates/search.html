@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="full">
+
+<form action="/search/text" method="GET">
+<fieldset class="width4">
+<legend>Search report text</legend>
+<label class="unitx2 first">Query<input type="text" name="q" class="text"></label>
+</fieldset>
+<fieldset class="width2">
+<input type="submit" value="Submit"> 
+</fieldset>
+</form>
+
+<form action="/search/location" method="GET">
+<fieldset class="width4">
+<legend>Search by location</legend>
+<label class="unitx1 first">Latitude<input type="text" name="latitude" class="text"></label>
+<label class="unitx1">Longitude<input type="text" name="longitude" class="text"></label>
+<label class="unitx1">Radius (km)<input type="text" name="radius" class="text"></label>
+<label class="unitx2 first"><input type="radio" name="primary" value="primary" checked="checked">Primary location only</label>
+<label class="unitx2"><input type="radio" name="primary" value="all">All locations</label>
+</fieldset>
+<fieldset class="width2">
+<input type="submit" value="Submit"> 
+</fieldset>
+</form>
+
+
+</div>
+
+{% endblock %}
