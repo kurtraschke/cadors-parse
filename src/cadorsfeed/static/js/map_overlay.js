@@ -11,6 +11,8 @@ $(document).ready(function() {
       var theoverlay = $('div.overlay', element);
  
       $(thelink).overlay({
+        top: 'center',
+      
         target: $(theoverlay),
 
         onLoad: function(event) {
@@ -18,7 +20,10 @@ $(document).ready(function() {
             var ge = instance;
             ge.getWindow().setVisibility(true);
             ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
-
+            ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+            ge.getOptions().setStatusBarVisibility(true);
+            ge.getOptions().setScaleLegendVisibility(true);
+            
             var link = ge.createLink('');
             var href = thekml;
             link.setHref(href);
