@@ -28,7 +28,9 @@ setup(
     install_requires=[
         'setuptools',
         'Flask',
-        'PyMongo',
+        'Flask-SQLAlchemy',
+        'psycopg2',
+        'GeoAlchemy',
         'lxml',
         'mechanize',
         'html5lib',
