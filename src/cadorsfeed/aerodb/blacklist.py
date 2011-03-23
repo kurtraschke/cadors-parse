@@ -2,6 +2,7 @@ from cadorsfeed import db
 from cadorsfeed.aerodb import lookup
 from flask import current_app as app
 
+
 def import_blacklist():
     with app.open_resource('aerodb/blacklist.txt') as blacklist:
         for line in blacklist:
@@ -11,4 +12,3 @@ def import_blacklist():
                 if aerodrome is not None:
                     aerodrome.blacklist = True
     db.session.commit()
-

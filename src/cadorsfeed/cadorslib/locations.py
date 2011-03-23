@@ -5,6 +5,7 @@ from decimal import *
 setcontext(ExtendedContext)
 precision = Decimal('0.000001')
 
+
 class LocationStore(object):
     def __init__(self):
         self.locations = {}
@@ -34,6 +35,7 @@ class LocationStore(object):
             (data['latitude'], data['longitude']) = location
             out.append(data)
         return out
+
 
 def makedecimal(value):
     if isinstance(value, float):

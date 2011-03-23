@@ -14,6 +14,7 @@ def retrieve(report_date):
     from cadorsfeed.retrieve import retrieve_report
     retrieve_report(datetime.strptime(report_date, "%Y-%m-%d"))
 
+
 @manager.command
 def retrieve_today():
     from cadorsfeed.retrieve import retrieve_report, latest_daily_report
@@ -21,11 +22,13 @@ def retrieve_today():
     retrieve_report(report_date)
     print "Retrieved daily report for %s." % report_date
 
+
 @manager.command
 def load_aerodromes():
     '''Load or update aerodrome data from DBpedia'''
     from cadorsfeed.aerodb import fetch_aerodromes
     fetch_aerodromes()
+
 
 @manager.option('-a', '--aerodrome', dest='aerodrome', required=True)
 def lookup(aerodrome):
@@ -33,11 +36,13 @@ def lookup(aerodrome):
     from pprint import pprint
     pprint(dict(lookup(aerodrome)))
 
+
 @manager.command
 def load_iata_blacklist():
     '''Load or update blacklist of IATA codes which produce false positives'''
     from cadorsfeed.aerodb import import_blacklist
     import_blacklist()
+
 
 @manager.command
 def create_all():
@@ -47,6 +52,7 @@ def create_all():
     from cadorsfeed.models import Aircraft, NarrativePart, Location
     from cadorsfeed.models import Aerodrome
     db.create_all()
+
 
 @manager.command
 def drop_all():

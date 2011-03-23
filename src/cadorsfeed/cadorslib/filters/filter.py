@@ -17,7 +17,7 @@ def make_link(url, text, title, css_class='geolink', coordinates=None):
         if css_class is not None:
             parameters[('', 'class')] = css_class
         if coordinates is not None:
-            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#',
                         'lat')] = coordinates['latitude']
             parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#',
                         'long')] = coordinates['longitude']
@@ -25,6 +25,7 @@ def make_link(url, text, title, css_class='geolink', coordinates=None):
         out.characters(text)
         out.endElementNS((NS, 'a'), 'a')
     return output_link
+
 
 def make_span(text, title, css_class='geolink', coordinates=None):
     def output_span(out):
@@ -34,7 +35,7 @@ def make_span(text, title, css_class='geolink', coordinates=None):
         if coordinates is not None:
             parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#',
                         'lat')] = coordinates['latitude']
-            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#', 
+            parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#',
                         'long')] = coordinates['longitude']
         out.startElementNS((NS, 'span'), 'span', parameters)
         out.characters(text)
@@ -42,7 +43,8 @@ def make_span(text, title, css_class='geolink', coordinates=None):
     return output_span
 
 
-#There _is_ a cleaner way to replace text with an Element, but only marginally cleaner.
+#There _is_ a cleaner way to replace text with an Element,
+#but only marginally cleaner.
 class FilterContentHandler(ContentHandler, object):
 
     def __init__(self, replacement_function):

@@ -11,6 +11,7 @@ def register(func):
     extensions[(EXTENSION_NS, func.__name__)] = wrapper
     return func
 
+
 @register
 def strip_nbsp(to_strip):
     if isinstance(to_strip, list):
@@ -18,6 +19,7 @@ def strip_nbsp(to_strip):
             return None
         to_strip = stripout(to_strip)
     return to_strip.rstrip(u'\xa0')
+
 
 def stripout(things):
     assert len(things) == 1, things

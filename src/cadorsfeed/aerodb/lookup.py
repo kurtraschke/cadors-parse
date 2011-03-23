@@ -1,6 +1,7 @@
 from sqlalchemy import or_
 from cadorsfeed.models import Aerodrome
 
+
 def lookup(code):
     if code is None:
         return None

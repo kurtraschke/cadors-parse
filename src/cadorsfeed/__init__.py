@@ -13,8 +13,8 @@ for i in range(3 + __name__.count('.')):
 abspath = partial(os.path.join, _buildout_path)
 del _buildout_path
 
-
 db = SQLAlchemy()
+
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -28,7 +28,8 @@ def create_app(config=None):
     app.register_module(report)
     app.register_module(category)
     app.register_module(search)
-    app.add_url_rule('/favicon.ico', 'favicon', redirect_to='/static/favicon.ico')
+    app.add_url_rule('/favicon.ico', 'favicon',
+                     redirect_to='/static/favicon.ico')
     csrf(app)
     db.init_app(app)
 

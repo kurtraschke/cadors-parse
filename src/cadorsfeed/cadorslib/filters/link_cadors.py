@@ -9,7 +9,8 @@ def replace_cadors_links(text, link_function):
 
     for match in matches:
         text = match.group()
-        url = "http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/qs.aspx?lang=eng&cadorsno=" + text
+        url = "http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/" \
+            "qs.aspx?lang=eng&cadorsno=" + text
         title = "CADORS Report " + text
         substitutions[match] = link_function(url, match.group(), title, None)
 

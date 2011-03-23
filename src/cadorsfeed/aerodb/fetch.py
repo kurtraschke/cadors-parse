@@ -13,7 +13,6 @@ from cadorsfeed import db
 setcontext(ExtendedContext)
 
 
-
 def fix_coord(value):
     precision = Decimal('0.000001')
     value_d = Decimal(str(value))
@@ -33,12 +32,15 @@ def fetch_aerodromes():
         results = sparql.query().convert()
 
         for result in results["results"]["bindings"]:
-            values = dict([(key, value['value']) for key, value in result.items()])
+            values = dict([(key, value['value']) for key, value \
+                           in result.items()])
             values['longitude'] = fix_coord(values['longitude'])
             values['latitude'] = fix_coord(values['latitude'])
-            
+
             if 'name' not in values:
-                values['name'] = urllib.unquote(urlparse.urlparse(values['airport']).path.decode('utf-8').split('/')[-1]).replace('_', ' ')
+                values['name'] = urllib.unquote(urlparse.urlparse(
+                        values['airport']).path.decode(
+                        'utf-8').split('/')[-1]).replace('_', ' ')
 
             store_aerodrome(values)
 
@@ -46,19 +48,19 @@ def fetch_aerodromes():
             fetchResults(offset + limit)
 
     fetchResults(0)
-    #db.session.commit()
+
 
 def store_aerodrome(values):
-  try:
-      wkt = "POINT(%s %s)" % (values['longitude'], values['latitude'])
-      values['location'] = WKTSpatialElement(wkt)
-      del values['latitude']
-      del values['longitude']
-      aerodrome = Aerodrome(**values)
-      db.session.add(aerodrome)
-      db.session.commit()
-  except IntegrityError, e:
-      print "Duplicate aerodrome definition dropped:"
-      print values
-      print e
-      db.session.rollback()
+    try:
+        wkt = "POINT(%s %s)" % (values['longitude'], values['latitude'])
+        values['location'] = WKTSpatialElement(wkt)
+        del values['latitude']
+        del values['longitude']
+        aerodrome = Aerodrome(**values)
+        db.session.add(aerodrome)
+        db.session.commit()
+    except IntegrityError, e:
+        print "Duplicate aerodrome definition dropped:"
+        print values
+        print e
+        db.session.rollback()

@@ -16,20 +16,23 @@ from cadorsfeed.cadorslib.locations import LocationStore
 from cadorsfeed.aerodb import aerodromes_re, lookup
 
 
-NSMAP = {'h':'http://www.w3.org/1999/xhtml',
-         'pyf':'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd',
+NSMAP = {'h': 'http://www.w3.org/1999/xhtml',
+         'pyf': 'urn:uuid:fb23f64b-3c54-4009-b64d-cc411bd446dd',
          'a': 'http://www.w3.org/2005/Atom',
          'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'}
+
 
 def grouper(n, iterable):
     args = [iter(iterable)] * n
     return [group(l) for l in izip_longest(fillvalue=None, *args)]
+
 
 def group(elements):
     element = etree.Element("{http://www.w3.org/1999/xhtml}p",
                             nsmap={'h': 'http://www.w3.org/1999/xhtml'})
     element.extend(elements)
     return element
+
 
 def extractor(node, fields):
     out = {}
@@ -44,13 +47,17 @@ def extractor(node, fields):
         out[field] = data
     return out
 
+
 def q(query):
-    return "pyf:strip_nbsp(.//h:th[text()='%s']/following-sibling::h:td/h:strong/text())" % query
+    return "pyf:strip_nbsp(.//h:th[text()='%s']/" \
+        "following-sibling::h:td/h:strong/text())" % query
+
 
 def make_datetime(date, time):
     if time is None:
         time = "0000 Z"
-    return datetime.strptime(date+" "+time, "%Y-%m-%d %H%M Z")
+    return datetime.strptime(date + " " + time, "%Y-%m-%d %H%M Z")
+
 
 def safe_int(value):
     try:
@@ -58,15 +65,19 @@ def safe_int(value):
     except ValueError:
         return None
 
+
 def fix_name(name):
         (last, first) = name.split(", ")
         return first + " " + last
 
+
 def narrative_date(date_string):
     return datetime.strptime(date_string, "%Y-%m-%d")
 
+
 def unicode_list(items):
     return [unicode(item) for item in items]
+
 
 def parse_daily_report(report_file):
     parser = html5lib.HTMLParser(
@@ -83,16 +94,18 @@ def parse_daily_report(report_file):
         parsed_reports.append(report_data)
 
     header_date = re.search("\d\d\d\d-\d\d-\d\d",
-                      etree_document.xpath('//h:div[@class = "widthFull" and contains(text(), "CADORS National Report dated")]',
-                                           namespaces=NSMAP)[0].text).group()
+                            etree_document.xpath(
+            '//h:div[@class = "widthFull" and ' \
+                'contains(text(), "CADORS National Report dated")]',
+            namespaces=NSMAP)[0].text).group()
 
     daily_report = {'date': datetime.strptime(header_date,
                                               "%Y-%m-%d"),
                     'parse_timestamp': datetime.utcnow(),
-                    'reports': parsed_reports
-                    }
+                    'reports': parsed_reports}
 
     return daily_report
+
 
 def parse_report(report):
     fields = {'cadors_number': (q('Cadors Number:'), str),
@@ -114,14 +127,19 @@ def parse_report(report):
               'tsb_class': (q('TSB Class Of Investigation:'), safe_int),
               'tsb_number': (q('TSB Occurrence No:'), unicode)}
 
-    fields['categories'] = (".//h:fieldset/h:legend/h:strong[contains(text(),'Event Information')]/../following-sibling::h:table//h:strong/text()", unicode_list)
+    fields['categories'] = (
+        ".//h:fieldset/h:legend/h:strong[contains(text()," \
+            "'Event Information')]/../following-sibling::h:table//" \
+            "h:strong/text()", unicode_list)
 
     report_data = extractor(report, fields)
     report_data['narrative'] = []
     report_data['aircraft'] = []
 
-    narrative_parts = report.xpath(".//h:fieldset/h:legend/h:strong[contains(text(),'Detail Information')]/../following-sibling::h:table",
-                                 namespaces=NSMAP, extensions=extensions)
+    narrative_parts = report.xpath(
+        ".//h:fieldset/h:legend/h:strong[contains(text()," \
+            "'Detail Information')]/../following-sibling::h:table",
+        namespaces=NSMAP, extensions=extensions)
 
     narrative_fields = {'author_name': (q('User Name:'), fix_name),
                         'date': (q('Date:'), narrative_date),
@@ -135,8 +153,10 @@ def parse_report(report):
                                    narrative_fields)
         report_data['narrative'].append(narrative_data)
 
-    aircraft_parts = report.xpath(".//h:fieldset/h:legend/h:strong[contains(text(),'Aircraft Information')]/../following-sibling::h:table",
-                                  namespaces=NSMAP, extensions=extensions)
+    aircraft_parts = report.xpath(
+        ".//h:fieldset/h:legend/h:strong[contains(text()," \
+            "'Aircraft Information')]/../following-sibling::h:table",
+        namespaces=NSMAP, extensions=extensions)
 
     aircraft_fields = {'flight_number': (q('Flight #:'), unicode),
                        'category': (q('Aircraft Category:'), unicode),
@@ -199,16 +219,19 @@ def parse_report(report):
                           match.group(),
                           primary=True)
 
-    for narrative_part in report_data['narrative']:        
+    for narrative_part in report_data['narrative']:
         narrative_part['narrative_html'] = process_narrative(
             narrative_part['narrative_text'])
         #do the location extraction here
         root = etree.fromstring(narrative_part['narrative_html'])
-        elements = root.xpath("//*[@class='geolink' and @geo:lat and @geo:long]",
-                              namespaces=NSMAP)
+        elements = root.xpath(
+            "//*[@class='geolink' and @geo:lat and @geo:long]",
+            namespaces=NSMAP)
         for element in elements:
-            longitude = element.attrib['{http://www.w3.org/2003/01/geo/wgs84_pos#}long']
-            latitude = element.attrib['{http://www.w3.org/2003/01/geo/wgs84_pos#}lat']
+            longitude = element.attrib[
+                '{http://www.w3.org/2003/01/geo/wgs84_pos#}long']
+            latitude = element.attrib[
+                '{http://www.w3.org/2003/01/geo/wgs84_pos#}lat']
 
             name = element.attrib['title']
             url = element.attrib['href'] if 'href' in element.attrib else None

@@ -9,6 +9,7 @@ from geoalchemy.postgis import PGComparator
 from cadorsfeed import db
 from cadorsfeed.unique import unique_constructor
 
+
 class LocationMixin(object):
     @property
     def latitude(self):
@@ -22,8 +23,9 @@ class LocationMixin(object):
     def kml(self):
         return db.session.scalar(self.location.kml)
 
+
 class DictMixin(object):
-    #based on 
+    #based on
     #http://blog.mitechie.com/2010/04/01/hacking-the-sqlalchemy-base-class/
     def __iter__(self):
         d = {}
@@ -40,8 +42,8 @@ report_map = db.Table(
     db.Column('daily_report_id', db.Integer(),
            db.ForeignKey('daily_report.daily_report_id')),
     db.Column('report_id', db.CHAR(9),
-           db.ForeignKey('cadors_report.cadors_number'))
-    )
+           db.ForeignKey('cadors_report.cadors_number')))
+
 
 class DailyReport(db.Model, DictMixin):
     daily_report_id = db.Column(db.Integer(), primary_key=True)
@@ -51,24 +53,23 @@ class DailyReport(db.Model, DictMixin):
     report_html = db.Column(db.LargeBinary())
     reports = db.relationship("CadorsReport", secondary=report_map,
                               backref='daily_reports')
-    __mapper_args__ = {
-        'order_by': report_date.desc()
-        }
-    
+    __mapper_args__ = {'order_by': report_date.desc()}
+
     @property
     def last_updated(self):
         return db.session.query(func.max(NarrativePart.date)).join(
             CadorsReport).join(report_map).join(
             DailyReport).filter(
-                DailyReport.report_date==self.report_date).scalar()
+                DailyReport.report_date == self.report_date).scalar()
+
 
 category_map = db.Table(
     'category_map', db.Model.metadata,
     db.Column('report_id', db.CHAR(9),
            db.ForeignKey('cadors_report.cadors_number')),
     db.Column('category_id', db.Integer(),
-           db.ForeignKey('report_category.category_id'))
-    )
+           db.ForeignKey('report_category.category_id')))
+
 
 class CadorsReport(db.Model, DictMixin):
     cadors_number = db.Column(db.CHAR(9), primary_key=True)
@@ -77,7 +78,7 @@ class CadorsReport(db.Model, DictMixin):
     occurrence_type = db.Column(db.Unicode())
     fatalities = db.Column(db.Integer())
     injuries = db.Column(db.Integer())
-    aerodrome_name = db.Column(db.Unicode()) 
+    aerodrome_name = db.Column(db.Unicode())
     tclid = db.Column(db.CHAR(4))
     location = db.Column(db.Unicode())
     province = db.Column(db.Unicode())
@@ -98,21 +99,22 @@ class CadorsReport(db.Model, DictMixin):
                                       cascade="all, delete, delete-orphan")
     locations = db.relationship("Location", backref="report",
                                 cascade="all, delete, delete-orphan")
-    __mapper_args__ = {
-        'order_by': timestamp.desc()
-        }
+    __mapper_args__ = {'order_by': timestamp.desc()}
 
     @property
     def last_updated(self):
-        return db.session.query(func.max(NarrativePart.date)).with_parent(self).scalar()
+        return db.session.query(
+            func.max(NarrativePart.date)).with_parent(self).scalar()
 
-@unique_constructor(db.session, 
-            lambda text:text, 
-            lambda query, text:query.filter(ReportCategory.text==text)
-    )
+
+@unique_constructor(db.session,
+                    lambda text: text,
+                    lambda query, text: query.filter(
+        ReportCategory.text == text))
 class ReportCategory(db.Model, DictMixin):
     category_id = db.Column(db.Integer(), primary_key=True)
     text = db.Column(db.Unicode(), index=True, unique=True)
+
 
 class Aircraft(db.Model, DictMixin):
     aircraft_id = db.Column(db.Integer(), primary_key=True)
@@ -136,7 +138,8 @@ class Aircraft(db.Model, DictMixin):
     gear_type = db.Column(db.Unicode())
     engine_type = db.Column(db.Unicode())
     operator_type = db.Column(db.Unicode())
-    
+
+
 class NarrativePart(db.Model, DictMixin):
     narrative_part_id = db.Column(db.Integer(), primary_key=True)
     cadors_number = db.Column(db.CHAR(9),
@@ -148,11 +151,10 @@ class NarrativePart(db.Model, DictMixin):
     narrative_html = db.Column(db.UnicodeText())
     further_action = db.Column(db.Unicode())
     opi = db.Column(db.Unicode())
-    
-    __mapper_args__ = {
-        'order_by': date.asc()
-        }
-    
+
+    __mapper_args__ = {'order_by': date.asc()}
+
+
 class Location(db.Model, DictMixin, LocationMixin):
     location_id = db.Column(db.Integer(), primary_key=True)
     cadors_number = db.Column(db.CHAR(9),
@@ -163,6 +165,7 @@ class Location(db.Model, DictMixin, LocationMixin):
     primary = db.Column(db.Boolean(), nullable=False, default=False)
 
 GeometryDDL(Location.__table__)
+
 
 class Aerodrome(db.Model, DictMixin, LocationMixin):
     aerodrome_id = db.Column(db.Integer(), primary_key=True)
@@ -181,52 +184,52 @@ class Aerodrome(db.Model, DictMixin, LocationMixin):
 GeometryDDL(Aerodrome.__table__)
 
 #DDL('''ALTER TABLE cadors_report ADD COLUMN
-#       narrative_agg character varying''').execute_at("after-create", 
+#       narrative_agg character varying''').execute_at("after-create",
 #                                                      CadorsReport.__table__)
 
 DDL('''ALTER TABLE cadors_report ADD COLUMN
-       narrative_agg_idx_col tsvector''').execute_at("after-create", 
+       narrative_agg_idx_col tsvector''').execute_at("after-create",
                                                      CadorsReport.__table__)
-       
+
 DDL('''CREATE INDEX narrative_agg_idx ON cadors_report
-       USING gin(narrative_agg_idx_col)''').execute_at("after-create", 
+       USING gin(narrative_agg_idx_col)''').execute_at("after-create",
                                                        CadorsReport.__table__)
 
-DDL('''CREATE OR REPLACE FUNCTION 
+DDL('''CREATE OR REPLACE FUNCTION
        update_narrative_index(cadors_number_p varchar) RETURNS void AS $$
 BEGIN
-	UPDATE cadors_report SET narrative_agg = 
+        UPDATE cadors_report SET narrative_agg =
                array_to_string(
-                 (SELECT array_agg(narrative_text) 
-                         FROM narrative_part 
-                         WHERE narrative_part.cadors_number = cadors_number_p 
+                 (SELECT array_agg(narrative_text)
+                         FROM narrative_part
+                         WHERE narrative_part.cadors_number = cadors_number_p
                          GROUP BY narrative_part.cadors_number
                  ),' ') WHERE cadors_number = cadors_number_p;
-	
-        UPDATE cadors_report SET narrative_agg_idx_col = 
-               to_tsvector(narrative_agg) 
+
+        UPDATE cadors_report SET narrative_agg_idx_col =
+               to_tsvector(narrative_agg)
                WHERE cadors_report.cadors_number = cadors_number_p;
 END;
-$$ LANGUAGE plpgsql;''').execute_at("after-create", 
+$$ LANGUAGE plpgsql;''').execute_at("after-create",
                                     NarrativePart.__table__)
 
-DDL('''CREATE OR REPLACE FUNCTION process_narrative_update() 
+DDL('''CREATE OR REPLACE FUNCTION process_narrative_update()
        RETURNS TRIGGER AS $$
     BEGIN
         IF (TG_OP = 'DELETE') THEN
-	    PERFORM update_narrative_index(OLD.cadors_number);
+            PERFORM update_narrative_index(OLD.cadors_number);
         ELSIF (TG_OP = 'UPDATE') THEN
-	    PERFORM update_narrative_index(NEW.cadors_number);
+            PERFORM update_narrative_index(NEW.cadors_number);
         ELSIF (TG_OP = 'INSERT') THEN
-	    PERFORM update_narrative_index(NEW.cadors_number);
+            PERFORM update_narrative_index(NEW.cadors_number);
         END IF;
         RETURN NULL;
     END;
-$$ LANGUAGE plpgsql;''').execute_at("after-create", 
+$$ LANGUAGE plpgsql;''').execute_at("after-create",
                                     NarrativePart.__table__)
 
 DDL('''CREATE TRIGGER narrative_update
        AFTER INSERT OR UPDATE OR DELETE ON narrative_part
        FOR EACH ROW EXECUTE PROCEDURE process_narrative_update();
-    ''').execute_at("after-create", 
+    ''').execute_at("after-create",
                     NarrativePart.__table__)
