@@ -31,8 +31,10 @@
 
 <h3>Event Information</h3>
 <ul>
-{% for category in report.categories %}
-<li>{{category.text}}</li>
+{%- for category in report.categories %}
+<li><a href="{{ url_for('category.display_category_report_list',
+                catid=category.category_id)}}">{{category.text}}</a>
+</li>
 {% endfor %}
 </ul>
 <h3>Locations</h3>

@@ -1,11 +1,13 @@
-
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import func, DDL
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.dialects.postgresql import UUID
+
 from geoalchemy import GeometryColumn, Point, GeometryDDL
 from geoalchemy.postgis import PGComparator
 
 from cadorsfeed import db
+from cadorsfeed.unique import unique_constructor
 
 class LocationMixin(object):
     @property
@@ -60,6 +62,13 @@ class DailyReport(db.Model, DictMixin):
             DailyReport).filter(
                 DailyReport.report_date==self.report_date).scalar()
 
+category_map = db.Table(
+    'category_map', db.Model.metadata,
+    db.Column('report_id', db.CHAR(9),
+           db.ForeignKey('cadors_report.cadors_number')),
+    db.Column('category_id', db.Integer(),
+           db.ForeignKey('report_category.category_id'))
+    )
 
 class CadorsReport(db.Model, DictMixin):
     cadors_number = db.Column(db.CHAR(9), primary_key=True)
@@ -71,7 +80,6 @@ class CadorsReport(db.Model, DictMixin):
     aerodrome_name = db.Column(db.Unicode()) 
     tclid = db.Column(db.CHAR(4))
     location = db.Column(db.Unicode())
-    #report_type = db.Column(db.Unicode())
     province = db.Column(db.Unicode())
     nav_canada_aor = db.Column(db.Unicode())
     tsb_class = db.Column(db.Integer())
@@ -81,8 +89,9 @@ class CadorsReport(db.Model, DictMixin):
     world_area = db.Column(db.Unicode())
     day_night = db.Column(db.Unicode())
     narrative_agg = db.Column(db.UnicodeText())
-    categories = db.relationship("ReportCategory", backref="report",
-                                 cascade="all, delete, delete-orphan")
+    categories = db.relationship("ReportCategory", backref="reports",
+                                 secondary=category_map,
+                                 cascade="all, delete")
     aircraft = db.relationship("Aircraft", backref="report",
                                cascade="all, delete, delete-orphan")
     narrative_parts = db.relationship("NarrativePart", backref="report",
@@ -97,11 +106,13 @@ class CadorsReport(db.Model, DictMixin):
     def last_updated(self):
         return db.session.query(func.max(NarrativePart.date)).with_parent(self).scalar()
 
+@unique_constructor(db.session, 
+            lambda text:text, 
+            lambda query, text:query.filter(ReportCategory.text==text)
+    )
 class ReportCategory(db.Model, DictMixin):
     category_id = db.Column(db.Integer(), primary_key=True)
-    cadors_number = db.Column(db.CHAR(9),
-                              db.ForeignKey('cadors_report.cadors_number'))
-    text = db.Column(db.Unicode())
+    text = db.Column(db.Unicode(), index=True, unique=True)
 
 class Aircraft(db.Model, DictMixin):
     aircraft_id = db.Column(db.Integer(), primary_key=True)
