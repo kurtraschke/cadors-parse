@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 
-from flask import make_response, render_template, Module
+from flask import request, make_response, render_template, Module
 
 from geoalchemy import WKTSpatialElement, functions
 from sqlalchemy import sql
