@@ -1,30 +1,19 @@
-from datetime import datetime, timedelta
 import uuid
+from datetime import datetime
 from urllib2 import URLError
 
 from geoalchemy import WKTSpatialElement
 
-from cadorsfeed.models import *
 from cadorsfeed import db
+from cadorsfeed.models import DailyReport, CadorsReport, ReportCategory
+from cadorsfeed.models import Aircraft, NarrativePart, Location
 from cadorsfeed.cadorslib.fetch import fetch_daily_report, fetch_latest_date
 from cadorsfeed.cadorslib.fetch import ReportNotFoundError, ReportFetchError
 from cadorsfeed.cadorslib.parse import parse_daily_report
 
 
 def latest_daily_report():
-    return datetime.strptime(fetch_latest_date(),
-                             "%Y-%m-%d")
-
-    """
-    latest = g.mdb.latest_daily_report.find_one({})
-    if latest is None or (datetime.utcnow() - \
-                              latest['fetch_time']) > timedelta(hours=12):
-        latest = {'report_date': datetime.strptime(fetch_latest_date(),
-                                                   "%Y-%m-%d"),
-                  'fetch_time': datetime.utcnow()}
-        g.mdb.latest_daily_report.save(latest)
-    return latest['report_date']
-    """
+    return datetime.strptime(fetch_latest_date(), "%Y-%m-%d")
 
 
 def conditional_fetch(report_date, refetch=False):

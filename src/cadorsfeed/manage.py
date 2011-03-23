@@ -1,5 +1,4 @@
-from flaskext.script import Manager, prompt_pass, prompt_bool
-from functools import wraps
+from flaskext.script import Manager, prompt_bool
 
 from cadorsfeed import create_app
 
@@ -31,14 +30,14 @@ def load_aerodromes():
 
 
 @manager.option('-a', '--aerodrome', dest='aerodrome', required=True)
-def lookup(aerodrome):
+def lookup_aerodrome(aerodrome):
     from cadorsfeed.aerodb import lookup
     from pprint import pprint
     pprint(dict(lookup(aerodrome)))
 
 
 @manager.command
-def load_iata_blacklist():
+def load_blacklist():
     '''Load or update blacklist of IATA codes which produce false positives'''
     from cadorsfeed.aerodb import import_blacklist
     import_blacklist()
@@ -48,9 +47,7 @@ def load_iata_blacklist():
 def create_all():
     '''Create PostgreSQL tables'''
     from cadorsfeed import db
-    from cadorsfeed.models import DailyReport, CadorsReport, ReportCategory
-    from cadorsfeed.models import Aircraft, NarrativePart, Location
-    from cadorsfeed.models import Aerodrome
+    import cadorsfeed.models
     db.create_all()
 
 
@@ -58,9 +55,7 @@ def create_all():
 def drop_all():
     '''Drop PostgreSQL tables'''
     from cadorsfeed import db
-    from cadorsfeed.models import DailyReport, CadorsReport, ReportCategory
-    from cadorsfeed.models import Aircraft, NarrativePart, Location
-    from cadorsfeed.models import Aerodrome
+    import cadorsfeed.models
     if prompt_bool("Are you sure you want to drop the database tables?"):
         db.drop_all()
 

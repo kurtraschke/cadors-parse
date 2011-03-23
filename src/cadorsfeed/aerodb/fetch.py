@@ -3,7 +3,7 @@ import urllib
 from decimal import Decimal, setcontext, ExtendedContext
 
 from SPARQLWrapper import SPARQLWrapper, JSON
-from flask import g, current_app as app
+from flask import current_app as app
 from geoalchemy import WKTSpatialElement
 from sqlalchemy.exc import IntegrityError
 

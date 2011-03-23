@@ -1,6 +1,5 @@
 import lxml
 import lxml.sax
-from lxml import etree
 from xml.sax.handler import ContentHandler
 
 NS = 'http://www.w3.org/1999/xhtml'
@@ -100,7 +99,7 @@ class FilterContentHandler(ContentHandler, object):
         return self.out.etree.getroot()
 
 
-def do_filter(input, replacement_function):
+def do_filter(input_doc, replacement_function):
     handler = FilterContentHandler(replacement_function)
-    lxml.sax.saxify(input, handler)
+    lxml.sax.saxify(input_doc, handler)
     return handler.getOutput()

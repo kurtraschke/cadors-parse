@@ -67,8 +67,8 @@ def safe_int(value):
 
 
 def fix_name(name):
-        (last, first) = name.split(", ")
-        return first + " " + last
+    (last, first) = name.split(", ")
+    return u"%s %s" % (first, last)
 
 
 def narrative_date(date_string):

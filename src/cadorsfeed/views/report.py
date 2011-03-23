@@ -1,14 +1,10 @@
-from urllib2 import URLError
-from datetime import datetime
-import time
 import json
 
 from flask import request, make_response, render_template, Module
 from pyrfc3339 import generate
 
 from cadorsfeed.views.util import process_report_atom, json_default
-from cadorsfeed import db
-from cadorsfeed.models import *
+from cadorsfeed.models import CadorsReport
 
 report = Module(__name__)
 

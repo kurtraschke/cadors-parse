@@ -1,14 +1,10 @@
-from datetime import datetime
-import json
-
-from flask import request, make_response, render_template, Module
+from flask import request, render_template, Module
 
 from geoalchemy import WKTSpatialElement, functions
-from sqlalchemy import sql
+from sqlalchemy import sql, func
 import sqlalchemy.types as types
 
-from cadorsfeed import db
-from cadorsfeed.models import *
+from cadorsfeed.models import CadorsReport, Location
 
 search = Module(__name__)
 

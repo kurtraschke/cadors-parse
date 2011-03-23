@@ -19,8 +19,8 @@ class Aerodromes(object):
         codes = [c for (c,) in icao_codes] + [c for (c,) in tc_codes]
 
         re_string = r"\b(" + '|'.join(codes) + r")\b"
-        aerodromes_re = re.compile(re_string)
-        return aerodromes_re
+        icao_re = re.compile(re_string)
+        return icao_re
 
     @cached_property
     def get_iata_re(self):
@@ -33,8 +33,8 @@ class Aerodromes(object):
         codes = [c for (c,) in iata_codes] + [c for (c,) in faa_codes]
 
         re_string = r"\b(" + '|'.join(codes) + r")\b"
-        aerodromes_re = re.compile(re_string)
-        return aerodromes_re
+        iata_re = re.compile(re_string)
+        return iata_re
 
 
 aerodromes_re = Aerodromes()
@@ -43,7 +43,7 @@ aerodromes_re = Aerodromes()
 def replace_aerodromes(text, link_function):
     substitutions = {}
 
-    def process_matches(matches, lookup):
+    def process_matches(matches):
         for match in matches:
             title = match.group()
             result = lookup(match.group())
@@ -59,8 +59,8 @@ def replace_aerodromes(text, link_function):
                     'longitude': longitude})
 
     icao_matches = aerodromes_re.get_icao_re.finditer(text)
-    process_matches(icao_matches, lambda code: lookup(code))
+    process_matches(icao_matches)
     iata_matches = aerodromes_re.get_iata_re.finditer(text)
-    process_matches(iata_matches, lambda code: lookup(code))
+    process_matches(iata_matches)
 
     return substitutions

@@ -1,6 +1,4 @@
-from decimal import *
-
-#from bson.son import SON
+from decimal import Decimal, setcontext, ExtendedContext
 
 setcontext(ExtendedContext)
 precision = Decimal('0.000001')

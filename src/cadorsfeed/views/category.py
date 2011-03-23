@@ -3,8 +3,7 @@ from flask import render_template, Module
 from sqlalchemy import func
 from sqlalchemy.sql.expression import select
 
-from cadorsfeed import db
-from cadorsfeed.models import *
+from cadorsfeed.models import ReportCategory, CadorsReport, category_map
 
 category = Module(__name__)
 

@@ -2,8 +2,6 @@ from uuid import UUID
 from datetime import datetime
 
 from pyrfc3339 import generate
-from werkzeug import cached_property
-from flask import url_for, request
 from geoalchemy import PersistentSpatialElement
 
 from cadorsfeed import db

@@ -3,11 +3,12 @@ import json
 
 from flask import abort, request, redirect, url_for
 from flask import make_response, render_template, Module
-from flask import current_app as app
 from pyrfc3339 import generate
+from sqlalchemy import func
+
 
 from cadorsfeed import db
-from cadorsfeed.models import *
+from cadorsfeed.models import DailyReport, CadorsReport
 from cadorsfeed.views.util import process_report_atom, json_default
 
 daily_report = Module(__name__)

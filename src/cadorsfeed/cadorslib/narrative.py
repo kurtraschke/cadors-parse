@@ -34,8 +34,8 @@ def process_narrative(narrative_block):
         p = etree.Element("{http://www.w3.org/1999/xhtml}p",
                           nsmap=NSMAP)
         p.text = paragraph
-        for filter in filters:
-            p = do_filter(p, filter)
+        for filter_func in filters:
+            p = do_filter(p, filter_func)
         div.append(p)
 
     root = div
