@@ -13,6 +13,17 @@ from cadorsfeed.views.util import process_report_atom, json_default
 
 daily_report = Module(__name__)
 
+@daily_report.route('/daily-reports/', defaults={'page': 1})
+@daily_report.route('/daily-reports/<int:page>')
+def daily_reports_list(page):
+    daily_reports = DailyReport.query
+
+    pagination = daily_reports.paginate(page)
+
+    return render_template('daily_report_list.html',
+                           daily_reports=daily_reports,
+                           pagination=pagination)
+
 
 @daily_report.route('/daily-report/latest/', defaults={'format': 'html'})
 @daily_report.route('/daily-report/latest/' \

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "pagination.html" as pg %}
+{% import "report_list.html" as r %}
+
+{% block body %}
+{% if pagination.page > 1 %}
+{{ pg.render_pagination(pagination) }}
+{% endif %}
+
+<table>
+<thead>
+<th>Report Date</th><th>Number of Reports</th>
+</thead>
+<tbody>
+{% for daily_report in daily_reports %}
+<tr>
+<td><a href="{{ url_for('daily_report.do_daily_report', 
+         year=daily_report.report_date.year,
+         month=daily_report.report_date.month,
+         day=daily_report.report_date.day,
+         format='html')}}">{{ daily_report.report_date.strftime("%Y-%m-%d") }}</a></td>
+<td>{{daily_report.reports|length}}
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{{ pg.render_pagination(pagination) }}
+
+{% endblock %}
