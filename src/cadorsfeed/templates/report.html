@@ -37,11 +37,13 @@
 </li>
 {% endfor %}
 </ul>
+{% if report.locations|length > 0 %}
 <h3>Locations</h3>
 <p><a href="{{ url_for('report.display_report',
 	    report=report.cadors_number,
 	    format='kml',
-	    _external=True)}}" class="maplink">View map</a></p>
+	    _external=True)}}" class="maplink">View {{ report.locations|length }} locations</a></p>
+{% endif %}
 </section>
 
 
@@ -50,9 +52,9 @@
 {% for aircraft_block in report.aircraft %}
 <div class="column width1 {{"first" if loop.index0 % 3 == 0}}">
 <h4>{{aircraft_block.category}} {{loop.index}}</h4>
-<p>{{aircraft_block.year|d('foo')}} {{aircraft_block.make}} {{aircraft_block.model}}</p>
+<p>{{aircraft_block.year|d('', true)}} {{aircraft_block.make|d('', true)}} {{aircraft_block.model|d('', true)}}</p>
 <dl>
-{% if aircraft_block.flight_number is defined %}
+{% if aircraft_block.flight_number != None %}
 <dt>Flight number</dt>
 <dd>{{aircraft_block.flight_number }}</dd>
 {% endif %} 
@@ -61,17 +63,19 @@
 <dt>Phase of flight</dt>
 <dd>{{aircraft_block.flight_phase}}</dd>
 <dt>Engine</dt>
-<dd>{{aircraft_block.engine_type|d}} {{aircraft_block.engine_make|d}} {{aircraft_block.engine_model|d}}</dd>
+<dd>{{aircraft_block.engine_type|d('Unknown type', true)}} {{aircraft_block.engine_make|d('', true)}} {{aircraft_block.engine_model|d('', true)}}</dd>
 <dt>Gear type</dt>
 <dd>{{ aircraft_block.gear_type|d('Unknown', true) }}</dd>
 <dt>Amateur-built</dt>
 <dd>{{aircraft_block.amateur_built}}</dd>
+{% if aircraft_block.owner != None %}
 <dt>Owner</dt>
 <dd>{{aircraft_block.owner}}</dd>
+{% endif %}
 <dt>Operator</dt>
-<dd>{{aircraft_block.operator_type}} {{aircraft_block.operator|d}}</dd>
+<dd>{{aircraft_block.operator_type}} {{aircraft_block.operator|d('', true)}}</dd>
 <dt>Country of registration</dt>
-<dd>{{aircraft_block.reg_country}}</dd>
+<dd>{{aircraft_block.reg_country|d('Unknown',true)}}</dd>
 </dl>
 </div>
 {% endfor %}

@@ -7,10 +7,10 @@
 		     report=report.cadors_number,
 		     format='html',
 		     _external=True) }}" />
-    {% for location in report['locations'] %}
+    {% for location in report.locations %}
     <Placemark>
       <name>{{location.name}}</name>
-      {% if location.url is defined %}
+      {% if location.url != None %}
       <description>
         <![CDATA[
                  <a href="{{location.url}}">{{location.name}}</a>      
