@@ -16,8 +16,7 @@ def display_report_list(page):
     pagination = CadorsReport.query.paginate(page)
 
     return render_template('list.html', reports=pagination.items,
-                           pagination=pagination,
-                           endpoint='report.display_report_list')
+                           pagination=pagination)
 
 
 @report.route('/report/<report>', defaults={'format': 'html'})

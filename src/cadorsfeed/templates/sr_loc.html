@@ -4,7 +4,7 @@
 
 {% block body %}
 {% if pagination.page > 1 %}
-{{ pg.render_pagination(pagination, endpoint) }}
+{{ pg.render_pagination(pagination) }}
 {% endif %}
 
 <table>
@@ -30,6 +30,6 @@
 
 
 
-{{ pg.render_pagination(pagination, endpoint) }}
+{{ pg.render_pagination(pagination) }}
 
 {% endblock %}

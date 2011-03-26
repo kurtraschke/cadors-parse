@@ -42,8 +42,7 @@ def search_text():
     pagination = query.paginate(page)
 
     return render_template('sr_text.html', reports=pagination.items,
-                           pagination=pagination,
-                           endpoint='search.search_text')
+                           pagination=pagination)
 
 
 class Geography(types.TypeEngine):
@@ -82,5 +81,4 @@ def search_location():
     pagination = query.paginate(page)
 
     return render_template('sr_loc.html', reports=pagination.items,
-                           pagination=pagination,
-                           endpoint='search.search_location')
+                           pagination=pagination)

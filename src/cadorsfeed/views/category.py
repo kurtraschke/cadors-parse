@@ -33,5 +33,4 @@ def display_category_report_list(catid, page):
         CadorsReport.categories.contains(cat)).paginate(page)
 
     return render_template('list.html', reports=pagination.items,
-                           pagination=pagination,
-                           endpoint='category.display_category_report_list')
+                           pagination=pagination)
