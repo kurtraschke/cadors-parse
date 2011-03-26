@@ -73,7 +73,8 @@ def search_location():
         query = query.filter(Location.primary == True)
 
     query = query.add_column(functions.distance(loc, q_loc).label('distance'))
-    #query = query.add_column((functions.azimuth(loc, q_loc) * 180)/func.pi())
+    query = query.add_column(func.ST_Azimuth(location, 
+                                             Location.location.RAW) * (180/func.pi()))
 
     query = query.order_by('distance ASC',
                            CadorsReport.timestamp.desc())
@@ -81,4 +82,21 @@ def search_location():
     pagination = query.paginate(page)
 
     return render_template('sr_loc.html', reports=pagination.items,
-                           pagination=pagination)
+                           pagination=pagination,
+                           get_direction=get_direction)
+
+def get_direction(degrees):
+    degrees = degrees % 360
+    
+    directions = {0: 'N',
+                  45: 'NE',
+                  90: 'E',
+                  135: 'SE',
+                  180: 'S',
+                  225: 'SW',
+                  270: 'W',
+                  315: 'NW',
+                  360: 'N'}
+
+    return directions[min(directions.keys(),
+                          key=lambda x:abs(x-degrees))]
