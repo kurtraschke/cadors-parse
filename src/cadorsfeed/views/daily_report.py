@@ -83,6 +83,7 @@ def do_daily_report(year, month, day, format):
 
         response = make_response(
             render_template('daily_report.html',
+                            daily_report=daily_report,
                             reports=daily_report.reports,
                             types=types,
                             regions=regions,

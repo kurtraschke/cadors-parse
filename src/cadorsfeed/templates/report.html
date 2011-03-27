@@ -1,7 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 {% extends "base.html" %}
 
 {% block head %}
 {{ super() }}
+<!-- FIXME: the Google Maps key should be parameterized. -->
+<script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAXcuKXMwaEjGtWQylDfGXqBQ4MdEIN7TugTKbD7ebaEXCKD6fOxQDvaeGczoQkzQQMYM2p0W50crfDw"></script>
 <script type="text/javascript" src="/static/js/map_overlay.js"></script>
 <link type="text/css" rel="stylesheet" media="screen" href="/static/css/map_overlay.css">
 {% endblock %}
@@ -10,11 +13,11 @@
 {% block body %}
 
 {% for report in reports %}
-<div class="report clear width4" id="{{report.cadors_number}}">
+<div class="report" id="{{report.cadors_number}}">
 <h2>CADORS Report {{report.cadors_number}}</h2>
 
 
-<section class="column width1 first">
+<section class="span-6">
 <h3>Occurrence Information</h3>
 <dl>
 <dt>Location</dt>
@@ -47,12 +50,13 @@
 </section>
 
 
-<div class="column width3">
-<h3 class="current">Aircraft Information</h3>
+<div>
+<h3>Aircraft Information</h3>
+{% if report.aircraft | length > 0 %}
 {% for aircraft_block in report.aircraft %}
-<div class="column width1 {{"first" if loop.index0 % 3 == 0}}">
-<h4>{{aircraft_block.category}} {{loop.index}}</h4>
-<p>{{aircraft_block.year|d('', true)}} {{aircraft_block.make|d('', true)}} {{aircraft_block.model|d('', true)}}</p>
+<div class="span-6 {{"last" if loop.last or (loop.index0  - 2) % 4 == 0}}">
+<h4 style="margin-bottom:0;">{{aircraft_block.category}} {{loop.index}}</h4>
+<span class="large">{{aircraft_block.year|d('', true)}} {{aircraft_block.make|d('', true)}} {{aircraft_block.model|d('', true)}}</span>
 <dl>
 {% if aircraft_block.flight_number != None %}
 <dt>Flight number</dt>
@@ -79,13 +83,18 @@
 </dl>
 </div>
 {% endfor %}
+{% else %}
+<div style="text-align: center; font-size:3em;" class="span-18 last">
+<span>No aircraft involved</span>
+</div>
+{% endif %}
 
 </div>
 
-<section class="narrative width4 clear">
+<section class="narrative span-24 clear">
 <h3>Narrative</h3>
 {% for narrative_block in report.narrative_parts %}
-<h4>Update {{loop.index}} by {{narrative_block.name}} on {{narrative_block.date}}</h4>
+<h4 >Update {{loop.index}} by {{narrative_block.name}} on {{narrative_block.date.strftime('%Y-%m-%d')}}</h4>
 {{narrative_block.narrative_html|safe}}
 {% endfor %}
 </section>

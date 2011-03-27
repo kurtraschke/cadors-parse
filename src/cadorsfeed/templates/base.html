@@ -3,25 +3,56 @@
 <head>
 {% block head %}
 <title>cadorsfeed</title>
-<link type="text/css" rel="stylesheet" media="screen" href="/static/css/baseline.compress.css">
-<style type="text/css">
-#page { margin: 0 auto 36px auto; }
-</style>
+<link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
+<link rel="stylesheet" href="/static/css/blueprint/print.css" type="text/css" media="print"> 
+<!--[if lt IE 8]>
+<link rel="stylesheet" href="/static/css/blueprint/ie.css" type="text/css" media="screen, projection">
+<![endif]-->
 <!--[if IE]>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" />
 <![endif]-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="http://cdn.jquerytools.org/1.2.5/all/jquery.tools.min.js"></script>
-<!-- FIXME: the Google Maps key should be parameterized. -->
-<script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAXcuKXMwaEjGtWQylDfGXqBQ4MdEIN7TugTKbD7ebaEXCKD6fOxQDvaeGczoQkzQQMYM2p0W50crfDw"></script>
+<style type="text/css">
+
+div#nav {
+    line-height: 4em;
+    font-size: 1.5em;
+    text-align:center;
+    height:4em;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 2em;
+}
+
+div#nav a {
+    vertical-align: middle;
+    color: #FF1721;
+}
+
+div#nav a:hover {
+    background: #FF1721;
+    color: white;
+}
+
+</style>
 
 {% endblock %}
 </head>
 
-<body class="page-home">
-<div id="page">
-  <header class="full">
+<body>
+<div class="container">
+  <header class="span-24">
   <h1>Header text goes here.</h1>
+
+  <div id="nav">
+      <a class="span-4 border" href="/">Home</a>
+      <a class="span-4 border" href="/daily-reports">Daily Reports</a>
+      <a class="span-4 border" href="/reports">Reports</a>
+      <a class="span-4 border" href="/categories">Categories</a>
+      <a class="span-4 border last" href="/search">Search</a>
+  </div>
+
   </header>
 
   {% with messages = get_flashed_messages() %}
@@ -34,11 +65,11 @@
   {% endif %}
   {% endwith %}
   
-  <section class="full">
+  <section class="span-24">
   {% block body %}{% endblock %}
   </section>
   
-  <footer class="full">
+  <footer class="span-24">
   <p><small>Footer text goes here</small></p>
   </footer>
 </div>

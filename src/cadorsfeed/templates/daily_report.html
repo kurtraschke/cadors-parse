@@ -7,10 +7,11 @@
 <style type="text/css">
 
 .count {
-    font-size: 36px;
-    top: 5px;
-    line-height: 36px;
+    font-size: 1.5em;
+    line-height: 1;
+    margin-bottom: 0.5em;
 }
+
 </style>
 
 {% endblock %}
@@ -18,43 +19,43 @@
 
 {% block body %}
 
-<section>
+<section class="clear large">
+<div class="span-4 append-16">
 {% if previous_report %}
 <a href="{{ url_for('daily_report.do_daily_report', 
 	 year=previous_report.report_date.year,
 	 month=previous_report.report_date.month,
 	 day=previous_report.report_date.day,
-	 format='html')}}">{{ previous_report.report_date.strftime("%Y-%m-%d")}}</a>
-{% endif %}
-
-|
-
+	 format='html')}}">&laquo;{{previous_report.report_date.strftime("%Y-%m-%d")}}</a>
+{% endif %}&nbsp;
+</div>
+{#| <strong>{{daily_report.report_date.strftime("%Y-%m-%d")}}</strong>&nbsp;|#}
+<div class="span-4 last" style="text-align: right;">
 {% if next_report %}
 <a href="{{ url_for('daily_report.do_daily_report', 
 	 year=next_report.report_date.year,
 	 month=next_report.report_date.month,
 	 day=next_report.report_date.day,
-	 format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}</a>
+	 format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}&raquo;</a>
 {% endif %}
-
+</div>
 </section>
 
-<section>
-<h2>What</h2>
+
+<section class="clear">
+<div class="span-2 colborder"><h2>What</h2></div>
 {% for type in types %}
-<div class="column unitx1 {{ 'first' if loop.index0 == 0}}">
+<div class="span-2">
 <p>
 <span class="count">{{ type[1] }}</span><br />
 <span><strong>{{ type[0] }}</strong></span>
 </p>
 </div>
 {% endfor %}
-</section>
 
-<section class="width4 clear">
-<h2>Where</h2>
+<div class="span-2 colborder"><h2>Where</h2></div>
 {% for region in regions %}
-<div class="column unitx1 {{ 'first' if loop.index0 == 0}}">
+<div class="span-2 {{ 'last' if loop.last}}">
 <p>
 <span class="count">{{ region[1] }}</span><br />
 <span><strong>{{ region[0] }}</strong></span>
@@ -62,6 +63,7 @@
 </div>
 {% endfor %}
 </section>
+
 
 {{ r.report_list(reports) }}
 
