@@ -56,7 +56,7 @@ def drop_all():
     '''Drop PostgreSQL tables'''
     from cadorsfeed import db
     import cadorsfeed.models
-    if prompt_bool("Are you sure you want to drop the database tables?"):
+    if prompt_bool("Are you sure you want to drop the database tables"):
         db.drop_all()
 
 
