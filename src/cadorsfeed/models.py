@@ -2,26 +2,13 @@ from sqlalchemy import func, DDL
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from geoalchemy import GeometryColumn, Point, GeometryDDL
 from geoalchemy.postgis import PGComparator
 
 from cadorsfeed import db
 from cadorsfeed.unique import unique_constructor
-
-
-class LocationMixin(object):
-    @property
-    def latitude(self):
-        return db.session.scalar(self.location.y)
-
-    @property
-    def longitude(self):
-        return db.session.scalar(self.location.x)
-
-    @property
-    def kml(self):
-        return db.session.scalar(self.location.kml)
 
 
 class DictMixin(object):
@@ -97,8 +84,11 @@ class CadorsReport(db.Model, DictMixin):
                                cascade="all, delete, delete-orphan")
     narrative_parts = db.relationship("NarrativePart", backref="report",
                                       cascade="all, delete, delete-orphan")
-    locations = db.relationship("Location", backref="report",
-                                cascade="all, delete, delete-orphan")
+    locationrefs = db.relationship("LocationRef", backref="report",
+                                   cascade="all, delete, delete-orphan")
+
+    locations = association_proxy('locationrefs', 'location')
+
     __mapper_args__ = {'order_by': timestamp.desc()}
 
     @property
@@ -155,22 +145,52 @@ class NarrativePart(db.Model, DictMixin):
     __mapper_args__ = {'order_by': date.asc()}
 
 
-class Location(db.Model, DictMixin, LocationMixin):
-    location_id = db.Column(db.Integer(), primary_key=True)
+class LocationRef(db.Model):
+    locref_id = db.Column(db.Integer(), primary_key=True)
     cadors_number = db.Column(db.CHAR(9),
                               db.ForeignKey('cadors_report.cadors_number'))
+    location_id = db.Column(db.Integer(),
+                            db.ForeignKey('location.location_id'))
+    primary = db.Column(db.Boolean(), default=False, nullable=False)
+
+
+class LocationBase(db.Model, DictMixin):
+    __tablename__ = 'location'
+
+    location_id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.Unicode())
     url = db.Column(db.String())
     location = GeometryColumn(Point(2), comparator=PGComparator)
-    primary = db.Column(db.Boolean(), nullable=False, default=False)
+    discriminator = db.Column('type', db.CHAR(10))
+    __mapper_args__ = {'polymorphic_on': discriminator}
+    locationrefs = db.relationship("LocationRef", backref="location",
+                                   cascade="all, delete, delete-orphan")
 
-GeometryDDL(Location.__table__)
+    @property
+    def latitude(self):
+        return db.session.scalar(self.location.y)
+
+    @property
+    def longitude(self):
+        return db.session.scalar(self.location.x)
+
+    @property
+    def kml(self):
+        return db.session.scalar(self.location.kml)
+
+GeometryDDL(LocationBase.__table__)
+
+@unique_constructor(db.session,
+                    lambda location: db.session.scalar(location.wkt),
+                    lambda query, location: query.filter(
+        Location.location == location))
+class Location(LocationBase):
+    __mapper_args__ = {'polymorphic_identity':'location  '}
+    context = db.Column(db.Unicode())
 
 
-class Aerodrome(db.Model, DictMixin, LocationMixin):
-    aerodrome_id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.Unicode())
-    url = db.Column(db.String())
+class Aerodrome(LocationBase):
+    __mapper_args__ = {'polymorphic_identity': 'aerodrome '}
     icao = db.Column(db.CHAR(4), unique=True, index=True)
     iata = db.Column(db.CHAR(3), unique=True, index=True)
     faa = db.Column(db.CHAR(3), unique=True, index=True)
@@ -178,14 +198,8 @@ class Aerodrome(db.Model, DictMixin, LocationMixin):
     lid = db.synonym('tclid')
     airport = db.synonym('url')
     blacklist = db.Column(db.Boolean(), nullable=False, default=False)
-    location = GeometryColumn(Point(2), comparator=PGComparator)
 
 
-GeometryDDL(Aerodrome.__table__)
-
-#DDL('''ALTER TABLE cadors_report ADD COLUMN
-#       narrative_agg character varying''').execute_at("after-create",
-#                                                      CadorsReport.__table__)
 
 DDL('''ALTER TABLE cadors_report ADD COLUMN
        narrative_agg_idx_col tsvector''').execute_at("after-create",
