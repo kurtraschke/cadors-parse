@@ -1,4 +1,5 @@
 import re
+import uuid
 from datetime import datetime
 
 from lxml import etree
@@ -124,6 +125,8 @@ def format_parsed_report(parsed_report):
                              primary=True)
         db.session.add(locref)
 
+    other_locations -= primary_locations
+
     for location in other_locations:
         locref = LocationRef(report=report, location=location,
                              primary=False)
@@ -132,6 +135,8 @@ def format_parsed_report(parsed_report):
 
     for key, value in parsed_report.iteritems():
         setattr(report, key, value)
+
+    return report
     
     
 def make_location(latitude, longitude):
