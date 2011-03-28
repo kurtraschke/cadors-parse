@@ -10,7 +10,8 @@ from cadorsfeed.cadorslib.filters.filter import make_link, make_span, do_filter
 
 NSMAP = {None: 'http://www.w3.org/1999/xhtml',
          #'a': 'http://www.w3.org/2005/Atom',
-         'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'}
+         'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+         'aero':'urn:uuid:1469bf5a-50a9-4c9b-813c-af19f9d6824d'}
 
 
 def geolucidate_span(maplink):
@@ -42,4 +43,4 @@ def process_narrative(narrative_block):
     new_root = etree.Element(root.tag, root.attrib, nsmap=NSMAP)
     new_root[:] = root[:]
 
-    return etree.tostring(new_root, method="html", encoding="unicode")
+    return new_root

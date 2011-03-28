@@ -6,10 +6,12 @@ NS = 'http://www.w3.org/1999/xhtml'
 
 NSMAP = {'h': 'http://www.w3.org/1999/xhtml',
          #'a': 'http://www.w3.org/2005/Atom',
-         'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'}
+         'geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+         'aero':'urn:uuid:1469bf5a-50a9-4c9b-813c-af19f9d6824d'}
 
 
-def make_link(url, text, title, css_class='geolink', coordinates=None):
+def make_link(url, text, title, css_class='geolink', coordinates=None,
+              code=None):
     def output_link(out):
         parameters = {('', 'href'): url,
                       ('', 'title'): title}
@@ -20,6 +22,9 @@ def make_link(url, text, title, css_class='geolink', coordinates=None):
                         'lat')] = coordinates['latitude']
             parameters[('http://www.w3.org/2003/01/geo/wgs84_pos#',
                         'long')] = coordinates['longitude']
+        if code is not None:
+            parameters[('urn:uuid:1469bf5a-50a9-4c9b-813c-af19f9d6824d',
+                        'code')] = code
         out.startElementNS((NS, 'a'), 'a', parameters)
         out.characters(text)
         out.endElementNS((NS, 'a'), 'a')

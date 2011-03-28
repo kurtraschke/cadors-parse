@@ -10,7 +10,7 @@ from cadorsfeed.models import Aircraft, NarrativePart, Location
 from cadorsfeed.cadorslib.fetch import fetch_daily_report, fetch_latest_date
 from cadorsfeed.cadorslib.fetch import ReportNotFoundError, ReportFetchError
 from cadorsfeed.cadorslib.parse import parse_daily_report
-
+from cadorsfeed.fpr import format_parsed_report
 
 def latest_daily_report():
     return datetime.strptime(fetch_latest_date(), "%Y-%m-%d")
@@ -52,44 +52,8 @@ def retrieve_report(report_date):
     reports = []
 
     for parsed_report in parsed_daily_report['reports']:
-
-        categories = []
-        for category in parsed_report['categories']:
-            categories.append(ReportCategory(text=category))
-        del parsed_report['categories']
-
-        aircraft_parts = []
-        for aircraft_part in parsed_report['aircraft']:
-            aircraft_parts.append(Aircraft(**aircraft_part))
-        del parsed_report['aircraft']
-
-        narrative_parts = []
-        for narrative_part in parsed_report['narrative']:
-            narrative_parts.append(NarrativePart(**narrative_part))
-        del parsed_report['narrative']
-
-        locations = []
-        for location in parsed_report['locations']:
-            wkt = "POINT(%s %s)" % (location['longitude'],
-                                    location['latitude'])
-            location['location'] = WKTSpatialElement(wkt)
-            del location['latitude']
-            del location['longitude']
-            locations.append(Location(**location))
-        del parsed_report['locations']
-
-        report = CadorsReport.query.get(
-            parsed_report['cadors_number']) or CadorsReport(uuid=uuid.uuid4())
-
-        for key, value in parsed_report.iteritems():
-            setattr(report, key, value)
-
-        report.categories = categories
-        report.aircraft = aircraft_parts
-        report.narrative_parts = narrative_parts
-        report.locations = locations
-
-        reports.append(report)
+        report = format_parsed_report(parsed_report)
+        reports.append(report)        
 
     daily_report.reports = reports
     db.session.commit()
