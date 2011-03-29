@@ -56,7 +56,9 @@ def replace_aerodromes(text, link_function):
                                                  match.group(), title,
                                                  coordinates={
                     'latitude': latitude,
-                    'longitude': longitude})
+                    'longitude': longitude},
+                                                 code=match.group(),
+                                                 css_class='aerolink')
 
     icao_matches = aerodromes_re.get_icao_re.finditer(text)
     process_matches(icao_matches)

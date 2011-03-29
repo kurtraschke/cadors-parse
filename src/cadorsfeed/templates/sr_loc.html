@@ -15,12 +15,12 @@
   </tr>
   </thead>
   <tbody>
-  {% for (report, distance, azimuth) in reports %}
+  {% for (report, distance, azimuth, location_name) in reports %}
   <tr>
     <td><a href="{{ url_for('report.display_report',
 		 report=report.cadors_number) }}">{{report.cadors_number}}</a></td>
     <td>{{ report.timestamp.strftime("%Y&#8209;%m&#8209;%d %H%M&nbsp;Z") | safe }}</td>
-    <td>{{report.location}}</td>
+    <td>{{location_name}}</td>
     <td>{{(distance/1000)|round(2)}}&nbsp;km&nbsp;<span title="{{azimuth | round(2)}}&deg;">{{get_direction(azimuth)}}</span></td>
     <td>{{report.occurrence_type}}</td>
     <td>{{report.narrative_parts[0].narrative_text | truncate(length=150)}}</td>

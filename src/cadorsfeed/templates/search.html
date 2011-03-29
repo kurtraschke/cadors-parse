@@ -29,6 +29,29 @@
 </form>
 
 
+<form action="/search/aerodrome" method="GET">
+<fieldset class="width4">
+<legend>Search by aerodrome</legend>
+<label class="unitx1 first">Code<input type="text" name="code" class="text"></label>
+<label class="unitx2 first"><input type="radio" name="primary" value="primary" checked="checked">Primary location only</label>
+<label class="unitx2"><input type="radio" name="primary" value="all">All locations</label>
+</fieldset>
+<fieldset class="width2">
+<input type="submit" value="Submit"> 
+</fieldset>
+</form>
+
+<form action="/search/flight" method="GET">
+<fieldset class="width4">
+<legend>Search by flight number</legend>
+<label class="unitx1 first">Operator<input type="text" name="operator" class="text"></label>
+<label class="unitx1">Flight<input type="text" name="flight" class="text"></label>
+</fieldset>
+<fieldset class="width2">
+<input type="submit" value="Submit"> 
+</fieldset>
+</form>
+
 </div>
 
 {% endblock %}

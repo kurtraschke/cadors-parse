@@ -4,11 +4,6 @@ from itertools import izip_longest
 
 import html5lib
 from lxml import etree
-#from bson.son import SON
-#from flask import g
-
-from geolucidate.functions import cleanup, convert
-from geolucidate.parser import parser_re
 
 from cadorsfeed.cadorslib.xpath_functions import extensions
 from cadorsfeed.cadorslib.narrative import process_narrative
@@ -51,12 +46,6 @@ def extractor(node, fields):
 def q(query):
     return "pyf:strip_nbsp(.//h:th[text()='%s']/" \
         "following-sibling::h:td/h:strong/text())" % query
-
-
-def make_datetime(date, time):
-    if time is None:
-        time = "0000 Z"
-    return datetime.strptime(date + " " + time, "%Y-%m-%d %H%M Z")
 
 
 def safe_int(value):
@@ -181,70 +170,6 @@ def parse_report(report):
         report_data['aircraft'].append(aircraft_data)
 
     #All of the extraction is done; on to formatting and cleanup.
-
-    report_data['timestamp'] = make_datetime(report_data['date'],
-                                             report_data['time'])
-    del report_data['date']
-    del report_data['time']
-
-    locations = LocationStore()
-
-    if report_data['tclid'] != '':
-        #try to do a db lookup
-        data = lookup(report_data['tclid'])
-        if data is not None:
-            locations.add(data.latitude,
-                          data.longitude,
-                          data.name,
-                          data.airport,
-                          True)
-
-    if report_data['location'] != '':
-        location = report_data['location']
-        #Apply geolucidate and the aerodromes RE
-        match = aerodromes_re.get_icao_re.search(location)
-        if match:
-            data = lookup(match.group())
-            locations.add(data.latitude,
-                          data.longitude,
-                          data.name,
-                          data.airport,
-                          True)
-        match = parser_re.search(location)
-        if match:
-            (latitude, longitude) = convert(*cleanup(match.groupdict()))
-
-            locations.add(latitude,
-                          longitude,
-                          match.group(),
-                          primary=True)
-
-    for narrative_part in report_data['narrative']:
-        narrative_part['narrative_html'] = process_narrative(
-            narrative_part['narrative_text'])
-        #do the location extraction here
-        root = etree.fromstring(narrative_part['narrative_html'])
-        elements = root.xpath(
-            "//*[@class='geolink' and @geo:lat and @geo:long]",
-            namespaces=NSMAP)
-        for element in elements:
-            longitude = element.attrib[
-                '{http://www.w3.org/2003/01/geo/wgs84_pos#}long']
-            latitude = element.attrib[
-                '{http://www.w3.org/2003/01/geo/wgs84_pos#}lat']
-
-            name = element.attrib['title']
-            url = element.attrib['href'] if 'href' in element.attrib else None
-            locations.add(latitude, longitude, name, url)
-
-    for aircraft_part in report_data['aircraft']:
-        if aircraft_part['flight_number'] is not None:
-            match = re.match("([A-Z]{2,4})([0-9]{1,4})M?",
-                             aircraft_part['flight_number'])
-            if match:
-                aircraft_part['flight_number_operator'] = match.group(1)
-                aircraft_part['flight_number_flight'] = match.group(2)
-
-    report_data['locations'] = locations.to_list()
+    #(which is no longer done here)
 
     return report_data

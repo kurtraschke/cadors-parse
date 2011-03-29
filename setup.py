@@ -28,7 +28,7 @@ setup(
     install_requires=[
         'setuptools',
         'Flask',
-        'Flask-SQLAlchemy',
+        'Flask-SQLAlchemy>0.11',
         'psycopg2',
         'GeoAlchemy',
         'lxml',
