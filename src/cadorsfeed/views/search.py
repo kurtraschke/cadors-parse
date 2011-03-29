@@ -1,10 +1,11 @@
 from flask import request, render_template, Module
 
 from geoalchemy import WKTSpatialElement, functions
-from sqlalchemy import sql, func
+from sqlalchemy import sql, func, or_
 import sqlalchemy.types as types
 
 from cadorsfeed.models import CadorsReport, LocationBase, LocationRef
+from cadorsfeed.models import Aerodrome, Aircraft
 
 search = Module(__name__)
 
@@ -104,3 +105,45 @@ def get_direction(degrees):
 
     return directions[min(directions.keys(),
                           key=lambda x:abs(x-degrees))]
+
+
+@search.route('/search/aerodrome')
+def search_aerodrome():
+    code = request.args['code']
+    primary = True if (request.args['primary'] == 'primary') else False
+    page = int(request.args.get('page', '1'))
+
+    query = CadorsReport.query.join(LocationRef).join(Aerodrome).filter(
+        or_(Aerodrome.icao == code,
+            Aerodrome.iata == code,
+            Aerodrome.faa == code,
+            Aerodrome.tclid == code))
+
+    if primary:
+        query = query.filter(LocationRef.primary == True)
+
+    query = query.order_by(CadorsReport.timestamp.desc())
+
+    pagination = query.paginate(page)
+
+    return render_template('list.html', reports=pagination.items,
+                           pagination=pagination)
+
+@search.route('/search/flight')
+def search_aerodrome():
+    operator = request.args['operator']
+    flight = request.args.get('flight','')
+    page = int(request.args.get('page', '1'))
+
+    query = CadorsReport.query.join(Aircraft).filter(
+        Aircraft.flight_number_operator == operator)
+
+    if flight != '':
+        query = query.filter(Aircraft.flight_number_flight == int(flight))
+
+    query = query.order_by(CadorsReport.timestamp.desc())
+
+    pagination = query.paginate(page)
+
+    return render_template('list.html', reports=pagination.items,
+                           pagination=pagination)
