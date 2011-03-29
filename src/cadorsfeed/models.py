@@ -1,6 +1,5 @@
 from sqlalchemy import func, DDL
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.associationproxy import association_proxy
 
