@@ -53,7 +53,7 @@ def retrieve_report(report_date):
 
     for parsed_report in parsed_daily_report['reports']:
         report = format_parsed_report(parsed_report)
-        reports.append(report)        
+        reports.append(report)
 
     daily_report.reports = reports
     db.session.commit()
