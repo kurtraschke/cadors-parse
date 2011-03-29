@@ -36,7 +36,6 @@ setup(
         'html5lib',
         'SPARQLWrapper',
         'Flask-Script',
-        'Flask-CSRF',
         'pyRFC3339',
         'geolucidate',
     ],

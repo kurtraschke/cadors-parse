@@ -2,7 +2,6 @@ import os
 from functools import partial
 
 from flask import Flask, request, url_for
-from flaskext.csrf import csrf
 from flaskext.sqlalchemy import SQLAlchemy
 
 etc = partial(os.path.join, 'parts', 'etc')
@@ -30,7 +29,6 @@ def create_app(config=None):
     app.register_module(search)
     app.add_url_rule('/favicon.ico', 'favicon',
                      redirect_to='/static/favicon.ico')
-    csrf(app)
     db.init_app(app)
 
     def modified_url_for(**updates):
