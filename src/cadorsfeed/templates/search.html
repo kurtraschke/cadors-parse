@@ -7,10 +7,10 @@ form div.span-4 input.text {
     width: 120px;
 }
 </style>
+<script type="text/javascript" src="/static/js/search.js"></script>
 {% endblock %}
 
 {% block body %}
-
 <div>
   <form action="/search/text" method="GET" class="span-10">
     <fieldset>
@@ -46,13 +46,16 @@ form div.span-4 input.text {
         <input type="radio" id="location-all" name="primary" value="all">
         <label for="location-all">All locations</label>
       </div>
-      <div class="span-4 clear last">
+      <div class="span-8 clear">
         <input type="submit" value="Submit">
+      </div>
+      <div class="span-4 last">
+        <button type="button" id="geolocate">Use current location</button>
       </div>
     </fieldset>
   </form>
 
-  <form action="/search/aerodrome" method="GET" class="span-10">
+  <form action="/search/aerodrome" method="GET" class="span-10 clear">
     <fieldset>
       <legend>Search by aerodrome</legend>
       <div class="span-4 last">
