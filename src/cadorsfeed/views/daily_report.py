@@ -4,11 +4,11 @@ import json
 from flask import abort, request, redirect, url_for
 from flask import make_response, render_template, Module
 from pyrfc3339 import generate
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 
 from cadorsfeed import db
-from cadorsfeed.models import DailyReport, CadorsReport
+from cadorsfeed.models import DailyReport, CadorsReport, report_map
 from cadorsfeed.views.util import process_report_atom, json_default
 
 daily_report = Module(__name__)
@@ -16,12 +16,19 @@ daily_report = Module(__name__)
 @daily_report.route('/daily-reports/', defaults={'page': 1})
 @daily_report.route('/daily-reports/<int:page>')
 def daily_reports_list(page):
-    daily_reports = DailyReport.query
+    query = DailyReport.query
+    query = query.add_column(
+        select(
+            [func.count()],
+            report_map.c.daily_report_id == \
+                DailyReport.daily_report_id).select_from(
+                    report_map).label('report_count'))
+    
 
-    pagination = daily_reports.paginate(page)
+    pagination = query.paginate(page)
 
     return render_template('daily_report_list.html',
-                           daily_reports=daily_reports,
+                           daily_reports=pagination.items,
                            pagination=pagination)
 
 
