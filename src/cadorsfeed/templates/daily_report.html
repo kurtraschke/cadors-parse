@@ -26,7 +26,7 @@
 	 year=previous_report.report_date.year,
 	 month=previous_report.report_date.month,
 	 day=previous_report.report_date.day,
-	 format='html')}}">&laquo;{{previous_report.report_date.strftime("%Y-%m-%d")}}</a>
+	 format='html')}}">&laquo;&nbsp;{{previous_report.report_date.strftime("%Y-%m-%d")}}</a>
 {% endif %}&nbsp;
 </div>
 {#| <strong>{{daily_report.report_date.strftime("%Y-%m-%d")}}</strong>&nbsp;|#}
@@ -36,7 +36,7 @@
 	 year=next_report.report_date.year,
 	 month=next_report.report_date.month,
 	 day=next_report.report_date.day,
-	 format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}&raquo;</a>
+	 format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}&nbsp;&raquo;</a>
 {% endif %}
 </div>
 </section>
