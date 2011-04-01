@@ -41,7 +41,7 @@ def display_report(report, format):
         response.mimetype = "application/json"
     elif format == 'html':
         response = make_response(render_template('report.html',
-                                                 reports=[report]))
+                                                 report=report))
     elif format == 'kml':
         response = make_response(render_template('kml.xml', report=report))
         response.mimetype = "application/vnd.google-earth.kml+xml"

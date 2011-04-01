@@ -6,7 +6,6 @@ from flask import make_response, render_template, Module
 from pyrfc3339 import generate
 from sqlalchemy import func, select
 
-
 from cadorsfeed import db
 from cadorsfeed.models import DailyReport, CadorsReport, report_map
 from cadorsfeed.views.util import process_report_atom, json_default
@@ -95,7 +94,9 @@ def do_daily_report(year, month, day, format):
                             types=types,
                             regions=regions,
                             previous_report=previous_report,
-                            next_report=next_report))
+                            next_report=next_report,
+                            first=DailyReport.first(),
+                            last=DailyReport.last()))
     elif format == 'json':
         response = make_response(json.dumps(
                 {'reports': daily_report.reports},

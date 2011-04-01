@@ -11,8 +11,6 @@
 
 
 {% block body %}
-
-{% for report in reports %}
 <div class="report" id="{{report.cadors_number}}">
 <h2>CADORS Report {{report.cadors_number}}</h2>
 
@@ -32,7 +30,7 @@
 <dd>{{report.injuries}}</dd>
 </dl>
 
-<h3>Event Information</h3>
+<h3>Event Categories</h3>
 <ul>
 {%- for category in report.categories %}
 <li><a href="{{ url_for('category.display_category_report_list',
@@ -42,10 +40,7 @@
 </ul>
 {% if report.locations|length > 0 %}
 <h3>Locations</h3>
-<p><a href="{{ url_for('report.display_report',
-	    report=report.cadors_number,
-	    format='kml',
-	    _external=True)}}" class="maplink">View {{ report.locations|length }} locations</a></p>
+<p><a href="{{ report.link(format='kml', _external=True)}}" class="maplink">View {{ report.locations|length }} locations</a></p>
 {% endif %}
 </section>
 
@@ -105,5 +100,4 @@
 </div>
 </div>
 <hr />
-{% endfor %}
 {% endblock %}

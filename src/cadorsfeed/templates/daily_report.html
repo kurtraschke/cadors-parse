@@ -4,16 +4,21 @@
 
 {% block head %}
 {{ super() }}
+<link rel="first" href="{{ first.link(format='html') }}">
+{% if previous_report %}
+<link rel="prev" href="{{ previous_report.link(format='html') }}">
+{% endif %}
+{% if next_report %}
+<link rel="next" href="{{ next_report.link(format='html') }}">
+{% endif %}
+<link rel="last" href="{{ last.link(format='html') }}">
 <style type="text/css">
-
 .count {
     font-size: 1.5em;
     line-height: 1;
     margin-bottom: 0.5em;
 }
-
 </style>
-
 {% endblock %}
 
 
@@ -22,21 +27,13 @@
 <section class="clear large">
 <div class="span-4 append-16">
 {% if previous_report %}
-<a href="{{ url_for('daily_report.do_daily_report', 
-	 year=previous_report.report_date.year,
-	 month=previous_report.report_date.month,
-	 day=previous_report.report_date.day,
-	 format='html')}}">&laquo;&nbsp;{{previous_report.report_date.strftime("%Y-%m-%d")}}</a>
+<a href="{{ previous_report.link(format='html')}}">&laquo;&nbsp;{{previous_report.report_date.strftime("%Y-%m-%d")}}</a>
 {% endif %}&nbsp;
 </div>
 {#| <strong>{{daily_report.report_date.strftime("%Y-%m-%d")}}</strong>&nbsp;|#}
 <div class="span-4 last" style="text-align: right;">
 {% if next_report %}
-<a href="{{ url_for('daily_report.do_daily_report', 
-	 year=next_report.report_date.year,
-	 month=next_report.report_date.month,
-	 day=next_report.report_date.day,
-	 format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}&nbsp;&raquo;</a>
+<a href="{{ next_report.link(format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}&nbsp;&raquo;</a>
 {% endif %}
 </div>
 </section>
@@ -64,8 +61,6 @@
 {% endfor %}
 </section>
 
-
 {{ r.report_list(reports) }}
-
 
 {% endblock %}

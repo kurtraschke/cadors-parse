@@ -1,3 +1,5 @@
+from flask import url_for
+
 from sqlalchemy import func, DDL
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty
 from sqlalchemy.dialects.postgresql import UUID
@@ -48,6 +50,20 @@ class DailyReport(db.Model, DictMixin):
             DailyReport).filter(
                 DailyReport.report_date == self.report_date).scalar()
 
+    @staticmethod
+    def first():
+        return DailyReport.query.order_by(DailyReport.report_date.asc()).first()
+
+    @staticmethod
+    def last():
+        return DailyReport.query.order_by(DailyReport.report_date.desc()).first()
+
+    def link(self, **kwargs):
+        return url_for('daily_report.do_daily_report',
+                       year=self.report_date.year,
+                       month=self.report_date.month,
+                       day=self.report_date.day,
+                       **kwargs)
 
 category_map = db.Table(
     'category_map', db.Model.metadata,
@@ -94,6 +110,11 @@ class CadorsReport(db.Model, DictMixin):
     def last_updated(self):
         return db.session.query(
             func.max(NarrativePart.date)).with_parent(self).scalar()
+
+    def link(self, **kwargs):
+        return url_for('report.display_report',
+                       report=self.cadors_number,
+                       **kwargs)
 
 
 @unique_constructor(db.session,
