@@ -9,6 +9,7 @@
 {{ pg.render_pagination(pagination) }}
 {% endif %}
 
+<div class="span-18">
 <table>
 <thead>
 <th>Report Date</th><th>Number of Reports</th>
@@ -16,17 +17,22 @@
 <tbody>
 {% for (daily_report, count) in daily_reports %}
 <tr>
-<td><a href="{{ url_for('daily_report.do_daily_report', 
-         year=daily_report.report_date.year,
-         month=daily_report.report_date.month,
-         day=daily_report.report_date.day,
-         format='html')}}">{{ daily_report.report_date.strftime("%Y-%m-%d") }}</a></td>
+<td><a href="{{ daily_report.link(format='html') }}">{{ daily_report.report_date.strftime("%Y-%m-%d") }}</a></td>
 <td>{{count}}</td>
 </tr>
 {% endfor %}
 </tbody>
 </table>
-
 {{ pg.render_pagination(pagination) }}
-
+</div>
+<div class="span-6 last">
+<form method="GET" action="/daily-report/">
+<fieldset>
+<legend>Jump to date</legend>
+<label for="date">Date</label><br>
+<input type="date" name="report_date"><br>
+<input type="submit">
+</fieldset>
+</form>
+</div>
 {% endblock %}

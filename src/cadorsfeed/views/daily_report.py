@@ -43,6 +43,12 @@ def latest_report(format):
     return redirect(url_for('do_daily_report', year=year, month=month,
                             day=day, format=format))
 
+@daily_report.route('/daily-report/')
+def daily_report_redirect():
+    (year, month, day) = request.args['report_date'].split('-')
+
+    return redirect(url_for('do_daily_report', year=year, month=month,
+                            day=day))
 
 @daily_report.route('/daily-report/<int:year>/<int:month>/<int:day>/',
                     defaults={'format': 'html'})
