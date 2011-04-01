@@ -10,7 +10,7 @@
   <tr>
     <td><a href="{{ url_for('report.display_report',
 		 report=report.cadors_number) }}">{{report.cadors_number}}</a></td>
-    <td>{{ report.timestamp.strftime("%Y&#8209;%m&#8209;%d %H%M&nbsp;Z") | safe }}</td>
+    <td>{{ report.timestamp.strftime("%Y&#8209;%m&#8209;%d&nbsp;%H%M&nbsp;Z") | safe }}</td>
     <td>{{report.location}}</td>
     <td>{{report.occurrence_type}}</td>
     <td>{{report.narrative_parts[0].narrative_text | truncate(length=150)}}</td>
