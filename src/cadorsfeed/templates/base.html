@@ -2,7 +2,7 @@
 <html lang="en" class="no-js">
 <head>
 {% block head %}
-<title>cadorsfeed</title>
+<title>{% block title %}{% endblock %} - CADORS</title>
 <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
 <link rel="stylesheet" href="/static/css/blueprint/print.css" type="text/css" media="print"> 
 <!--[if lt IE 8]>
@@ -32,6 +32,13 @@ div#nav a:hover {
     background: #FF1721;
     color: white;
 }
+
+header div p.title {
+    color: #FF1721;
+    font-size: 3em;
+    line-height: 1;
+    margin-bottom: 0.5em;
+}
 </style>
 {% endblock %}
 
@@ -40,18 +47,21 @@ div#nav a:hover {
 <body>
 <div class="container">
   <header class="span-24">
-  <h1>Header text goes here.</h1>
-
-  <div id="nav">
+  
+  <div class="prepend-20 span-4 last">
+    <p class="title" title="Civil Aviation Daily Occurrence Reporting System">CADORS</p>
+  </div>
+  <div id="nav" class="clear">
       <a class="span-4 border" href="/">Home</a>
       <a class="span-4 border" href="/daily-reports">Daily Reports</a>
       <a class="span-4 border" href="/reports">Reports</a>
       <a class="span-4 border" href="/categories">Categories</a>
       <a class="span-4 border last" href="/search">Search</a>
   </div>
-
+  <h1>{{self.title()}}</h1>
   </header>
-
+ 
+  {#
   {% with messages = get_flashed_messages() %}
   {% if messages %}
   <section class="full flashes">
@@ -60,7 +70,7 @@ div#nav a:hover {
     {% endfor %}
   </section>
   {% endif %}
-  {% endwith %}
+  {% endwith %}#}
   
   <section class="span-24">
   {% block body %}{% endblock %}

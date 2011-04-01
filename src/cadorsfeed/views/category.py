@@ -29,8 +29,11 @@ def display_categories():
 def display_category_report_list(catid, page):
     cat = ReportCategory.query.get_or_404(catid)
 
+    title = "Category: " + cat.text
+
     pagination = CadorsReport.query.filter(
         CadorsReport.categories.contains(cat)).paginate(page)
 
     return render_template('list.html', reports=pagination.items,
-                           pagination=pagination)
+                           pagination=pagination,
+                           title=title)

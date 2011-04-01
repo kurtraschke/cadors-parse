@@ -2,6 +2,8 @@
 {% import "pagination.html" as pg %}
 {% import "report_list.html" as r %}
 
+{% block title %}Daily Reports{% endblock %}
+
 {% block body %}
 {% if pagination.page > 1 %}
 {{ pg.render_pagination(pagination) }}

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block body %}
+{% block title %}Report Categories{% endblock %}
 
+{% block body %}
 <ul>
 {% for (category, count) in categories %}
 <li><a href="{{ url_for('category.display_category_report_list',
                 catid=category.category_id)}}">{{category.text}}</a> ({{count}})</li>
 {% endfor %}
 </ul>
-
 {% endblock %}

@@ -2,6 +2,8 @@
 {% import "pagination.html" as pg %}
 {% import "report_list.html" as r %}
 
+{% block title %}Daily Report for {{daily_report.report_date.strftime("%Y-%m-%d")}}{% endblock %}
+
 {% block head %}
 {{ super() }}
 <link rel="first" href="{{ first.link(format='html') }}">

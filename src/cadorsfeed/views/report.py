@@ -12,11 +12,12 @@ report = Module(__name__)
 @report.route('/reports/', defaults={'page': 1})
 @report.route('/reports/<int:page>')
 def display_report_list(page):
-
     pagination = CadorsReport.query.paginate(page)
 
+    title = "Reports"
+
     return render_template('list.html', reports=pagination.items,
-                           pagination=pagination)
+                           pagination=pagination, title=title)
 
 
 @report.route('/report/<report>', defaults={'format': 'html'})
