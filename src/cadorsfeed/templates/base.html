@@ -69,24 +69,12 @@ header div p.title {
   </div>
   <h1>{{self.title()}}</h1>
   </header>
- 
-  {#
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-  <section class="full flashes">
-    {% for message in messages %}
-    <mark>{{ message }}</mark><br />
-    {% endfor %}
-  </section>
-  {% endif %}
-  {% endwith %}#}
-  
   <section class="span-24">
   {% block body %}{% endblock %}
   </section>
-  
+  <hr>
   <footer class="span-24">
-  <p><small>Footer text goes here</small></p>
+  <p><small>CADORS data is provided by Transport Canada. All reports are unveritified and subject to change. <a href="/disclaimer">View full disclaimer.</a></small></p>
   </footer>
 </div>
 </body>
