@@ -6,6 +6,11 @@
 form div.span-4 input.text {
     width: 120px;
 }
+
+input[type="search"] {
+  -webkit-appearance: textfield;
+}
+
 </style>
 <script type="text/javascript" src="/static/js/search.js"></script>
 {% endblock %}
@@ -17,7 +22,7 @@ form div.span-4 input.text {
       <legend>Search report text</legend>
       <p>
         <label for="query">Query</label><br>
-        <input type="text" id="query" name="q" class="text">
+        <input type="search" id="query" name="q" class="text" required>
       </p>
       <p><input type="submit" value="Submit"></p>
     </fieldset>
@@ -28,18 +33,18 @@ form div.span-4 input.text {
       <legend>Search by location</legend>
       <div class="span-4">
         <label for="latitude">Latitude</label><br>
-        <input type="text" id="latitude" name="latitude" class="text">
+        <input type="number" id="latitude" name="latitude" class="text" min="-90" max="90" step="any" required>
       </div>
       <div class="span-4">
         <label for="longitude">Longitude</label><br>
-        <input type="text" id="longitude" name="longitude" class="text">
+        <input type="number" id="longitude" name="longitude" class="text" min="-180" max="180" step="any" required>
       </div>
       <div class="span-4 last">
         <label for="radius">Radius (km)</label><br>
-        <input type="text" id="radius" name="radius" class="text">
+        <input type="number" id="radius" name="radius" class="text" min="0" required>
       </div>
       <div class="span-4 clear">
-        <input type="radio" id="location-primary" name="primary" value="primary" checked="checked">
+        <input type="radio" id="location-primary" name="primary" value="primary" checked>
         <label for="location-primary">Primary location only</label>
       </div>
       <div class="span-4 last">
@@ -58,9 +63,12 @@ form div.span-4 input.text {
   <form action="/search/aerodrome" method="GET" class="span-10 clear">
     <fieldset>
       <legend>Search by aerodrome</legend>
+      <div class="span-4">
+        <label for="aerodrome">Aerodrome identifier</label><br>
+        <input type="text" id="aerodrome" name="aerodrome" class="text" maxlength="4" required placeholder="CYYZ">
+      </div>
       <div class="span-4 last">
-        <label for="code">Code</label><br>
-        <input type="text" id="code" name="code" class="text" maxlength="4">
+        <p class="small"></p>
       </div>
       <div class="span-4 clear">
         <input type="radio" id="aerodrome-primary" name="primary" value="primary" checked="checked">
@@ -81,11 +89,11 @@ form div.span-4 input.text {
       <legend>Search by flight number</legend>
       <div class="span-4">
         <label for="operator">Operator</label><br>
-        <input type="text" id="operator" name="operator" class="text">
+        <input type="text" id="operator" name="operator" class="text" required placeholder="ACA">
       </div>
       <div class="span-4 last">
         <label for="flight">Flight</label><br>
-        <input type="text" id="flight" name="flight" class="text">
+        <input type="number" id="flight" name="flight" class="text">
       </div>
       <div class="span-4 clear last">
         <input type="submit" value="Submit"> 

@@ -29,7 +29,7 @@ def search_text():
         func.ts_headline('pg_catalog.english',
                          CadorsReport.narrative_agg,
                          func.plainto_tsquery(terms),
-                         '''MaxFragments=5,
+                         '''MaxFragments=2,
                             MinWords=15,
                             MaxWords=20,
                             FragmentDelimiter=|||,
@@ -109,7 +109,7 @@ def get_direction(degrees):
 
 @search.route('/search/aerodrome')
 def search_aerodrome():
-    code = request.args['code']
+    code = request.args['aerodrome'].upper()
     primary = True if (request.args['primary'] == 'primary') else False
     page = int(request.args.get('page', '1'))
 
@@ -118,20 +118,21 @@ def search_aerodrome():
             Aerodrome.iata == code,
             Aerodrome.faa == code,
             Aerodrome.tclid == code))
-
+    
     if primary:
         query = query.filter(LocationRef.primary == True)
-
+        
     query = query.order_by(CadorsReport.timestamp.desc())
 
     pagination = query.paginate(page)
 
     return render_template('list.html', reports=pagination.items,
                            pagination=pagination)
+                           
 
 @search.route('/search/flight')
-def search_aerodrome():
-    operator = request.args['operator']
+def search_flight():
+    operator = request.args['operator'].upper()
     flight = request.args.get('flight','')
     page = int(request.args.get('page', '1'))
 
