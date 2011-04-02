@@ -1,7 +1,7 @@
 from flask import url_for
 
 from sqlalchemy import func, DDL
-from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty, deferred
+from sqlalchemy.orm import class_mapper, ColumnProperty, deferred
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -19,9 +19,7 @@ class DictMixin(object):
         d = {}
         for c in [p.key for p in \
                   class_mapper(self.__class__).iterate_properties \
-                  if isinstance(p, ColumnProperty) or \
-                  (isinstance(p, RelationshipProperty) and \
-                   p.backref is not None)]:
+                  if isinstance(p, ColumnProperty)]:
             value = getattr(self, c)
             yield(c, value)
 
