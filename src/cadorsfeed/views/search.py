@@ -4,6 +4,7 @@ from geoalchemy import WKTSpatialElement, functions
 from sqlalchemy import sql, func, or_
 import sqlalchemy.types as types
 
+from cadorsfeed.aerodb import lookup
 from cadorsfeed.models import CadorsReport, LocationBase, LocationRef
 from cadorsfeed.models import Aerodrome, Aircraft
 
@@ -43,7 +44,7 @@ def search_text():
     pagination = query.paginate(page)
 
     return render_template('sr_text.html', reports=pagination.items,
-                           pagination=pagination)
+                           pagination=pagination, terms=terms)
 
 
 class Geography(types.TypeEngine):
@@ -73,10 +74,10 @@ def search_location():
     if primary:
         query = query.filter(LocationRef.primary == True)
 
-        
+
     query = query.add_column(functions.distance(loc, q_loc).label('distance'))
     query = query.add_column(
-        func.ST_Azimuth(location, 
+        func.ST_Azimuth(location,
                         LocationBase.location.RAW) * (180/func.pi()))
     query = query.add_column(LocationBase.name)
 
@@ -86,13 +87,13 @@ def search_location():
     pagination = query.paginate(page)
 
     return render_template('sr_loc.html',
-                           reports=pagination.items,
-                           pagination=pagination,
-                           get_direction=get_direction)
+                           reports=pagination.items, pagination=pagination,
+                           get_direction=get_direction, radius=radius,
+                           latitude=latitude, longitude=longitude)
 
 def get_direction(degrees):
     degrees = degrees % 360
-    
+
     directions = {0: 'N',
                   45: 'NE',
                   90: 'E',
@@ -113,22 +114,31 @@ def search_aerodrome():
     primary = True if (request.args['primary'] == 'primary') else False
     page = int(request.args.get('page', '1'))
 
-    query = CadorsReport.query.join(LocationRef).join(Aerodrome).filter(
-        or_(Aerodrome.icao == code,
-            Aerodrome.iata == code,
-            Aerodrome.faa == code,
-            Aerodrome.tclid == code))
-    
+    aerodrome = lookup(code)
+
+    if aerodrome is None:
+        title = "No results"
+        message = "Aerodrome %s not found." % code
+        return render_template('message.html', title=title, message=message)
+
+    query = CadorsReport.query.join(LocationRef).filter(
+        LocationRef.location == aerodrome)
+
     if primary:
         query = query.filter(LocationRef.primary == True)
-        
+        relation = "at"
+    else:
+        relation = "involving"
+
     query = query.order_by(CadorsReport.timestamp.desc())
 
     pagination = query.paginate(page)
 
+    title = "Events %s %s" % (relation, aerodrome.name)
+
     return render_template('list.html', reports=pagination.items,
-                           pagination=pagination)
-                           
+                           pagination=pagination, title=title)
+
 
 @search.route('/search/flight')
 def search_flight():
@@ -146,5 +156,10 @@ def search_flight():
 
     pagination = query.paginate(page)
 
+    if flight == '':
+        title = "Events involving operator %s" % (operator)
+    else:
+        title = "Events involving flight %s%s" % (operator, flight)
+
     return render_template('list.html', reports=pagination.items,
-                           pagination=pagination)
+                           pagination=pagination, title=title)
