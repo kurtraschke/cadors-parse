@@ -1,7 +1,7 @@
 from flask import url_for
 
 from sqlalchemy import func, DDL
-from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty
+from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty, deferred
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -38,7 +38,7 @@ class DailyReport(db.Model, DictMixin):
     report_date = db.Column(db.DateTime(), unique=True, index=True)
     fetch_timestamp = db.Column(db.DateTime())
     parse_timestamp = db.Column(db.DateTime())
-    report_html = db.Column(db.LargeBinary())
+    report_html = deferred(db.Column(db.LargeBinary()))
     reports = db.relationship("CadorsReport", secondary=report_map,
                               backref='daily_reports')
     __mapper_args__ = {'order_by': report_date.desc()}
@@ -91,7 +91,7 @@ class CadorsReport(db.Model, DictMixin):
     region = db.Column(db.Unicode())
     world_area = db.Column(db.Unicode())
     day_night = db.Column(db.Unicode())
-    narrative_agg = db.Column(db.UnicodeText())
+    narrative_agg = deferred(db.Column(db.UnicodeText()))
     categories = db.relationship("ReportCategory", backref="reports",
                                  secondary=category_map,
                                  cascade="all, delete")
@@ -157,7 +157,7 @@ class NarrativePart(db.Model, DictMixin):
     author_name = db.Column(db.Unicode())
     name = db.synonym('author_name')
     date = db.Column(db.DateTime())
-    narrative_text = db.Column(db.UnicodeText())
+    narrative_text = deferred(db.Column(db.UnicodeText()))
     narrative_html = db.Column(db.UnicodeText())
     further_action = db.Column(db.Unicode())
     opi = db.Column(db.Unicode())
