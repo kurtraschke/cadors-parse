@@ -18,7 +18,7 @@
   <tr>
     <td><a href="{{ url_for('report.display_report',
 		 report=report.cadors_number) }}">{{report.cadors_number}}</a></td>
-    <td>{{ report.timestamp.strftime("%Y&#8209;%m&#8209;%d %H%M&nbsp;Z") | safe }}</td>
+    <td>{{report.timestamp_html|safe}}</td>
     <td>{{report.location}}</td>
     <td>{{report.occurrence_type}}</td>
     <td>{% for snippet in snippets.split('|||') %}
@@ -26,6 +26,8 @@
     {% endfor %}
     </td>
   </tr>
+  {% else %}
+  <tr><td colspan="5" class="large center">No results</td></tr>
   {% endfor %}
   </tbody>
 </table>

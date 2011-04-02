@@ -111,6 +111,10 @@ class CadorsReport(db.Model, DictMixin):
         return db.session.query(
             func.max(NarrativePart.date)).with_parent(self).scalar()
 
+    @property
+    def timestamp_html(self):
+        return self.timestamp.strftime("%Y&#8209;%m&#8209;%d&nbsp;%H%M&nbsp;Z")
+
     def link(self, **kwargs):
         return url_for('report.display_report',
                        report=self.cadors_number,
