@@ -1,0 +1,49 @@
+div#nav {
+    line-height: 4em;
+    font-size: 1.5em;
+    text-align:center;
+    height:4em;
+    margin-bottom: 2em;
+}
+
+div#nav a {
+    vertical-align: middle;
+    color: #FF1721;
+    margin-right: 0px;
+    padding-right: 4px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+div#nav a.border:not(:first-child) {
+    padding-left: 5px;
+}
+
+div#nav a.border:first-child {
+    border-left: 1px solid #DDD;
+}
+
+div#nav a:hover {
+    background: #FF1721;
+    color: white;
+}
+
+header div p.title {
+    color: #FF1721;
+    font-size: 3em;
+    line-height: 1;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+.center {
+    text-align: center;
+}
+
+form div.span-4 input.text {
+    width: 120px;
+}
+
+input[type="search"] {
+  -webkit-appearance: textfield;
+}
