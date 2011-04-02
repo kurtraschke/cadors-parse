@@ -7,6 +7,7 @@ import sqlalchemy.types as types
 from cadorsfeed.aerodb import lookup
 from cadorsfeed.models import CadorsReport, LocationBase, LocationRef
 from cadorsfeed.models import Aerodrome, Aircraft
+from cadorsfeed.views.util import render_list
 
 search = Module(__name__)
 
@@ -20,31 +21,35 @@ def search_form():
 def search_text():
     terms = request.args['q']
     page = int(request.args.get('page', '1'))
+    format = request.args.get('format', 'html')
 
     query = CadorsReport.query.filter(
         'cadors_report.narrative_agg_idx_col @@ plainto_tsquery(:terms)')
 
     query = query.params(terms=terms)
+    query = query.order_by(
+        'ts_rank_cd(narrative_agg_idx_col, plainto_tsquery(:terms)) DESC')
 
-    query = query.add_column(
-        func.ts_headline('pg_catalog.english',
-                         CadorsReport.narrative_agg,
-                         func.plainto_tsquery(terms),
-                         '''MaxFragments=2,
+    if format == 'html':
+        query = query.add_column(
+            func.ts_headline('pg_catalog.english',
+                             CadorsReport.narrative_agg,
+                             func.plainto_tsquery(terms),
+                             '''MaxFragments=2,
                             MinWords=15,
                             MaxWords=20,
                             FragmentDelimiter=|||,
                             StartSel="<b>",
                             StopSel = "</b>"''',
-                         type_=types.Unicode))
+                             type_=types.Unicode))
+        pagination = query.paginate(page)
 
-    query = query.order_by(
-        'ts_rank_cd(narrative_agg_idx_col, plainto_tsquery(:terms)) DESC')
-
-    pagination = query.paginate(page)
-
-    return render_template('sr_text.html', reports=pagination.items,
-                           pagination=pagination, terms=terms)
+        return render_template('sr_text.html', reports=pagination.items,
+                               pagination=pagination, terms=terms)
+    else:
+        pagination = query.paginate(page)
+        title = "Results for '%s'" % (terms)
+        return render_list(pagination, title, format)
 
 
 class Geography(types.TypeEngine):
@@ -59,6 +64,7 @@ def search_location():
     radius = int(request.args['radius'])
     primary = True if (request.args['primary'] == 'primary') else False
     page = int(request.args.get('page', '1'))
+    format = request.args.get('format', 'html')
 
     radius_m = radius * 1000
 
@@ -74,23 +80,26 @@ def search_location():
     if primary:
         query = query.filter(LocationRef.primary == True)
 
+    if format == 'html':
+        query = query.add_column(functions.distance(loc, q_loc))
+        query = query.add_column(
+            func.ST_Azimuth(location,
+                            LocationBase.location.RAW) * (180/func.pi()))
+        query = query.add_column(LocationBase.name)
+        query = query.order_by('distance ASC',
+                               CadorsReport.timestamp.desc())
+        paginate = query.paginate(page)
 
-    query = query.add_column(functions.distance(loc, q_loc).label('distance'))
-    query = query.add_column(
-        func.ST_Azimuth(location,
-                        LocationBase.location.RAW) * (180/func.pi()))
-    query = query.add_column(LocationBase.name)
-
-    query = query.order_by('distance ASC',
-                           CadorsReport.timestamp.desc())
-
-    pagination = query.paginate(page)
-
-    return render_template('sr_loc.html',
-                           reports=pagination.items, pagination=pagination,
-                           get_direction=get_direction, radius=radius,
-                           latitude=latitude, longitude=longitude)
-
+        return render_template('sr_loc.html',
+                               reports=pagination.items, pagination=pagination,
+                               get_direction=get_direction, radius=radius,
+                               latitude=latitude, longitude=longitude)
+    else:
+        pagination = query.paginate(page)
+        title = "Events within %s km of %s, %s" % (radius, latitude,
+                                                   longitude)
+        return render_list(pagination, title, format)
+    
 def get_direction(degrees):
     degrees = degrees % 360
 
@@ -113,6 +122,7 @@ def search_aerodrome():
     code = request.args['aerodrome'].upper()
     primary = True if (request.args['primary'] == 'primary') else False
     page = int(request.args.get('page', '1'))
+    format = request.args.get('format', 'html')
 
     aerodrome = lookup(code)
 
@@ -136,8 +146,7 @@ def search_aerodrome():
 
     title = "Events %s %s" % (relation, aerodrome.name)
 
-    return render_template('list.html', reports=pagination.items,
-                           pagination=pagination, title=title)
+    return render_list(pagination, title, format)
 
 
 @search.route('/search/flight')
@@ -145,7 +154,8 @@ def search_flight():
     operator = request.args['operator'].upper()
     flight = request.args.get('flight','')
     page = int(request.args.get('page', '1'))
-
+    format = request.args.get('format', 'html')
+    
     query = CadorsReport.query.join(Aircraft).filter(
         Aircraft.flight_number_operator == operator)
 
@@ -161,5 +171,4 @@ def search_flight():
     else:
         title = "Events involving flight %s%s" % (operator, flight)
 
-    return render_template('list.html', reports=pagination.items,
-                           pagination=pagination, title=title)
+    return render_list(pagination, title, format)

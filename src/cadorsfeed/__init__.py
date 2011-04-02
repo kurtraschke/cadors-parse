@@ -14,6 +14,11 @@ del _buildout_path
 
 db = SQLAlchemy()
 
+def modified_url_for(**updates):
+    args = request.args.to_dict(flat=True)
+    args.update(request.view_args)
+    args.update(updates)
+    return url_for(request.endpoint, **args)
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -31,11 +36,6 @@ def create_app(config=None):
                      redirect_to='/static/favicon.ico')
     db.init_app(app)
 
-    def modified_url_for(**updates):
-        args = request.args.to_dict(flat=True)
-        args.update(request.view_args)
-        args.update(updates)
-        return url_for(request.endpoint, **args)
     app.jinja_env.globals['modified_url_for'] = modified_url_for
 
     return app

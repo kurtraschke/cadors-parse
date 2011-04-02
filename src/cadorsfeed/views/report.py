@@ -1,23 +1,21 @@
 import json
 
-from flask import request, make_response, render_template, Module
+from flask import request, redirect, make_response, render_template, Module
 from pyrfc3339 import generate
 
-from cadorsfeed.views.util import process_report_atom, json_default
+from cadorsfeed.views.util import process_report_atom, json_default, render_list
 from cadorsfeed.models import CadorsReport
+from cadorsfeed import modified_url_for
 
 report = Module(__name__)
 
 
-@report.route('/reports/', defaults={'page': 1})
-@report.route('/reports/<int:page>')
-def display_report_list(page):
+@report.route('/reports/', defaults={'page': 1, 'format':'html'})
+@report.route('/reports/<int:page>.<any(u"atom", u"json", u"html"):format>')
+def display_report_list(page, format):
     pagination = CadorsReport.query.paginate(page)
-
     title = "Reports"
-
-    return render_template('list.html', reports=pagination.items,
-                           pagination=pagination, title=title)
+    return render_list(pagination, title, format)
 
 
 @report.route('/report/<report>', defaults={'format': 'html'})
@@ -46,7 +44,14 @@ def display_report(report, format):
     elif format == 'kml':
         response = make_response(render_template('kml.xml', report=report))
         response.mimetype = "application/vnd.google-earth.kml+xml"
-
+        
+    response.last_modified = report.last_updated
     response.add_etag()
     response.make_conditional(request)
     return response
+
+@report.route('/report/<report>/original')
+def redirect_original(report):
+    report = CadorsReport.query.get_or_404(report)
+
+    return redirect("http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/qs.aspx?lang=eng&cadorsno=%s" % report.cadors_number)

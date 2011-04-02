@@ -63,22 +63,32 @@ def do_daily_report(year, month, day, format):
     daily_report = DailyReport.query.filter(
         DailyReport.report_date == ts).first_or_404()
 
+    first = DailyReport.first()
+    last = DailyReport.last()
+        
+    prev = DailyReport.query.filter(
+        DailyReport.report_date < ts).order_by(
+        DailyReport.report_date.desc()).first()
+        
+    next = DailyReport.query.filter(
+        DailyReport.report_date > ts).order_by(
+        DailyReport.report_date.asc()).first()
+
     if format == 'atom':
         reports = process_report_atom(daily_report.reports)
         feed_timestamp = generate(daily_report.last_updated, accept_naive=True)
-        response = make_response(render_template('feed.xml',
-                                                 feed_timestamp=feed_timestamp,
-                                                 reports=reports))
+        title = "Daily Report for %s" % ts.strftime("%Y-%m-%d")
+        response = make_response(
+            render_template('feed.xml',
+                            feed_timestamp=feed_timestamp,
+                            reports=reports,
+                            title=title,
+                            first=first.link(format='atom', _external=True),
+                            prev=prev.link(format='atom', _external=True),
+                            next=next.link(format='atom', _external=True),
+                            last=last.link(format='atom', _external=True)))
         response.mimetype = "application/atom+xml"
     elif format == 'html':
-        next_report = DailyReport.query.filter(
-            DailyReport.report_date > ts).order_by(
-            DailyReport.report_date.asc()).first()
-
-        previous_report = DailyReport.query.filter(
-            DailyReport.report_date < ts).order_by(
-            DailyReport.report_date.desc()).first()
-
         occurrence_type = CadorsReport.occurrence_type
         type_count = func.count(CadorsReport.region)
 
@@ -99,10 +109,10 @@ def do_daily_report(year, month, day, format):
                             reports=daily_report.reports,
                             types=types,
                             regions=regions,
-                            previous_report=previous_report,
-                            next_report=next_report,
-                            first=DailyReport.first(),
-                            last=DailyReport.last()))
+                            prev=prev,
+                            next=next,
+                            first=first,
+                            last=last))
     elif format == 'json':
         response = make_response(json.dumps(
                 {'reports': daily_report.reports},
@@ -110,6 +120,7 @@ def do_daily_report(year, month, day, format):
                 default=json_default))
         response.mimetype = "application/json"
 
+    response.last_modified = daily_report.last_updated
     response.add_etag()
     response.make_conditional(request)
     return response

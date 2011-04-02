@@ -7,12 +7,12 @@
 {% block head %}
 {{ super() }}
 <link rel="first" href="{{ first.link(format='html') }}">
-{% if previous_report %}
-<link rel="prev" href="{{ previous_report.link(format='html') }}">
+{%- if prev %}
+<link rel="prev" href="{{ prev.link(format='html') }}">
 {% endif %}
-{% if next_report %}
-<link rel="next" href="{{ next_report.link(format='html') }}">
-{% endif %}
+{%- if next -%}
+<link rel="next" href="{{ next.link(format='html') }}">
+{% endif -%}
 <link rel="last" href="{{ last.link(format='html') }}">
 {% endblock %}
 
@@ -23,7 +23,6 @@
 <a href="{{ previous_report.link(format='html')}}">&laquo;&nbsp;{{previous_report.report_date.strftime("%Y-%m-%d")}}</a>
 {% endif %}&nbsp;
 </div>
-{#| <strong>{{daily_report.report_date.strftime("%Y-%m-%d")}}</strong>&nbsp;|#}
 <div class="span-4 last" style="text-align: right;">
 {% if next_report %}
 <a href="{{ next_report.link(format='html')}}">{{ next_report.report_date.strftime("%Y-%m-%d")}}&nbsp;&raquo;</a>
