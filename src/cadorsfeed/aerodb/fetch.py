@@ -23,7 +23,7 @@ def fetch_aerodromes():
     with app.open_resource("aerodb/dbpedia_query.rq") as queryfile:
         query = queryfile.read()
 
-    limit = 100
+    limit = 1000
 
     def fetchResults(offset):
         sparql = SPARQLWrapper("http://dbpedia.org/sparql")
