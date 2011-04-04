@@ -3,12 +3,12 @@
   <a:id>{{request.url}}</a:id>
   <a:title>{{title}} - CADORS</a:title>
   <a:rights>
-    Transport Canada endeavours to ensure the accuracy and integrity of the
-    data contained within CADORS, however, the information within should be
-    treated as preliminary, unsubstantiated and subject to change. This is
-    an unofficial reproduction of data contained within the CADORS database,
-    and was neither produced in affiliation with nor with the endorsement of
-    Transport Canada.
+    This is an unofficial reproduction of data contained within the CADORS
+    database, and was neither produced in affiliation with nor with the
+    endorsement of Transport Canada. Transport Canada endeavours to ensure the
+    accuracy and integrity of the data contained within CADORS, however, the
+    information within should be treated as preliminary, unsubstantiated and
+    subject to change. 
   </a:rights>
   {% if first -%}
   <a:link rel="first" href="{{first}}" />

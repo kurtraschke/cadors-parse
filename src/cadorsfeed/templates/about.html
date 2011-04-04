@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+
+{% block body %}
+<div class="span-16 append-4 prepend-4 last">
+  <!--<p>The project has several aims:
+  <ul>
+    <li>Extract structured information from report narratives
+    <ul>
+      <li>Geographic coordinates (using geolucidate)</li>
+      <li>Aerodrome identifiers</li>
+      <li>CADORS report numbers</li>
+    </ul>
+    </li>
+    <li>Generate Atom and JSON feeds</li>
+    <li>Generate KML feeds with geographic information</li>
+    <li>Provide an improved search facility
+    <ul>
+      <li>Full-text search of report narratives</li>
+      <li>Geographic search of extracted locations</li>
+    </ul>
+    </li>
+  </ul>
+</p>-->
+<p><a href="http://github.com/kurtraschke/cadors-parse"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://d3nwyuy0nl342s.cloudfront.net/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub"></a></p>
+<p><code>cadorsfeed</code> retrieves the CADORS National Report from the Transport Caanda web site, then parses the reports to produce structured information.  The text of each report narrative is also parsed to extract additional structured information, including geographic coordinates and aerodrome identifiers. After being parsed, the reports are made available through this HTML interface, as well as Atom, JSON, and KML feeds. The KML feeds are used with the Google Earth plugin to create an overlay on each report which shows the locations extracted from that report.</p>
+
+<p><code>cadorsfeed</code> uses the mechanize library to retrieve the CADORS National Report from Transport Canada's web site.  The reports are parsed using html5lib and lxml, and the parsed reports are stored in PostgreSQL with PostGIS, using SQLAlchemy with GeoAlchemy.  This front-end is created using Flask and Flask-SQLAlchemy.</p>
+
+<p>The database of aerodromes (used to identify aerodrome codes in report narratives and map them to geographic locations) is produced using Wikipedia data parsed by the DBPedia project; SPARQLWrapper is used to retrieve DBPedia results programmatically.</p>
+
+<p>The following Atom feeds are available (for JSON, replace <code>atom</code> with <code>json</code>):
+<ul>
+<li><code>/daily-report/<em>year</em>/<em>month</em>/<em>day</em>/report.atom</code></li>
+<li><code>/daily-report/latest/report.atom</code></li>
+<li><code>/report/<em>CADORS number</em>.atom</code></li>
+<li><code>/category/<em>category id</em>/<em>page</em>.atom</code> (get category IDs from the <a href="/categories">category index</a>)</li>
+<li><code>/search/text?q=<em>query</em>&page=1&format=atom</code></li>
+<li><code>/search/location?latitude=<em>latitude</em>&longitude=<em>longitude</em>&radius=<em>radius</em>&primary=primary&page=1&format=atom</code></li>
+<li><code>/search/aerodrome?aerodrome=<em>identifier</em>&primary=primary&page=1&format=atom</code></li>
+<li><code>/search/flight&operator=<em>operator</em>&flight=<em>flight</em>&page=1&format=atom</code> (if <code>flight</code> is omitted, all flights from that operator are retrieved)</li>
+</ul>
+
+Some locations associated with a report are identified as 'primary' locations; to search all locations, replace <code>primary=primary</code> with <code>primary=all</code>.
+The paginated feeds have <code>&lt;link rel="prev"&gt;</code> and <code>&lt;link rel="next"&gt;</code> elements to aid in retrieving multiple pages of results.
+
+</div>
+{% endblock %}

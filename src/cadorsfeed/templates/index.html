@@ -1,4 +1,10 @@
 {% extends "base.html" %}
-{% block body %}
 
+{% block title %}Home{% endblock %}
+
+{% block body %}
+<div class="span-16 append-4 prepend-4 last">
+  <p class="large">This is is <code>cadorsfeed</code>, a project to make Transport Canada's Civil Aviation Daily Occurrence Reporting System more useful by extracting metadata from unstructured text, and providing an improved HTML interface, as well as Atom and JSON feeds.</p>
+  <p>To get started, try viewing <a href="/daily-report/latest">the latest daily report</a>, or select an option from the links above.</p>
+</div>
 {% endblock %}
