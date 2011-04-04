@@ -81,14 +81,14 @@ def search_location():
         query = query.filter(LocationRef.primary == True)
 
     if format == 'html':
-        query = query.add_column(functions.distance(loc, q_loc))
+        query = query.add_column(functions.distance(loc, q_loc).label('distance'))
         query = query.add_column(
             func.ST_Azimuth(location,
                             LocationBase.location.RAW) * (180/func.pi()))
         query = query.add_column(LocationBase.name)
         query = query.order_by('distance ASC',
                                CadorsReport.timestamp.desc())
-        paginate = query.paginate(page)
+        pagination = query.paginate(page)
 
         return render_template('sr_loc.html',
                                reports=pagination.items, pagination=pagination,
