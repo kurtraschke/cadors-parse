@@ -2,8 +2,7 @@
 
 {% block head %}
 {{ super() }}
-<!-- FIXME: the Google Maps key should be parameterized. -->
-<script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAXcuKXMwaEjGtWQylDfGXqBQ4MdEIN7TugTKbD7ebaEXCKD6fOxQDvaeGczoQkzQQMYM2p0W50crfDw"></script>
+<script type="text/javascript" src="http://www.google.com/jsapi?key={{google_maps_key}}"></script>
 <script type="text/javascript" src="/static/js/map_overlay.js"></script>
 <link type="text/css" rel="stylesheet" media="screen" href="/static/css/map_overlay.css">
 {% endblock %}

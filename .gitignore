@@ -11,7 +11,8 @@ eggs
 fake-eggs
 parts
 dist
-var
+etc/deploy.cfg
+etc/debug.cfg
 .installed.cfg
 .mr.developer.cfg
 .hg

@@ -1,0 +1,6 @@
+DEBUG = ${:debug}
+SQLALCHEMY_DATABASE_URI = ${:db_uri}
+SQLALCHEMY_ECHO = ${:debug}
+SQLALCHEMY_NATIVE_UNICODE = False
+GOOGLE_MAPS_KEY = ${:google_maps_key}
+PROXY_FIX = ${:proxy_fix}

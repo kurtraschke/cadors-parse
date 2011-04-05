@@ -1,16 +1,9 @@
 import os
-from functools import partial
 
 from flask import Flask, request, url_for
 from flaskext.sqlalchemy import SQLAlchemy
+from werkzeug.contrib.fixers import ProxyFix
 
-etc = partial(os.path.join, 'parts', 'etc')
-_buildout_path = __file__
-for i in range(3 + __name__.count('.')):
-    _buildout_path = os.path.dirname(_buildout_path)
-
-abspath = partial(os.path.join, _buildout_path)
-del _buildout_path
 
 db = SQLAlchemy()
 
@@ -20,10 +13,9 @@ def modified_url_for(**updates):
     args.update(updates)
     return url_for(request.endpoint, **args)
 
-def create_app(config=None):
+def create_app(config):
     app = Flask(__name__)
-    if config is not None:
-        app.config.from_pyfile(abspath(etc(config)))
+    app.config.from_pyfile(os.path.abspath(config))
     from cadorsfeed.views.daily_report import daily_report
     from cadorsfeed.views.report import report
     from cadorsfeed.views.category import category
@@ -39,5 +31,8 @@ def create_app(config=None):
     db.init_app(app)
 
     app.jinja_env.globals['modified_url_for'] = modified_url_for
+    
+    if app.config['PROXY_FIX']:
+        app.wsgi_app = ProxyFix(app.wsgi_app)
 
     return app

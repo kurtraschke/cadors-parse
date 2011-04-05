@@ -1,6 +1,7 @@
 import json
 
 from flask import request, redirect, make_response, render_template, Module
+from flask import current_app as app
 from pyrfc3339 import generate
 
 from cadorsfeed.views.util import process_report_atom, json_default, render_list
@@ -39,8 +40,10 @@ def display_report(report, format):
                 default=json_default))
         response.mimetype = "application/json"
     elif format == 'html':
-        response = make_response(render_template('report.html',
-                                                 report=report))
+        response = make_response(
+            render_template('report.html',
+                            report=report,
+                            google_maps_key=app.config['GOOGLE_MAPS_KEY']))
     elif format == 'kml':
         response = make_response(render_template('kml.xml', report=report))
         response.mimetype = "application/vnd.google-earth.kml+xml"
