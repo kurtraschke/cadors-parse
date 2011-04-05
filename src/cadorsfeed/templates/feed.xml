@@ -39,7 +39,7 @@
     <a:content type="xhtml">
       <h:div>
       {% for narrative in report.narrative_parts %}
-      {{narrative.narrative_html|safe}}
+      {{narrative.narrative_xml|safe}}
       {% endfor %}
       </h:div>
     </a:content>

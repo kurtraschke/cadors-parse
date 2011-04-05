@@ -39,8 +39,9 @@ def process_narrative(narrative_block):
             p = do_filter(p, filter_func)
         div.append(p)
 
-    root = div
-    new_root = etree.Element(root.tag, root.attrib, nsmap=NSMAP)
-    new_root[:] = root[:]
+    return normalize_ns(div, nsmap=NSMAP)
 
+def normalize_ns(root, **kwargs):
+    new_root = etree.Element(root.tag, root.attrib, **kwargs)
+    new_root[:] = root[:]
     return new_root

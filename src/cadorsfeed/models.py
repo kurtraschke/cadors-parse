@@ -160,6 +160,7 @@ class NarrativePart(db.Model, DictMixin):
     name = db.synonym('author_name')
     date = db.Column(db.DateTime())
     narrative_text = deferred(db.Column(db.UnicodeText()))
+    narrative_xml = db.Column(db.UnicodeText())
     narrative_html = db.Column(db.UnicodeText())
     further_action = db.Column(db.Unicode())
     opi = db.Column(db.Unicode())

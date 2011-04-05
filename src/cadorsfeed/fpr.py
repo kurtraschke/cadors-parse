@@ -1,8 +1,10 @@
 import re
 import uuid
+from copy import deepcopy
 from datetime import datetime
 
 from lxml import etree
+from lxml.html import xhtml_to_html
 
 from geoalchemy import WKTSpatialElement
 
@@ -13,7 +15,7 @@ from cadorsfeed import db
 from cadorsfeed.models import DailyReport, CadorsReport, ReportCategory
 from cadorsfeed.models import Aircraft, NarrativePart, Location, LocationRef
 from cadorsfeed.cadorslib.xpath_functions import extensions
-from cadorsfeed.cadorslib.narrative import process_narrative
+from cadorsfeed.cadorslib.narrative import process_narrative, normalize_ns
 from cadorsfeed.cadorslib.locations import LocationStore
 from cadorsfeed.aerodb import aerodromes_re, lookup
 
@@ -29,6 +31,17 @@ def make_datetime(date, time):
     if time is None:
         time = "0000 Z"
     return datetime.strptime(date + " " + time, "%Y-%m-%d %H%M Z")
+
+def clean_html(tree):
+    mytree = deepcopy(tree)
+    for elem in mytree.iter():
+        for attr, val in elem.attrib.iteritems():
+            if attr.startswith('{'):
+                del elem.attrib[attr]
+
+    xhtml_to_html(mytree)
+    return etree.tostring(normalize_ns(mytree), method="html",
+                          encoding="unicode")
 
 
 def format_parsed_report(parsed_report):
@@ -69,7 +82,11 @@ def format_parsed_report(parsed_report):
 
     for narrative_part in parsed_report['narrative']:
         narrative_tree = process_narrative(narrative_part['narrative_text'])
-        narrative_part['narrative_html'] = etree.tostring(narrative_tree, method="html", encoding="unicode")
+
+        narrative_part['narrative_html'] = clean_html(narrative_tree)
+        narrative_part['narrative_xml'] = etree.tostring(narrative_tree,
+                                                         method="xml",
+                                                         encoding="unicode")
 
         #do the location extraction here        
         #parse out geolinks
