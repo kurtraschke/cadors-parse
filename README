@@ -1,11 +1,12 @@
 python bootstrap.py
+cp instance.cfg.in instance.cfg
 emacs instance.cfg #Set SQLAlchemy database address and Google Maps key
 ./bin/buildout -c instance.cfg
-./bin/manage create_all -c etc/debug.cfg
-./bin/manage load_aerodromes -c etc/debug.cfg
-./bin/manage load_blacklist -c etc/debug.cfg
+./bin/manage create_all -c etc/flask.cfg
+./bin/manage load_aerodromes -c etc/flask.cfg
+./bin/manage load_blacklist -c etc/flask.cfg
 #To start the development server:
-./bin/manage runserver -c etc/debug.cfg -t 0.0.0.0
+./bin/manage runserver -c etc/flask.cfg -t 0.0.0.0
 #To start gunicorn:
-./bin/gunicorn -c etc/gunicorn.cfg "cadorsfeed:create_app('etc/deploy.cfg')"
+./bin/gunicorn -c etc/gunicorn.cfg "cadorsfeed:create_app('etc/flask.cfg')"
 

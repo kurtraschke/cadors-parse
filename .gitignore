@@ -1,3 +1,7 @@
+*.pyc
+*.pyo
+*.tmp*
+*~
 *.mo
 *.egg-info
 *.egg
@@ -11,14 +15,11 @@ eggs
 fake-eggs
 parts
 dist
-etc/deploy.cfg
-etc/debug.cfg
+etc/gunicorn.cfg
+etc/flask.cfg
+buildout.cfg
 .installed.cfg
 .mr.developer.cfg
 .hg
 .bzr
 .svn
-*.pyc
-*.pyo
-*.tmp*
-*~

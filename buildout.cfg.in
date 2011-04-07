@@ -1,0 +1,12 @@
+[buildout]
+extends = base.cfg
+
+[flask_cfg]
+debug = False
+proxy_fix = True
+db_uri = ""
+google_maps_key = ""
+
+[gunicorn_cfg]
+workers = 3
+bind = "unix:/tmp/gunicorn.sock"
