@@ -81,6 +81,7 @@ def json_default(obj):
         result = dict(obj)
         del result['cadors_number']
         del result['narrative_html']
+        del result['narrative_xml']
         del result['narrative_part_id']
         return result
     if isinstance(obj, LocationBase):
