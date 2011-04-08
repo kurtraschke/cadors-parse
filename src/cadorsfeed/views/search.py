@@ -1,4 +1,4 @@
-from flask import request, render_template, Module
+from flask import request, render_template, Module, make_response
 
 from geoalchemy import WKTSpatialElement, functions
 from sqlalchemy import sql, func, or_
@@ -7,7 +7,7 @@ import sqlalchemy.types as types
 from cadorsfeed.aerodb import lookup
 from cadorsfeed.models import CadorsReport, LocationBase, LocationRef
 from cadorsfeed.models import Aerodrome, Aircraft
-from cadorsfeed.views.util import render_list, render_file
+from cadorsfeed.views.util import render_list, render_file, prepare_response
 
 search = Module(__name__)
 

@@ -4,7 +4,8 @@ from flask import request, redirect, make_response, render_template, Module
 from flask import current_app as app
 from pyrfc3339 import generate
 
-from cadorsfeed.views.util import process_report_atom, json_default, render_list
+from cadorsfeed.views.util import process_report_atom, json_default
+from cadorsfeed.views.util import render_list, prepare_response
 from cadorsfeed.models import CadorsReport
 from cadorsfeed import modified_url_for
 
