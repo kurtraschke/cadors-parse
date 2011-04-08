@@ -7,14 +7,14 @@ import sqlalchemy.types as types
 from cadorsfeed.aerodb import lookup
 from cadorsfeed.models import CadorsReport, LocationBase, LocationRef
 from cadorsfeed.models import Aerodrome, Aircraft
-from cadorsfeed.views.util import render_list
+from cadorsfeed.views.util import render_list, render_file
 
 search = Module(__name__)
 
 
 @search.route('/search/')
 def search_form():
-    return render_template('search.html')
+    return render_file('search.html')
 
 
 @search.route('/search/text')
@@ -44,8 +44,11 @@ def search_text():
                              type_=types.Unicode))
         pagination = query.paginate(page)
 
-        return render_template('sr_text.html', reports=pagination.items,
-                               pagination=pagination, terms=terms)
+        response = make_response(
+            render_template('sr_text.html', reports=pagination.items,
+                            pagination=pagination, terms=terms))
+
+        return prepare_response(response, 300)
     else:
         pagination = query.paginate(page)
         title = "Results for '%s'" % (terms)
@@ -90,10 +93,12 @@ def search_location():
                                CadorsReport.timestamp.desc())
         pagination = query.paginate(page)
 
-        return render_template('sr_loc.html',
-                               reports=pagination.items, pagination=pagination,
-                               get_direction=get_direction, radius=radius,
-                               latitude=latitude, longitude=longitude)
+        response = make_response(
+            render_template('sr_loc.html',
+                            reports=pagination.items, pagination=pagination,
+                            get_direction=get_direction, radius=radius,
+                            latitude=latitude, longitude=longitude))
+        return prepare_response(response, 300)
     else:
         pagination = query.paginate(page)
         title = "Events within %s km of %s, %s" % (radius, latitude,

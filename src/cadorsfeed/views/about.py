@@ -1,4 +1,6 @@
-from flask import Module, make_response, render_template, request
+from flask import Module
+
+from cadorsfeed.views.util import render_file
 
 about = Module(__name__)
 
@@ -14,8 +16,3 @@ def disclaimer():
 def about_page():
     return render_file('about.html')
 
-def render_file(template):
-    response = make_response(render_template(template))
-    response.add_etag()
-    response.make_conditional(request)
-    return response

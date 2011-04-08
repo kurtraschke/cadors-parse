@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 
 from cadorsfeed import db
 from cadorsfeed.models import DailyReport, CadorsReport, report_map
-from cadorsfeed.views.util import process_report_atom, json_default
+from cadorsfeed.views.util import process_report_atom, json_default, prepare_response
 
 daily_report = Module(__name__)
 
@@ -26,9 +26,11 @@ def daily_reports_list(page):
 
     pagination = query.paginate(page)
 
-    return render_template('daily_report_list.html',
+    response = make_response(render_template('daily_report_list.html',
                            daily_reports=pagination.items,
-                           pagination=pagination)
+                           pagination=pagination))
+    
+    return prepare_response(response, 3600)
 
 
 @daily_report.route('/daily-report/latest/', defaults={'format': 'html'})
@@ -121,9 +123,7 @@ def do_daily_report(year, month, day, format):
         response.mimetype = "application/json"
 
     response.last_modified = daily_report.last_updated
-    response.add_etag()
-    response.make_conditional(request)
-    return response
+    return prepare_response(response, 43200)
 
 
 @daily_report.route('/daily-report/<int:year>/<int:month>/<int:day>/' \
@@ -137,9 +137,10 @@ def do_input(year, month, day):
     daily_report = DailyReport.query.filter(
         DailyReport.report_date == ts).first_or_404()
 
+    filename = "report-%04d%02d%02d.html" % (year, month, day)
+
     response = make_response(unicode(daily_report.report_html,
                                      'utf-8'))
     response.mimetype = 'text/html'
-    response.add_etag()
-    response.make_conditional(request)
-    return response
+    response.headers['Content-disposition'] = "attachment; filename=%s" % (filename)
+    return prepare_response(response, 43200)

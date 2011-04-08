@@ -49,9 +49,7 @@ def display_report(report, format):
         response.mimetype = "application/vnd.google-earth.kml+xml"
         
     response.last_modified = report.last_updated
-    response.add_etag()
-    response.make_conditional(request)
-    return response
+    return prepare_response(response, 43200)
 
 @report.route('/report/<report>/original')
 def redirect_original(report):

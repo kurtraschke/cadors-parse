@@ -20,6 +20,14 @@ def process_report_atom(reports):
         out.append(report)
     return out
 
+def prepare_response(response, cache=None):
+    response.add_etag()
+    response.make_conditional(request)
+    if cache is not None:
+        response.cache_control.public = True
+        response.cache_control.s_maxage = cache
+    return response
+
 
 def render_list(pagination, title, format):
     if format == 'json':
@@ -56,10 +64,11 @@ def render_list(pagination, title, format):
     else:
         abort(400)
 
-    response.add_etag()
-    response.make_conditional(request)
-    return response
+    return prepare_response(response, 3600)
 
+def render_file(template):
+    response = make_response(render_template(template))
+    return prepare_response(response, 43200)
 
 def json_default(obj):
     if isinstance(obj, CadorsReport):

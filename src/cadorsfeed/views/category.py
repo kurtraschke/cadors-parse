@@ -4,7 +4,7 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import select
 
 from cadorsfeed.models import ReportCategory, CadorsReport, category_map
-from cadorsfeed.views.util import render_list
+from cadorsfeed.views.util import render_list, prepare_response
 
 category = Module(__name__)
 
@@ -22,7 +22,10 @@ def display_categories():
     categories = categories.order_by('report_count DESC',
                                      ReportCategory.text.asc()).all()
 
-    return render_template('category_list.html', categories=categories)
+    response = make_response(render_template('category_list.html',
+                                             categories=categories))
+    
+    return prepare_response(response, 3600)
 
 
 @category.route('/category/<int:catid>/', defaults={'page': 1, 'format':'html'})
