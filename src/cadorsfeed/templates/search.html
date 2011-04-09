@@ -35,7 +35,7 @@
         <label for="radius">Radius (km)</label><br>
         <input type="number" id="radius" name="radius" class="text" min="0" required>
       </div>
-      <div class="span-4 clear">
+      <div class="span-8 clear">
         <input type="radio" id="location-primary" name="primary" value="primary" checked>
         <label for="location-primary">Primary location only</label>
       </div>
@@ -52,31 +52,7 @@
     </fieldset>
   </form>
 
-  <form action="/search/aerodrome" method="GET" class="span-10 clear">
-    <fieldset>
-      <legend>Search by aerodrome</legend>
-      <div class="span-4">
-        <label for="aerodrome">Aerodrome identifier</label><br>
-        <input type="text" id="aerodrome" name="aerodrome" class="text" maxlength="4" required placeholder="CYYZ">
-      </div>
-      <div class="span-4 last">
-        <p class="small"></p>
-      </div>
-      <div class="span-4 clear">
-        <input type="radio" id="aerodrome-primary" name="primary" value="primary" checked="checked">
-        <label for="aerodrome-primary">Primary location only</label>
-      </div>
-      <div class="span-4 last">
-        <input type="radio" id="aerodrome-all" name="primary" value="all">
-        <label for="aerodrome-all">All locations</label>
-      </div>
-      <div class="span-4 clear last">
-        <input type="submit" value="Submit">
-      </div>
-    </fieldset>
-  </form>
-
-  <form action="/search/flight" method="GET" class="span-14 last">
+  <form action="/search/flight" method="GET" class="span-10 clear">
     <fieldset>
       <legend>Search by flight number</legend>
       <div class="span-4">
@@ -92,5 +68,30 @@
       </div>
     </fieldset>
   </form>
+
+  <form action="/search/aerodrome" method="GET" class="span-14 last">
+    <fieldset>
+      <legend>Search by aerodrome</legend>
+      <div class="span-4">
+        <label for="aerodrome">Aerodrome identifier</label><br>
+        <input type="text" id="aerodrome" name="aerodrome" class="text" maxlength="4" required placeholder="CYYZ">
+      </div>
+      <div class="span-4 last">
+        <p class="small"></p>
+      </div>
+      <div class="span-8 clear">
+        <input type="radio" id="aerodrome-primary" name="primary" value="primary" checked="checked">
+        <label for="aerodrome-primary">Primary location only</label>
+      </div>
+      <div class="span-4 last">
+        <input type="radio" id="aerodrome-all" name="primary" value="all">
+        <label for="aerodrome-all">All locations</label>
+      </div>
+      <div class="span-4 clear last">
+        <input type="submit" value="Submit">
+      </div>
+    </fieldset>
+  </form>
+
 </div>
 {% endblock %}
