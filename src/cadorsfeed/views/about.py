@@ -16,3 +16,6 @@ def disclaimer():
 def about_page():
     return render_file('about.html')
 
+@about.route('/privacy')
+def privacy_policy():
+    return render_file('privacy.html')
