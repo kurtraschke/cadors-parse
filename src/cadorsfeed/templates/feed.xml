@@ -1,7 +1,7 @@
 <a:feed xmlns:a="http://www.w3.org/2005/Atom" xmlns:h="http://www.w3.org/1999/xhtml">
   <a:updated>{{feed_timestamp}}</a:updated>
   <a:id>{{request.url}}</a:id>
-  <a:title>{{title}} - CADORS</a:title>
+  <a:title>{{title}} - cadorsfeed</a:title>
   <a:rights>
     This is an unofficial reproduction of data contained within the CADORS
     database, and was neither produced in affiliation with nor with the
