@@ -4,31 +4,12 @@
 
 {% block body %}
 <div class="span-16 append-4 prepend-4 last">
-  <!--<p>The project has several aims:
-  <ul>
-    <li>Extract structured information from report narratives
-    <ul>
-      <li>Geographic coordinates (using geolucidate)</li>
-      <li>Aerodrome identifiers</li>
-      <li>CADORS report numbers</li>
-    </ul>
-    </li>
-    <li>Generate Atom and JSON feeds</li>
-    <li>Generate KML feeds with geographic information</li>
-    <li>Provide an improved search facility
-    <ul>
-      <li>Full-text search of report narratives</li>
-      <li>Geographic search of extracted locations</li>
-    </ul>
-    </li>
-  </ul>
-</p>-->
 <p><a href="http://github.com/kurtraschke/cadors-parse"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://d3nwyuy0nl342s.cloudfront.net/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub"></a></p>
-<p><code>cadorsfeed</code> retrieves the CADORS National Report from the Transport Caanda web site, then parses the reports to produce structured information.  The text of each report narrative is also parsed to extract additional structured information, including geographic coordinates and aerodrome identifiers. After being parsed, the reports are made available through this HTML interface, as well as Atom, JSON, and KML feeds. The KML feeds are used with the Google Earth plugin to create an overlay on each report which shows the locations extracted from that report.</p>
+<p><code>cadorsfeed</code> retrieves the <a href="http://wwwapps.tc.gc.ca/Saf-Sec-Sur/2/cadors-screaq/nrpt.aspx?lang=eng">CADORS National Report</a> from the Transport Canada web site, then parses the reports to produce structured data.  The text of each report narrative is also parsed to extract additional structured information, including geographic coordinates and aerodrome identifiers. After being parsed, the reports are made available through this HTML interface, as well as <a href="http://www.atomenabled.org/developers/syndication/">Atom</a>, <a href="http://json.org/">JSON</a>, and <a href="http://code.google.com/apis/kml/documentation/">KML</a> feeds. The KML feeds are used with the <a href="http://code.google.com/apis/earth/">Google Earth plugin</a> to create an overlay on each report which shows the locations referenced in that report.</p>
 
-<p><code>cadorsfeed</code> uses the mechanize library to retrieve the CADORS National Report from Transport Canada's web site.  The reports are parsed using html5lib and lxml, and the parsed reports are stored in PostgreSQL with PostGIS, using SQLAlchemy with GeoAlchemy.  This front-end is created using Flask and Flask-SQLAlchemy.</p>
+<p><code>cadorsfeed</code> uses the <a href="http://wwwsearch.sourceforge.net/mechanize/">mechanize</a> library to retrieve the CADORS National Report from Transport Canada's web site.  The reports are parsed using <a href="http://code.google.com/p/html5lib/">html5lib</a> and <a href="http://lxml.de/">lxml</a>, and the parsed reports are stored in <a href="http://www.postgresql.org/">PostgreSQL</a> with <a href="http://postgis.refractions.net/">PostGIS</a>, using <a href="http://www.sqlalchemy.org/">SQLAlchemy</a> with <a href="http://www.geoalchemy.org/">GeoAlchemy</a>.  This front-end is created using <a href="http://flask.pocoo.org/">Flask</a> and <a href="http://packages.python.org/Flask-SQLAlchemy/">Flask-SQLAlchemy</a>.</p>
 
-<p>The database of aerodromes (used to identify aerodrome codes in report narratives and map them to geographic locations) is produced using Wikipedia data parsed by the DBPedia project; SPARQLWrapper is used to retrieve DBPedia results programmatically.</p>
+<p>The database of aerodromes (used to identify aerodrome codes in report narratives and map them to geographic locations) is produced using Wikipedia data parsed by the <a href="http://dbpedia.org/About">DBPedia</a> project; <a href="http://sparql-wrapper.sourceforge.net/">SPARQLWrapper</a> is used to retrieve DBPedia results programmatically.</p>
 
 <p>The following Atom feeds are available (for JSON, replace <code>atom</code> with <code>json</code>):
 <ul>
