@@ -1,8 +1,0 @@
-* Send Last-Modified where appropriate
-* Add Cache-control headers where appropriate
-* Add index page, disclaimer
-* Add Atom, JSON feeds for search results
-* Document URLs for Atom, JSON output
-* Make report list uniform across views (timestamp)
-* Make sure every page has a title
-* Nav bar should have a border at far left
