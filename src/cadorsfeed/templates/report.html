@@ -36,7 +36,7 @@
 </ul>
 {% if report.locations|length > 0 %}
 <h3>Locations</h3>
-<p><a href="{{ report.link(format='kml', _external=True)}}" class="maplink">View {{ report.locations|length }} locations</a></p>
+<p><a href="{{ report.link(format='kml', _external=True)}}" class="maplink">View {{ report.locations|length }} location{{ 's' if report.locations|length > 1}}</a></p>
 {% endif %}
 </section>
 
