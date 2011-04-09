@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+<link href='http://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lato:regular,bold' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Arvo:regular,bold' rel='stylesheet' type='text/css'>
 {% block head %}
-<title>{% block title %}{% endblock %} - CADORS</title>
+<title>{% block title %}{% endblock %} - cadorsfeed</title>
 <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
 <link rel="stylesheet" href="/static/css/blueprint/print.css" type="text/css" media="print"> 
 <!--[if lt IE 8]>
@@ -19,8 +22,8 @@
 <div class="container">
   <header class="span-24">
   
-  <div class="prepend-18 span-6 last">
-    <p class="title center" title="Civil Aviation Daily Occurrence Reporting System">cadorsfeed</p>
+  <div class="prepend-16 span-8 last title">
+    <p title="Civil Aviation Daily Occurrence Reporting System">cadorsfeed</p><p class="small">beta</p>
   </div>
   <div id="nav" class="clear">
       <a class="span-4 border" href="/">Home</a>
@@ -31,12 +34,12 @@
   </div>
   <h1>{{self.title()}}</h1>
   </header>
-  <section class="span-24">
+  <section class="content" class="span-24">
   {% block body %}{% endblock %}
   </section>
   <hr>
   <footer class="span-24">
-  <p><small>CADORS data is provided by Transport Canada. All reports are unverified and subject to change. <a href="/disclaimer">View full disclaimer.</a></small></p>
+  <p><small>CADORS data is provided by Transport Canada. All reports are unverified and subject to change. <a href="/disclaimer">View full disclaimer.</a> <a href="/privacy">Privacy policy.</a><br>This is a <a href="http://www.kurtraschke.com/">Kurt Raschke</a> production.</small></p>
   </footer>
 </div>
 </body>

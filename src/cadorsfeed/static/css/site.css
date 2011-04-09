@@ -28,13 +28,25 @@ div#nav a:hover {
     color: white;
 }
 
-header div p.title {
+header div.title {
+    font-family: "Orbitron", "Helvetica Neue", Arial, Helvetica, sans-serif;
     color: #FF1721;
     font-size: 3em;
     line-height: 1;
     margin-bottom: 0.5em;
     margin-top: 0.5em;
+    text-align: right;
 }
+
+header div.title p {
+    margin:0;
+}
+
+header div.title p.small {
+    font-size: 50%;
+    line-height: 50%;
+}
+
 
 .center {
     text-align: center;
@@ -45,11 +57,24 @@ form div.span-4 input.text {
 }
 
 input[type="search"] {
-  -webkit-appearance: textfield;
+    -webkit-appearance: textfield;
 }
 
 .count {
     font-size: 1.5em;
     line-height: 1;
     margin-bottom: 0.5em;
+}
+
+body {
+    font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+.large {
+    line-height: 2em;
+}
+
+section.content {
+    font-family: "Arvo", "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
