@@ -14,7 +14,7 @@
   <a:link rel="first" href="{{first}}" />
   {% endif -%}
   {%- if prev -%}
-  <a:link rel="prev" href="{{prev}}" />
+  <a:link rel="previous" href="{{prev}}" />
   {% endif -%}
   {%- if next -%}
   <a:link rel="next" href="{{next}}" />

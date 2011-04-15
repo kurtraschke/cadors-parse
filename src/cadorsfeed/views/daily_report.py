@@ -86,8 +86,10 @@ def do_daily_report(year, month, day, format):
                             reports=reports,
                             title=title,
                             first=first.link(format='atom', _external=True),
-                            prev=prev.link(format='atom', _external=True),
-                            next=next.link(format='atom', _external=True),
+                            prev=prev.link(format='atom', _external=True) \
+                                if prev is not None else None,
+                            next=next.link(format='atom', _external=True) \
+                                if next is not None else None,
                             last=last.link(format='atom', _external=True)))
         response.mimetype = "application/atom+xml"
     elif format == 'html':
