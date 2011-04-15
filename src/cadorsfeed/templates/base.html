@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-<link href='http://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Lato:regular,bold' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Droid+Serif:regular,bold' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Orbitron|Lato:r,b|Droid+Serif:r,b' rel='stylesheet' type='text/css'>
 {% block head %}
 <title>{% block title %}{% endblock %} - cadorsfeed</title>
 <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
@@ -34,7 +32,7 @@
   </div>
   <h1>{{self.title()}}</h1>
   </header>
-  <section class="content" class="span-24">
+  <section class="content span-24">
   {% block body %}{% endblock %}
   </section>
   <hr>
