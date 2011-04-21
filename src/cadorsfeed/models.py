@@ -25,10 +25,11 @@ class DictMixin(object):
 
 report_map = db.Table(
     'report_map', db.Model.metadata,
+    db.Column('reportmap_id', db.Integer(), primary_key=True),
     db.Column('daily_report_id', db.Integer(),
-           db.ForeignKey('daily_report.daily_report_id')),
+              db.ForeignKey('daily_report.daily_report_id'), index=True),
     db.Column('report_id', db.CHAR(9),
-           db.ForeignKey('cadors_report.cadors_number')))
+              db.ForeignKey('cadors_report.cadors_number'), index=True))
 
 
 class DailyReport(db.Model, DictMixin):
@@ -65,10 +66,11 @@ class DailyReport(db.Model, DictMixin):
 
 category_map = db.Table(
     'category_map', db.Model.metadata,
+    db.Column('catmap_id', db.Integer(), primary_key=True),
     db.Column('report_id', db.CHAR(9),
-           db.ForeignKey('cadors_report.cadors_number')),
+              db.ForeignKey('cadors_report.cadors_number'), index=True),
     db.Column('category_id', db.Integer(),
-           db.ForeignKey('report_category.category_id')))
+              db.ForeignKey('report_category.category_id'), index=True))
 
 
 class CadorsReport(db.Model, DictMixin):
@@ -131,7 +133,8 @@ class ReportCategory(db.Model, DictMixin):
 class Aircraft(db.Model, DictMixin):
     aircraft_id = db.Column(db.Integer(), primary_key=True)
     cadors_number = db.Column(db.CHAR(9),
-                              db.ForeignKey('cadors_report.cadors_number'))
+                              db.ForeignKey('cadors_report.cadors_number'),
+                              index=True)
     category = db.Column(db.Unicode())
     engine_model = db.Column(db.Unicode())
     engine_make = db.Column(db.Unicode())
@@ -141,8 +144,8 @@ class Aircraft(db.Model, DictMixin):
     reg_country = db.Column(db.Unicode())
     owner = db.Column(db.Unicode())
     flight_number = db.Column(db.Unicode())
-    flight_number_operator = db.Column(db.Unicode())
-    flight_number_flight = db.Column(db.Integer())
+    flight_number_operator = db.Column(db.Unicode(), index=True)
+    flight_number_flight = db.Column(db.Integer(), index=True)
     flight_phase = db.Column(db.Unicode())
     year = db.Column(db.Integer())
     operator = db.Column(db.Unicode())
@@ -155,7 +158,8 @@ class Aircraft(db.Model, DictMixin):
 class NarrativePart(db.Model, DictMixin):
     narrative_part_id = db.Column(db.Integer(), primary_key=True)
     cadors_number = db.Column(db.CHAR(9),
-                              db.ForeignKey('cadors_report.cadors_number'))
+                              db.ForeignKey('cadors_report.cadors_number'),
+                              index=True)
     author_name = db.Column(db.Unicode())
     name = db.synonym('author_name')
     date = db.Column(db.DateTime())
@@ -171,9 +175,11 @@ class NarrativePart(db.Model, DictMixin):
 class LocationRef(db.Model):
     locref_id = db.Column(db.Integer(), primary_key=True)
     cadors_number = db.Column(db.CHAR(9),
-                              db.ForeignKey('cadors_report.cadors_number'))
+                              db.ForeignKey('cadors_report.cadors_number'),
+                              index=True)
     location_id = db.Column(db.Integer(),
-                            db.ForeignKey('location.location_id'))
+                            db.ForeignKey('location.location_id'),
+                            index=True)
     primary = db.Column(db.Boolean(), default=False, nullable=False)
 
 
@@ -184,7 +190,7 @@ class LocationBase(db.Model, DictMixin):
     name = db.Column(db.Unicode())
     url = db.Column(db.String())
     location = GeometryColumn(Point(2), comparator=PGComparator)
-    discriminator = db.Column('type', db.CHAR(10))
+    discriminator = db.Column('type', db.String(10))
     __mapper_args__ = {'polymorphic_on': discriminator}
     locationrefs = db.relationship("LocationRef", backref="location",
                                    cascade="all, delete, delete-orphan")
@@ -208,12 +214,11 @@ GeometryDDL(LocationBase.__table__)
                     lambda query, location: query.filter(
         Location.location == location))
 class Location(LocationBase):
-    __mapper_args__ = {'polymorphic_identity':'location  '}
-    context = db.Column(db.Unicode())
+    __mapper_args__ = {'polymorphic_identity':'location'}
 
 
 class Aerodrome(LocationBase):
-    __mapper_args__ = {'polymorphic_identity': 'aerodrome '}
+    __mapper_args__ = {'polymorphic_identity': 'aerodrome'}
     icao = db.Column(db.CHAR(4), unique=True, index=True)
     iata = db.Column(db.CHAR(3), unique=True, index=True)
     faa = db.Column(db.CHAR(3), unique=True, index=True)
