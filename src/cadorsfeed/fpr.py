@@ -41,7 +41,7 @@ def clean_html(tree):
 
     xhtml_to_html(mytree)
     return etree.tostring(normalize_ns(mytree), method="html",
-                          encoding="unicode")
+                          encoding=unicode)
 
 
 def format_parsed_report(parsed_report):
@@ -86,7 +86,7 @@ def format_parsed_report(parsed_report):
         narrative_part['narrative_html'] = clean_html(narrative_tree)
         narrative_part['narrative_xml'] = etree.tostring(narrative_tree,
                                                          method="xml",
-                                                         encoding="unicode")
+                                                         encoding=unicode)
 
         #do the location extraction here        
         #parse out geolinks
