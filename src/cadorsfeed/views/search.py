@@ -28,7 +28,8 @@ def search_text():
 
     query = query.params(terms=terms)
     query = query.order_by(
-        'ts_rank_cd(narrative_agg_idx_col, plainto_tsquery(:terms)) DESC')
+        'ts_rank_cd(narrative_agg_idx_col, plainto_tsquery(:terms)) DESC',
+        CadorsReport.timestamp.desc())
 
     if format == 'html':
         query = query.add_column(
