@@ -1,5 +1,6 @@
 #Keep sorted with C-x h M-x sort-lines
 08R
+15Z
 26R
 30F
 AAF
@@ -27,6 +28,7 @@ CAS
 CAT
 CCR
 CFR
+CGA
 CIA
 CNK
 CSA
@@ -35,6 +37,7 @@ CYR
 DME
 DOM
 DUE
+EET
 FAA
 FSS
 GPS
@@ -42,14 +45,17 @@ LTN
 M06
 MEA
 MEL
+MHR
 MKI
 MLG
 MPE
+NAT
 NAV
 NDB
 NOC
 OFF
 OMA
+OSI
 PAG
 PAN
 PDT
