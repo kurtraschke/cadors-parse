@@ -57,3 +57,20 @@ def retrieve_report(report_date):
 
     daily_report.reports = reports
     db.session.commit()
+
+def reparse_reports():
+    for daily_report in DailyReport.query.all():
+        reparse_report(daily_report)
+        print "Reparsed report for "+str(daily_report.report_date)
+
+def reparse_report(daily_report):
+    report_file = daily_report.report_html
+    parsed_daily_report = parse_daily_report(report_file)
+    daily_report.parse_timestamp = datetime.utcnow()
+    reports = []
+
+    for parsed_report in parsed_daily_report['reports']:
+        report = format_parsed_report(parsed_report)
+        reports.append(report)
+    daily_report.reports = reports
+    db.session.commit()

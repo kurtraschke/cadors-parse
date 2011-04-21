@@ -23,6 +23,11 @@ def retrieve_today():
 
 
 @manager.command
+def reparse_reports():
+    from cadorsfeed.retrieve import reparse_reports
+    reparse_reports()
+
+@manager.command
 def load_aerodromes():
     '''Load or update aerodrome data from DBpedia'''
     from cadorsfeed.aerodb import fetch_aerodromes
