@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "render_report.html" as rr %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script type="text/javascript" src="http://www.google.com/jsapi?key={{google_maps_key}}"></script>
+<script type="text/javascript" src="/static/js/map_overlay.js"></script>
+<link type="text/css" rel="stylesheet" media="screen" href="/static/css/map_overlay.css">
+{% endblock %}
+
+{% block body %}
+<section class="clear large">
+<div class="span-4 append-20">
+<a href="{{ daily_report.link()}}">&laquo;&nbsp;Return to report list</a>
+</div>
+</section>
+
+<div class="clear" id="top"></div>
+
+<hr>
+
+{% for report in reports %}
+<h2>Report {{report.cadors_number}}</h2>
+{{ rr.render_report(report) }}
+<div class="span-24 last"><p><a href="#top">Return to top</a></p></div>
+{{ "<hr>"|safe if not loop.last }}
+{% endfor %}
+
+{% endblock %}

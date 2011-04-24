@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 
-from flask import abort, request, redirect, url_for
+from flask import abort, request, redirect, url_for, current_app as app
 from flask import make_response, render_template, Module
 from pyrfc3339 import generate
 from sqlalchemy import func, select
@@ -65,32 +65,27 @@ def do_daily_report(year, month, day, format):
     daily_report = DailyReport.query.filter(
         DailyReport.report_date == ts).first_or_404()
 
-    first = DailyReport.first()
-    last = DailyReport.last()
-        
-    prev = DailyReport.query.filter(
-        DailyReport.report_date < ts).order_by(
-        DailyReport.report_date.desc()).first()
-        
-    next = DailyReport.query.filter(
-        DailyReport.report_date > ts).order_by(
-        DailyReport.report_date.asc()).first()
+
+    navlinks = make_navlinks(daily_report)
 
     if format == 'atom':
         reports = process_report_atom(daily_report.reports)
         feed_timestamp = generate(daily_report.last_updated, accept_naive=True)
         title = "Daily Report for %s" % ts.strftime("%Y-%m-%d")
+        
+        first=navlinks['first'].link(format='atom', _external=True)
+        prev=navlinks['prev'].link(format='atom', _external=True) \
+            if navlinks['prev'] is not None else None
+        next=navlinks['next'].link(format='atom', _external=True) \
+            if navlinks['next'] is not None else None
+        last=navlinks['last'].link(format='atom', _external=True)
+
         response = make_response(
             render_template('feed.xml',
                             feed_timestamp=feed_timestamp,
                             reports=reports,
                             title=title,
-                            first=first.link(format='atom', _external=True),
-                            prev=prev.link(format='atom', _external=True) \
-                                if prev is not None else None,
-                            next=next.link(format='atom', _external=True) \
-                                if next is not None else None,
-                            last=last.link(format='atom', _external=True)))
+                            first=first, next=next, prev=prev, last=last)) 
         response.mimetype = "application/atom+xml"
     elif format == 'html':
         occurrence_type = CadorsReport.occurrence_type
@@ -113,16 +108,53 @@ def do_daily_report(year, month, day, format):
                             reports=daily_report.reports,
                             types=types,
                             regions=regions,
-                            prev=prev,
-                            next=next,
-                            first=first,
-                            last=last))
+                            **navlinks))
     elif format == 'json':
         response = make_response(json.dumps(
                 {'reports': daily_report.reports},
                 indent=None if request.is_xhr else 2,
                 default=json_default))
         response.mimetype = "application/json"
+
+    response.last_modified = daily_report.last_updated
+    return prepare_response(response, 43200)
+
+
+@daily_report.route('/daily-report/<int:year>/<int:month>/<int:day>/all/')
+def daily_report_full(year, month, day):
+    try:
+        ts = datetime(year, month, day)
+    except ValueError:
+        abort(400)
+
+    daily_report = DailyReport.query.filter(
+        DailyReport.report_date == ts).first_or_404()
+
+    reports = CadorsReport.query.with_parent(daily_report)
+
+    report_date = daily_report.report_date.strftime("%Y-%m-%d")
+
+    title = "Report details for %s" % (report_date)
+
+    if 'type' in request.args:
+        report_type = request.args['type']
+        reports = reports.filter(
+            CadorsReport.occurrence_type==report_type)
+        title = "%s reports for %s" % (report_type, report_date)
+    if 'region' in request.args:
+        region = request.args['region']
+        reports = reports.filter(
+            CadorsReport.region==region)
+        title = "Reports in %s for %s" % (region, report_date)
+
+    reports = reports.all()
+
+    response = make_response(
+        render_template('daily_report_full.html',
+                        daily_report=daily_report,
+                        reports=reports,
+                        google_maps_key=app.config['GOOGLE_MAPS_KEY'],
+                        title=title))
 
     response.last_modified = daily_report.last_updated
     return prepare_response(response, 43200)
@@ -146,3 +178,20 @@ def do_input(year, month, day):
     response.mimetype = 'text/html'
     response.headers['Content-disposition'] = "attachment; filename=%s" % (filename)
     return prepare_response(response, 43200)
+
+
+def make_navlinks(daily_report):
+    ts = daily_report.report_date
+    first = DailyReport.first()
+    last = DailyReport.last()
+        
+    prev = DailyReport.query.filter(
+        DailyReport.report_date < ts).order_by(
+        DailyReport.report_date.desc()).first()
+        
+    next = DailyReport.query.filter(
+        DailyReport.report_date > ts).order_by(
+        DailyReport.report_date.asc()).first()
+
+    return {'first': first, 'last': last,
+            'prev': prev, 'next': next}

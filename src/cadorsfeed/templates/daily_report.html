@@ -30,28 +30,29 @@
 </div>
 </section>
 
-
 <section class="clear">
 <div class="span-2 colborder"><h2>What</h2></div>
 {% for type in types %}
 <div class="span-2">
 <p>
 <span class="count">{{ type[1] }}</span><br />
-<span><strong>{{ type[0] }}</strong></span>
+<span><strong><a href="{{daily_report.link(full=True, type=type[0])}}">{{ type[0] }}</a></strong></span>
 </p>
 </div>
 {% endfor %}
 
 <div class="span-2 colborder"><h2>Where</h2></div>
 {% for region in regions %}
-<div class="span-2 {{ 'last' if loop.last}}">
+<div class="span-2 {{'colborder' if loop.last}}">
 <p>
 <span class="count">{{ region[1] }}</span><br />
-<span><strong>{{ region[0] }}</strong></span>
+<span><strong><a href="{{daily_report.link(full=True, region=region[0])}}">{{region[0]}}</a></strong></span>
 </p>
 </div>
 {% endfor %}
+<div class="span-2 large last"><a href="{{daily_report.link(full=True)}}">View all</a></div>
 </section>
+
 
 {{ r.report_list(reports) }}
 

@@ -57,8 +57,10 @@ class DailyReport(db.Model, DictMixin):
     def last():
         return DailyReport.query.order_by(DailyReport.report_date.desc()).first()
 
-    def link(self, **kwargs):
-        return url_for('daily_report.do_daily_report',
+    def link(self, full=False, **kwargs):
+        endpoint = 'daily_report.do_daily_report' if full is False \
+            else 'daily_report.daily_report_full'
+        return url_for(endpoint,
                        year=self.report_date.year,
                        month=self.report_date.month,
                        day=self.report_date.day,

@@ -1,15 +1,4 @@
-{% extends "base.html" %}
-
-{% block head %}
-{{ super() }}
-<script type="text/javascript" src="http://www.google.com/jsapi?key={{google_maps_key}}"></script>
-<script type="text/javascript" src="/static/js/map_overlay.js"></script>
-<link type="text/css" rel="stylesheet" media="screen" href="/static/css/map_overlay.css">
-{% endblock %}
-
-{% block title %}Report {{report.cadors_number}}{% endblock %}
-
-{% block body %}
+{% macro render_report(report) -%}
 <div class="report" id="{{report.cadors_number}}">
 <section class="span-6">
 <h3>Occurrence Information</h3>
@@ -39,7 +28,6 @@
 <p><a href="{{ report.link(format='kml', _external=True)}}" class="maplink">View {{ report.locations|length }} location{{ 's' if report.locations|length > 1}}</a></p>
 {% endif %}
 </section>
-
 
 <div>
 <h3>Aircraft Information</h3>
@@ -79,7 +67,6 @@
 <span>No aircraft involved</span>
 </div>
 {% endif %}
-
 </div>
 
 <section class="narrative span-24 clear">
@@ -90,9 +77,9 @@
 {% endfor %}
 </section>
 
-
 <div class="overlay">
-<div class="map" style="width: 800px; height: 500px"></div>
+  <div class="map" style="width: 800px; height: 500px"></div>
 </div>
+
 </div>
-{% endblock %}
+{%- endmacro %}

@@ -42,7 +42,7 @@ def display_report(report, format):
         response.mimetype = "application/json"
     elif format == 'html':
         response = make_response(
-            render_template('report.html',
+            render_template('single_report.html',
                             report=report,
                             google_maps_key=app.config['GOOGLE_MAPS_KEY']))
     elif format == 'kml':
