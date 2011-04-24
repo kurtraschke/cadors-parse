@@ -153,7 +153,6 @@ def daily_report_full(year, month, day):
         render_template('daily_report_full.html',
                         daily_report=daily_report,
                         reports=reports,
-                        google_maps_key=app.config['GOOGLE_MAPS_KEY'],
                         title=title))
 
     response.last_modified = daily_report.last_updated

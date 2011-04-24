@@ -43,8 +43,7 @@ def display_report(report, format):
     elif format == 'html':
         response = make_response(
             render_template('single_report.html',
-                            report=report,
-                            google_maps_key=app.config['GOOGLE_MAPS_KEY']))
+                            report=report))
     elif format == 'kml':
         response = make_response(render_template('kml.xml', report=report))
         response.mimetype = "application/vnd.google-earth.kml+xml"

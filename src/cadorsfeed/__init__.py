@@ -31,6 +31,7 @@ def create_app(config):
     db.init_app(app)
 
     app.jinja_env.globals['modified_url_for'] = modified_url_for
+    app.jinja_env.globals['config'] = app.config
     
     if app.config['PROXY_FIX']:
         app.wsgi_app = ProxyFix(app.wsgi_app)
