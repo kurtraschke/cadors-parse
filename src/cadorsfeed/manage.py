@@ -27,18 +27,11 @@ def reparse_reports():
     from cadorsfeed.retrieve import reparse_reports
     reparse_reports()
 
-@manager.command
-def load_aerodromes():
+@manager.option('-i', '--input', dest='json_file', required=True)
+def load_aerodromes(json_file):
     '''Load or update aerodrome data from DBpedia'''
-    from cadorsfeed.aerodb import fetch_aerodromes
-    fetch_aerodromes()
-
-
-@manager.option('-a', '--aerodrome', dest='aerodrome', required=True)
-def lookup_aerodrome(aerodrome):
-    from cadorsfeed.aerodb import lookup
-    from pprint import pprint
-    pprint(dict(lookup(aerodrome)))
+    from cadorsfeed.aerodb import import_aerodromes
+    import_aerodromes(json_file)
 
 
 @manager.command
