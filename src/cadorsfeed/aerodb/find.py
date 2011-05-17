@@ -18,7 +18,7 @@ class Aerodromes(object):
 
         codes = [c for (c,) in icao_codes] + [c for (c,) in tc_codes]
 
-        re_string = r"\b(" + '|'.join(codes) + r")\b"
+        re_string = r"\b(?<!C-)(" + '|'.join(codes) + r")\b"
         icao_re = re.compile(re_string)
         return icao_re
 
