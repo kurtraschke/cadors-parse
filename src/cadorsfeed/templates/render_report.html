@@ -27,6 +27,7 @@
 <h3>Locations</h3>
 <p><a href="{{ report.link(format='kml', _external=True)}}" class="maplink">View {{ report.locations|length }} location{{ 's' if report.locations|length > 1}}</a></p>
 {% endif %}
+<p><a href="{{url_for('report.redirect_original', report=report.cadors_number)}}">View original report</a></p>
 </section>
 
 <div>
