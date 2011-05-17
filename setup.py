@@ -34,7 +34,6 @@ setup(
         'lxml',
         'mechanize',
         'html5lib',
-        'SPARQLWrapper',
         'Flask-Script',
         'pyRFC3339',
         'geolucidate',
