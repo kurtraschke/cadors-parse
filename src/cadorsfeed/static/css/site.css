@@ -29,7 +29,6 @@ div#nav a:hover {
 }
 
 header div.title {
-    font-family: "Orbitron", "Helvetica Neue", Arial, Helvetica, sans-serif;
     color: #FF1721;
     font-size: 3em;
     line-height: 1;
@@ -61,14 +60,42 @@ input[type="search"] {
     margin-bottom: 0.5em;
 }
 
-body {
-    font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif;
-}
-
 .center {
     text-align: center;
 }
 
-section.content {
+.wf-loading body {
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-inactive body {
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-active body {
+    font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-loading section.content {
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-inactive section.content {
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-active section.content {
     font-family: "Droid Serif", "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-loading header div.title {
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-inactive header div.title {
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.wf-active header div.title {
+    font-family: "Orbitron", "Helvetica Neue", Arial, Helvetica, sans-serif;
 }

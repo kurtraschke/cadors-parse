@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-<link href='http://fonts.googleapis.com/css?family=Orbitron|Lato:r,b|Droid+Serif:r,b' rel='stylesheet' type='text/css'>
 {% block head %}
 <title>{% block title %}{% endblock %} - cadorsfeed</title>
+<script type="text/javascript">
+WebFontConfig = {
+    google: { families: [ 'Orbitron', 'Lato:r,b', 'Droid Serif:r,b' ] }
+};
+(function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+            '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+})();
+</script>
 <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
 <link rel="stylesheet" href="/static/css/blueprint/print.css" type="text/css" media="print"> 
 <!--[if lt IE 8]>
