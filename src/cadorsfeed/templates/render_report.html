@@ -35,7 +35,7 @@
 {% if report.aircraft | length > 0 %}
 {% for aircraft_block in report.aircraft %}
 <div class="span-6 {{"last" if loop.last or (loop.index0  - 2) % 4 == 0}}">
-<h4 style="margin-bottom:0;">{{aircraft_block.category}} {{loop.index}}</h4>
+<h4 style="margin-bottom:0;">{{aircraft_block.category|d('Unknown type aircraft', true)}} {{loop.index}}</h4>
 <span class="large">{{aircraft_block.year|d('', true)}} {{aircraft_block.make|d('', true)}} {{aircraft_block.model|d('', true)}}</span>
 <dl>
 {% if aircraft_block.flight_number != None %}
