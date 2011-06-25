@@ -2,21 +2,21 @@ from flask import Module
 
 from cadorsfeed.views.util import render_file
 
-about = Module(__name__)
+static = Module(__name__)
 
-@about.route('/')
-@about.route('/home')
+@static.route('/')
+@static.route('/home')
 def homepage():
     return render_file('index.html')
 
-@about.route('/disclaimer')
+@static.route('/disclaimer')
 def disclaimer():
     return render_file('disclaimer.html')
 
-@about.route('/about')
+@static.route('/about')
 def about_page():
     return render_file('about.html')
 
-@about.route('/privacy')
+@static.route('/privacy')
 def privacy_policy():
     return render_file('privacy.html')

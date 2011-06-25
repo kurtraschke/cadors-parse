@@ -20,12 +20,12 @@ def create_app(config):
     from cadorsfeed.views.report import report
     from cadorsfeed.views.category import category
     from cadorsfeed.views.search import search
-    from cadorsfeed.views.about import about
+    from cadorsfeed.views.static import static
     app.register_module(daily_report)
     app.register_module(report)
     app.register_module(category)
     app.register_module(search)
-    app.register_module(about)
+    app.register_module(static)
     app.add_url_rule('/favicon.ico', 'favicon',
                      redirect_to='/static/favicon.ico')
     db.init_app(app)
