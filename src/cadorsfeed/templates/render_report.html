@@ -1,4 +1,4 @@
-{% macro render_report(report) -%}
+{% macro render_report(report, single_report) -%}
 <div class="report" id="{{report.cadors_number}}">
 <section class="span-6">
 <h3>Occurrence Information</h3>
@@ -27,14 +27,13 @@
 <h3>Locations</h3>
 <p><a href="{{ report.link(format='kml', _external=True)}}" class="maplink">View {{ report.locations|length }} location{{ 's' if report.locations|length > 1}}</a></p>
 {% endif %}
-<p><a href="{{url_for('report.redirect_original', report=report.cadors_number)}}">View original report</a></p>
 </section>
 
 <div>
 <h3>Aircraft Information</h3>
 {% if report.aircraft | length > 0 %}
 {% for aircraft_block in report.aircraft %}
-<div class="span-6 {{"last" if loop.last or (loop.index0  - 2) % 4 == 0}}">
+<div class="span-6 {{"last" if loop.last or (loop.index0 - 2) % 4 == 0}}">
 <h4 style="margin-bottom:0;">{{aircraft_block.category|d('Unknown type aircraft', true)}} {{loop.index}}</h4>
 <span class="large">{{aircraft_block.year|d('', true)}} {{aircraft_block.make|d('', true)}} {{aircraft_block.model|d('', true)}}</span>
 <dl>
@@ -73,13 +72,26 @@
 <section class="narrative span-24 clear">
 <h3>Narrative</h3>
 {% for narrative_block in report.narrative_parts %}
-<h4 >Update {{loop.index}} by {{narrative_block.name}} on {{narrative_block.date.strftime('%Y-%m-%d')}}</h4>
+<h4>Update {{loop.index}} by {{narrative_block.name}} on {{narrative_block.date.strftime('%Y-%m-%d')}}</h4>
 {{narrative_block.narrative_html|safe}}
 {% endfor %}
 </section>
 
+{% if single_report %}
+<section class="resources span-24 clear">
+<h3>Resources</h3>
+<p>View in context:
+{% for daily_report in report.daily_reports %}
+<a href="{{daily_report.link(full=True)}}#{{report.cadors_number}}">{{daily_report.report_date_html|safe}}</a>&nbsp;
+{% endfor %}
+<br />
+<a href="{{url_for('report.redirect_original', report=report.cadors_number)}}">View original report</a>
+</p>
+</section>
+{% endif %}
+
 <div class="overlay">
-  <div class="map" style="width: 800px; height: 500px"></div>
+<div class="map" style="width: 800px; height: 500px"></div>
 </div>
 
 </div>

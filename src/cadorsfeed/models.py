@@ -42,6 +42,11 @@ class DailyReport(db.Model, DictMixin):
                               backref='daily_reports')
     __mapper_args__ = {'order_by': report_date.desc()}
 
+
+    @property
+    def report_date_html(self):
+        return self.report_date.strftime("%Y&#8209;%m&#8209;%d")
+
     @property
     def last_updated(self):
         return db.session.query(func.max(NarrativePart.date)).join(

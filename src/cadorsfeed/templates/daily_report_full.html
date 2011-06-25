@@ -23,7 +23,7 @@
 
 {% for report in reports %}
 <h2><a href="{{report.link()}}">Report {{report.cadors_number}}</a></h2>
-{{ rr.render_report(report) }}
+{{ rr.render_report(report, False) }}
 <div class="span-24 last"><p><a href="#top">Return to top</a></p></div>
 {{ "<hr>"|safe if not loop.last }}
 {% endfor %}
