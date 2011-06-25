@@ -5,6 +5,7 @@ from cadorsfeed.views.util import render_file
 about = Module(__name__)
 
 @about.route('/')
+@about.route('/home')
 def homepage():
     return render_file('index.html')
 
